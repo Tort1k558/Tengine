@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include"Renderer/Renderer.h"
+#include"Renderer/OpenGL/RendererContextOpenGL.h"
 #include"Window.h"
 
 #include<spdlog/spdlog.h>
@@ -69,11 +71,9 @@ void Application::init()
         return;
     }
 	m_window->init();
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        spdlog::critical("Failed to load glad!");
-        return;
-    }
+    Renderer::Init();
+
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui_ImplOpenGL3_Init();

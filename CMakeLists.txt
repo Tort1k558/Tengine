@@ -6,7 +6,12 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDART 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB TARGET_SRC "src/*.cpp" "src/*.h")
+set(SOURCE_DIRS 
+	"src/*.h" "src/*.cpp" 
+	"src/Renderer/*.h" "src/Renderer/*.cpp"
+	"src/Renderer/OpenGL/*.h" "src/Renderer/OpenGL/*.cpp"
+	)
+file(GLOB TARGET_SRC ${SOURCE_DIRS})
 
 include_directories(src)
   

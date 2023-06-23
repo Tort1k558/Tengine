@@ -2,9 +2,7 @@
 
 #include<string>
 #include<functional>
-#include<glad/glad.h>
 #include<GLFW/glfw3.h>
-
 #include"Event.h"
 class Window
 {
