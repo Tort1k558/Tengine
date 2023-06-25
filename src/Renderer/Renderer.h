@@ -12,8 +12,9 @@ class Renderer
 {
 public:
 	static void Init();
-	static void OnWindowResize(unsigned int widht,unsigned int height);
+	static void Render();
+	static void UpdateWindowSize(unsigned int widht,unsigned int height);
 	static RendererType GetType();
 private:
-	static std::shared_ptr<RendererContext> m_context;
+	static std::unique_ptr<RendererContext> m_context;
 };

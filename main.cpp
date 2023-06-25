@@ -1,7 +1,7 @@
 #include<glad/glad.h>
 #include <GLFW/glfw3.h>
 #include<spdlog/spdlog.h>
-#include"src/Application.h"
+#include"src/Core/Application.h"
 int main(int argc,char** argv)
 {
     spdlog::set_level(spdlog::level::debug);

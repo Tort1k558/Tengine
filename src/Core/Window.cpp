@@ -7,17 +7,25 @@
 Window::Window(unsigned int width, unsigned int height, std::string title) :
 	m_width(width), m_height(height), m_title(title), m_window(nullptr)
 {
-	
+
 }
 
 Window::~Window()
 {
 	glfwDestroyWindow(m_window);
+	glfwTerminate();
 }
 
 void Window::init()
 {
 	spdlog::debug("Creating a window named {0} size {1}x{2}", m_title, m_width, m_height);
+
+	if (!glfwInit())
+	{
+		spdlog::critical("Failed to load glfw!");
+		return;
+	}
+
 	m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 	if (!m_window)
 	{
@@ -92,7 +100,7 @@ void Window::init()
 	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 		{
 			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			Renderer::OnWindowResize(width, height);
+			Renderer::UpdateWindowSize(width, height);
 		});
 }
 

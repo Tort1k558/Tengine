@@ -9,8 +9,8 @@ void RendererContextOpenGL::init()
     }
     spdlog::info("OpenGL context");
     spdlog::info("OpenGL version: {0}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-    spdlog::info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     spdlog::info("Vendor: {0}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+    spdlog::info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
 }
 

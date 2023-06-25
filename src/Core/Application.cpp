@@ -3,6 +3,10 @@
 #include"Renderer/Renderer.h"
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
 #include"Window.h"
+#include"Renderer/VertexArray.h"
+#include"Renderer/VertexBuffer.h"
+#include"Renderer/IndexBuffer.h"
+#include"Renderer/Shader.h"
 
 #include<spdlog/spdlog.h>
 #include<GLFW/glfw3.h>
@@ -18,20 +22,22 @@ Application::Application(unsigned int width, unsigned int height, std::string ti
 
 Application::~Application()
 {
-    glfwTerminate();
+    
 }
 
-GLfloat points[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f
+GLfloat posCol[] =
+{
+//         Positions              Colors
+    -0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f,
+     0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 1.0f,
+    -0.5f,  0.5f, 0.0f,      1.0f, 0.0f, 1.0f,
+     0.5f, -0.5f, 0.0f,      1.0f, 1.0f, 0.0f
 };
-GLfloat colors[] = {
-     1.0f, 0.0f, 0.0f,
-     0.0f, 1.0f, 0.0f,
-     0.0f, 0.0f, 1.0f
+GLuint indices[] =
+{
+    0,1,2,
+    0,1,3
 };
-
 
 const char* vertexShader =
 R"(
@@ -48,7 +54,7 @@ R"(
     }
 )";
 
-const char* fragmenShader =
+const char* fragmentShader =
 R"(
     #version 460
 
@@ -61,18 +67,15 @@ R"(
     }
 )";
 
-GLuint shaderProgram;
-GLuint vao;
+std::shared_ptr<Shader> shader;
+std::shared_ptr<VertexArray> va;
+std::shared_ptr<VertexBuffer> vbPosCol;
+std::shared_ptr<IndexBuffer> ibPosCol;
+
 void Application::init()
 {
-    if (!glfwInit())
-    {
-        spdlog::critical("Failed to load glfw!");
-        return;
-    }
 	m_window->init();
     Renderer::Init();
-
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -113,59 +116,19 @@ void Application::init()
         {
             m_eventDispatcher.proccess(event);
         });
-
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertexShader, nullptr);
-    glCompileShader(vs);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vs, GL_COMPILE_STATUS, & success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vs, 512, nullptr, infoLog);
-        spdlog::critical("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n{0}", infoLog);
-    }
-
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragmenShader, nullptr);
-    glCompileShader(fs);
-
-    glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vs, 512, nullptr, infoLog);
-        spdlog::critical("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n{0}", infoLog);
-    }
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vs);
-    glAttachShader(shaderProgram, fs);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-
-    GLuint vboPoints;
-    glGenBuffers(1, &vboPoints);
-    glBindBuffer(GL_ARRAY_BUFFER, vboPoints);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
-
-    GLuint vboColors;
-    glGenBuffers(1, &vboColors);
-    glBindBuffer(GL_ARRAY_BUFFER, vboColors);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
     
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vboPoints);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, nullptr);
+    shader = Shader::Create();
+    shader->addShader(vertexShader, ShaderType::VertexShader);
+    shader->addShader(fragmentShader, ShaderType::FragmentShader);
+    shader->compile();
 
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, vboColors);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, nullptr);
-
+    va = VertexArray::Create();
+    vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
+    BufferLayout posCol({ {ElementType::Float3,false},{ElementType::Float3,false} });
+    vbPosCol->setLayout(posCol);
+    va->addVertexBuffer(vbPosCol);
+    ibPosCol = IndexBuffer::Create(indices, 6);
+    va->setIndexBuffer(ibPosCol);
 }
 
 void Application::run()
@@ -176,19 +139,10 @@ void Application::run()
         glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize.x = static_cast<float>(m_window->getWidth());
-        io.DisplaySize.y = static_cast<float>(m_window->getHeight());
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        shader->bind();
+        ibPosCol->bind();
+        va->bind();
+        glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT,0);
 
         m_window->update();
     }
