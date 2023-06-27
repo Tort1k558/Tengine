@@ -17,6 +17,7 @@ public:
 
 	void bind() override;
 	void unbind() override;
+	unsigned int getCountOfIndices() override { return m_count; }
 private:
 	GLuint m_id;
 	GLuint m_count;

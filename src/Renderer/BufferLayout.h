@@ -18,7 +18,7 @@ unsigned int GetCountOfElementType(ElementType type);
 unsigned int ElementTypeToSize(ElementType type);
 struct BufferElement
 {
-	BufferElement(ElementType type, bool normalized) :
+	BufferElement(ElementType type, bool normalized = false) :
 		type(type), normalized(normalized), offset(0){}
 	ElementType type;
 	bool normalized;
@@ -27,12 +27,14 @@ struct BufferElement
 class BufferLayout
 {
 public:
-	BufferLayout() = default;
+	BufferLayout();
 	BufferLayout(std::initializer_list<BufferElement> elements);
 	unsigned int getStride() { return m_stride; }
+	void push(BufferElement element);
 	std::vector<BufferElement>::iterator begin() { return m_elements.begin(); }
 	std::vector<BufferElement>::iterator end() { return m_elements.end(); }
 private:
+	void calculateStride();
 	std::vector<BufferElement> m_elements;
 	unsigned int m_stride;
 };

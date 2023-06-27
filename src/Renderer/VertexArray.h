@@ -15,6 +15,7 @@ public:
 
 	virtual void addVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
 	virtual void setIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
+	virtual unsigned int getCountOfIndices() = 0;
 
 	static std::shared_ptr<VertexArray> Create();
 };

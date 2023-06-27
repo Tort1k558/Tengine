@@ -1,8 +1,5 @@
 #include "VertexArrayOpenGL.h"
 
-#include "Renderer/IndexBuffer.h"
-#include "Renderer/VertexBuffer.h"
-
 int TypeOfElementTypeToGL(ElementType type)
 {
 	switch (type)

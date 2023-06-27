@@ -1,9 +1,28 @@
 #include "BufferLayout.h"
 
+
+BufferLayout::BufferLayout() :
+	m_elements({}), m_stride(0)
+{
+
+}
+
 BufferLayout::BufferLayout(std::initializer_list<BufferElement> elements) :
 	m_elements(elements), m_stride(0)
 {
+	calculateStride();
+}
+
+void BufferLayout::push(BufferElement element)
+{
+	m_elements.push_back(element);
+	calculateStride();
+}
+
+void BufferLayout::calculateStride()
+{
 	unsigned int offset = 0;
+	m_stride = 0;
 	for (auto& element : m_elements)
 	{
 		element.offset = offset;

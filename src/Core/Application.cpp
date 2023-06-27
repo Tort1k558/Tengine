@@ -14,6 +14,7 @@
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
 
+
 Application::Application(unsigned int width, unsigned int height, std::string title) :
     m_closeWindow(false)
 {
@@ -44,13 +45,15 @@ R"(
     #version 460
     layout(location = 0) in vec3 vertexPos;
     layout(location = 1) in vec3 vertexColor;
-
+    
     out vec3 color;
+    
+    uniform mat4 u_rotMatrix;
 
     void main()
     {
         color = vertexColor;
-        gl_Position = vec4(vertexPos,1.0);
+        gl_Position = u_rotMatrix * vec4(vertexPos,1.0);
     }
 )";
 
@@ -124,25 +127,30 @@ void Application::init()
 
     va = VertexArray::Create();
     vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
-    BufferLayout posCol({ {ElementType::Float3,false},{ElementType::Float3,false} });
+    BufferLayout posCol;
+    posCol.push({ ElementType::Float3 });
+    posCol.push({ ElementType::Float3 });
+
     vbPosCol->setLayout(posCol);
     va->addVertexBuffer(vbPosCol);
     ibPosCol = IndexBuffer::Create(indices, 6);
     va->setIndexBuffer(ibPosCol);
+    Mat4 rotateMatrix = RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), 1.0f);
+    shader->setUniformMat4("u_rotMatrix", rotateMatrix);
 }
 
 void Application::run()
 {
 
+    float delta = 0.0f;
     while (!m_closeWindow)
     {
+        delta += 0.001f;
         glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
         shader->bind();
-        ibPosCol->bind();
         va->bind();
-        glDrawElements(GL_TRIANGLES,6, GL_UNSIGNED_INT,0);
+        glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
 
         m_window->update();
     }

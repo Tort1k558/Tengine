@@ -2,6 +2,9 @@
 
 #include"Renderer/VertexArray.h"
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
+#include"Renderer/IndexBuffer.h"
+#include "Renderer/VertexBuffer.h"
+
 class VertexArrayOpenGL : public VertexArray
 {
 public:
@@ -18,6 +21,7 @@ public:
 
 	void addVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) override;
 	void setIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) override;
+	unsigned int getCountOfIndices() override { return m_indexBuffer->getCountOfIndices(); }
 private:
 	GLuint m_id;
 	std::shared_ptr<IndexBuffer> m_indexBuffer;

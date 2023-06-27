@@ -28,3 +28,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
 
 add_subdirectory(external/imgui ${CMAKE_CURRENT_BINARY_DIR}/external/imgui)
 target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
+
+add_subdirectory(external/glm ${CMAKE_CURRENT_BINARY_DIR}/external/glm)
+target_link_libraries(${PROJECT_NAME} PRIVATE glm)
