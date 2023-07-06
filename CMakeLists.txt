@@ -8,8 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_DIRS 
 	"src/Core/*.h" "src/Core/*.cpp" 
+	"src/ECS/*.h" "src/ECS/*.cpp" 
 	"src/Renderer/*.h" "src/Renderer/*.cpp"
 	"src/Renderer/OpenGL/*.h" "src/Renderer/OpenGL/*.cpp"
+	"src/Systems/*.h" "src/Systems/*.cpp"
 	)
 file(GLOB TARGET_SRC ${SOURCE_DIRS})
 

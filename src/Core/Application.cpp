@@ -7,7 +7,7 @@
 #include"Renderer/VertexBuffer.h"
 #include"Renderer/IndexBuffer.h"
 #include"Renderer/Shader.h"
-#include"Object.h"
+#include"ECS/Object.h"
 
 #include<spdlog/spdlog.h>
 #include<GLFW/glfw3.h>
@@ -76,6 +76,16 @@ std::shared_ptr<VertexArray> va;
 std::shared_ptr<VertexBuffer> vbPosCol;
 std::shared_ptr<IndexBuffer> ibPosCol;
 
+struct PositionComponent : public Component
+{
+    Vec3 pos;
+};
+
+struct VelocityComponent : public Component
+{
+    Vec3 velocity;
+};
+
 void Application::init()
 {
 	m_window->init();
@@ -141,11 +151,20 @@ void Application::init()
     std::shared_ptr<Object> object = Object::Create();
     std::shared_ptr<Object> object2 = Object::Create();
     std::shared_ptr<Object> object3 = Object::Create();
+
+    std::shared_ptr<PositionComponent> posComp = Component::Create<PositionComponent>();
+    std::shared_ptr<VelocityComponent> velComp = Component::Create<VelocityComponent>();
+    posComp->pos = Vec3(1.0f, 10.0f, -40.0f);
+    velComp->velocity= Vec3(99.0f, 10.0f, -5.0f);
+    object->addComponent<PositionComponent>(posComp);
+    object->addComponent<VelocityComponent>(velComp);
+    object2->addComponent<VelocityComponent>(velComp);
 }
 
 void Application::run()
 {
-
+    auto positionComponents = ComponentManager::getComponents<PositionComponent>();
+    auto velocityComponents = ComponentManager::getComponents<VelocityComponent>();
     float delta = 0.0f;
     while (!m_closeWindow)
     {
