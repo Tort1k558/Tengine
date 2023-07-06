@@ -8,6 +8,7 @@
 #include"Renderer/IndexBuffer.h"
 #include"Renderer/Shader.h"
 #include"ECS/Object.h"
+#include"Timer.h"
 
 #include<spdlog/spdlog.h>
 #include<GLFW/glfw3.h>
@@ -165,18 +166,19 @@ void Application::run()
 {
     auto positionComponents = ComponentManager::getComponents<PositionComponent>();
     auto velocityComponents = ComponentManager::getComponents<VelocityComponent>();
-    float delta = 0.0f;
+    double delta = 0.0f;
     while (!m_closeWindow)
     {
-        delta += 0.001f;
+        Timer::Start();
+        delta += Timer::GetDeltaTime() * 10000;
         glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         shader->setUniformMat4("u_rotMatrix", RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), delta));
         shader->bind();
         va->bind();
         glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
-
         m_window->update();
+        spdlog::info("FPS:{0}", 1.0 / Timer::GetDeltaTime());
     }
 }
 
