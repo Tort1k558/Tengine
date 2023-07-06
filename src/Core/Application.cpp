@@ -7,6 +7,7 @@
 #include"Renderer/VertexBuffer.h"
 #include"Renderer/IndexBuffer.h"
 #include"Renderer/Shader.h"
+#include"Object.h"
 
 #include<spdlog/spdlog.h>
 #include<GLFW/glfw3.h>
@@ -135,8 +136,11 @@ void Application::init()
     va->addVertexBuffer(vbPosCol);
     ibPosCol = IndexBuffer::Create(indices, 6);
     va->setIndexBuffer(ibPosCol);
-    Mat4 rotateMatrix = RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), 1.0f);
-    shader->setUniformMat4("u_rotMatrix", rotateMatrix);
+    shader->setUniformMat4("u_rotMatrix", RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), 5.3f));
+
+    std::shared_ptr<Object> object = Object::Create();
+    std::shared_ptr<Object> object2 = Object::Create();
+    std::shared_ptr<Object> object3 = Object::Create();
 }
 
 void Application::run()
@@ -148,6 +152,7 @@ void Application::run()
         delta += 0.001f;
         glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        shader->setUniformMat4("u_rotMatrix", RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), delta));
         shader->bind();
         va->bind();
         glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
