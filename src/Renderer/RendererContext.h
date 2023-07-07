@@ -4,6 +4,12 @@
 
 enum class RendererType;
 
+enum class RendererType
+{
+	None = 0,
+	OpenGL
+};
+
 class RendererContext
 {
 public:

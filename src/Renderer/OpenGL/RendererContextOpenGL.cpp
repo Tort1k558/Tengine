@@ -1,5 +1,5 @@
 #include "RendererContextOpenGL.h"
-#include "Renderer/Renderer.h"
+
 void RendererContextOpenGL::init()
 {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -21,7 +21,8 @@ void RendererContextOpenGL::setViewport(unsigned int x0, unsigned int y0, unsign
 
 void RendererContextOpenGL::drawIndexed(std::shared_ptr<VertexArray> va)
 {
-
+    va->bind();
+    glDrawElements(GL_TRIANGLES, va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
 }
 
 RendererType RendererContextOpenGL::getType()

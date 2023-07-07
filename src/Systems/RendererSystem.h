@@ -1,18 +1,12 @@
 #pragma once
 
-#include"RendererContext.h"
+#include"Renderer/RendererContext.h"
 #include<memory>
-enum class RendererType
-{
-	None = 0,
-	OpenGL
-};
-
-class Renderer
+class RendererSystem
 {
 public:
 	static void Init();
-	static void Render();
+	static void Update();
 	static void UpdateWindowSize(unsigned int widht,unsigned int height);
 	static RendererType GetType();
 private:

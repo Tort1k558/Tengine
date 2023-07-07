@@ -1,20 +1,26 @@
 #include "ObjectManager.h"
 
-std::vector<std::shared_ptr<Object>> ObjectManager::m_objects = {};
+std::unordered_map<size_t, std::shared_ptr<Object>> ObjectManager::m_objects = {};
 
-std::shared_ptr<Object> ObjectManager::getObjectById(unsigned int id)
+std::shared_ptr<Object> ObjectManager::getObjectById(size_t id)
 {
-	for (const auto& obj : m_objects)
+	if (m_objects.at(id))
 	{
-		if (obj->getId() == id)
-		{
-			return obj;
-		}
+		return m_objects[id];
 	}
-	return nullptr;
+}
+
+std::vector<std::shared_ptr<Object>> ObjectManager::getAllObjects()
+{
+	std::vector<std::shared_ptr<Object>> objects;
+	for (const auto& object : m_objects)
+	{
+		objects.push_back(object.second);
+	}
+	return objects;
 }
 
 void ObjectManager::addObject(std::shared_ptr<Object> object)
 {
-	m_objects.push_back(object);
+	m_objects[object->getId()] = object;
 }

@@ -3,7 +3,7 @@
 #include<spdlog/spdlog.h>
 #include<imgui/imgui.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
-#include"Renderer/Renderer.h"
+#include"Systems/RendererSystem.h"
 Window::Window(unsigned int width, unsigned int height, std::string title) :
 	m_width(width), m_height(height), m_title(title), m_window(nullptr)
 {
@@ -100,7 +100,7 @@ void Window::init()
 	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 		{
 			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			Renderer::UpdateWindowSize(width, height);
+			RendererSystem::UpdateWindowSize(width, height);
 		});
 }
 

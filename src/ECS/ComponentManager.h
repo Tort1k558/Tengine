@@ -21,13 +21,13 @@ public:
 		}
 		return components;
 	}
-	static std::vector<std::shared_ptr<Component>> getAllObjectComponents(unsigned int idObjcet);
+	static std::vector<std::shared_ptr<Component>> getAllObjectComponents(size_t idObjcet);
 	static std::vector<std::shared_ptr<Component>> getAllComponents();
 private:
-	static void addComponent(std::shared_ptr<Component> component, unsigned int idObject);
+	static void addComponent(std::shared_ptr<Component> component, size_t idObject);
 
 	template<typename T>
-	static void removeComponent(unsigned int idObject)
+	static void removeComponent(size_t idObject)
 	{
 		for (size_t i = 0; i < m_components.size(); i++)
 		{
@@ -42,7 +42,7 @@ private:
 		}
 	}
 
-	static std::vector<std::pair<unsigned int, std::shared_ptr<Component>>> m_components;
+	static std::vector<std::pair<size_t, std::shared_ptr<Component>>> m_components;
 
 	friend class Object;
 };

@@ -1,6 +1,7 @@
 #include "Application.h"
 
-#include"Renderer/Renderer.h"
+#include"Systems/RendererSystem.h"
+#include"Systems/SystemManager.h"
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
 #include"Window.h"
 #include"Renderer/VertexArray.h"
@@ -90,8 +91,8 @@ struct VelocityComponent : public Component
 void Application::init()
 {
 	m_window->init();
-    Renderer::Init();
-
+    SystemManager::AddSystem<RendererSystem>();
+    SystemManager::InitSystems();
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui_ImplOpenGL3_Init();
@@ -177,6 +178,7 @@ void Application::run()
         shader->bind();
         va->bind();
         glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
+        SystemManager::UpdateSystems();
         m_window->update();
         spdlog::info("FPS:{0}", 1.0 / Timer::GetDeltaTime());
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include<vector>
+#include<unordered_map>
 #include<memory>
 
 #include"Object.h"
@@ -8,10 +8,10 @@ class Object;
 class ObjectManager
 {
 public:
-	static std::shared_ptr<Object> getObjectById(unsigned int id);
-	static std::vector<std::shared_ptr<Object>> getAllObjects() { return m_objects; }
+	static std::shared_ptr<Object> getObjectById(size_t id);
+	static std::vector<std::shared_ptr<Object>> getAllObjects();
 private:
 	static void addObject(std::shared_ptr<Object> object);
-	static std::vector<std::shared_ptr<Object>> m_objects;
+	static std::unordered_map<size_t,std::shared_ptr<Object>> m_objects;
 	friend class Object;
 };
