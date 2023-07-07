@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDART 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_DIRS 
+	"src/Components/*.h" "src/Components/*.cpp" 
 	"src/Core/*.h" "src/Core/*.cpp" 
 	"src/ECS/*.h" "src/ECS/*.cpp" 
 	"src/Renderer/*.h" "src/Renderer/*.cpp"

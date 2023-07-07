@@ -10,6 +10,7 @@
 #include"Renderer/Shader.h"
 #include"ECS/Object.h"
 #include"Timer.h"
+#include"Components/Transform.h"
 
 #include<spdlog/spdlog.h>
 #include<GLFW/glfw3.h>
@@ -78,16 +79,6 @@ std::shared_ptr<VertexArray> va;
 std::shared_ptr<VertexBuffer> vbPosCol;
 std::shared_ptr<IndexBuffer> ibPosCol;
 
-struct PositionComponent : public Component
-{
-    Vec3 pos;
-};
-
-struct VelocityComponent : public Component
-{
-    Vec3 velocity;
-};
-
 void Application::init()
 {
 	m_window->init();
@@ -148,25 +139,21 @@ void Application::init()
     va->addVertexBuffer(vbPosCol);
     ibPosCol = IndexBuffer::Create(indices, 6);
     va->setIndexBuffer(ibPosCol);
-    shader->setUniformMat4("u_rotMatrix", RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), 5.3f));
 
     std::shared_ptr<Object> object = Object::Create();
     std::shared_ptr<Object> object2 = Object::Create();
     std::shared_ptr<Object> object3 = Object::Create();
 
-    std::shared_ptr<PositionComponent> posComp = Component::Create<PositionComponent>();
-    std::shared_ptr<VelocityComponent> velComp = Component::Create<VelocityComponent>();
-    posComp->pos = Vec3(1.0f, 10.0f, -40.0f);
-    velComp->velocity= Vec3(99.0f, 10.0f, -5.0f);
-    object->addComponent<PositionComponent>(posComp);
-    object->addComponent<VelocityComponent>(velComp);
-    object2->addComponent<VelocityComponent>(velComp);
+    std::shared_ptr<Transform> transform = Component::Create<Transform>();
+    transform->setRotation({ 0.0f,0.0f,90.0f });
+    transform->setScale({ 2.0f,1.0f,1.0f });
+    transform->setPosition({ 0.5f,0.0f,0.0f });
+    object->addComponent(transform);
 }
 
 void Application::run()
 {
-    auto positionComponents = ComponentManager::getComponents<PositionComponent>();
-    auto velocityComponents = ComponentManager::getComponents<VelocityComponent>();
+    std::shared_ptr<Transform> transform = ComponentManager::getComponents<Transform>()[0];
     double delta = 0.0f;
     while (!m_closeWindow)
     {
@@ -174,7 +161,8 @@ void Application::run()
         delta += Timer::GetDeltaTime() * 10000;
         glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        shader->setUniformMat4("u_rotMatrix", RotateMatrix<Mat4>(Mat4(1.0f), Vec3(1.0f), delta));
+        transform->setRotation( {delta, delta, delta });
+        shader->setUniformMat4("u_rotMatrix", transform->getMatrix());
         shader->bind();
         va->bind();
         glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
