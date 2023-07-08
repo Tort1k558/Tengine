@@ -22,9 +22,10 @@ inline Mat4 TranslateMatrix(Mat4& matrix, Vec3 position)
 	return glm::translate(matrix, position);
 }
 
+//The angle of rotation is indicated in degrees!
 inline Mat4 GetRotationMatrix(Vec3 angles)
 {
-	return glm::yawPitchRoll(angles.y, angles.x, angles.z);
+	return glm::yawPitchRoll(glm::radians(angles.y), glm::radians(angles.x), glm::radians(angles.z));
 }
 
 inline Mat4 GetScaleMatrix(Vec3 scale)

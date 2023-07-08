@@ -27,6 +27,16 @@ void RendererContextOpenGL::drawIndexed(std::shared_ptr<VertexArray> va)
     glDrawElements(GL_TRIANGLES, va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
 }
 
+void RendererContextOpenGL::clear()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void RendererContextOpenGL::clearColor(Vec4 color)
+{
+    glClearColor(color.r, color.g, color.b, color.a);
+}
+
 RendererType RendererContextOpenGL::getType()
 {
 	return RendererType::OpenGL;

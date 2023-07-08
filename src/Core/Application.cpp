@@ -83,8 +83,10 @@ std::shared_ptr<IndexBuffer> ibPosCol;
 void Application::init()
 {
 	m_window->init();
+
     SystemManager::AddSystem<RendererSystem>();
     SystemManager::InitSystems();
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui_ImplOpenGL3_Init();
@@ -142,8 +144,6 @@ void Application::init()
     va->setIndexBuffer(ibPosCol);
 
     std::shared_ptr<Object> object = Object::Create();
-    std::shared_ptr<Object> object2 = Object::Create();
-    std::shared_ptr<Object> object3 = Object::Create();
 
     std::shared_ptr<Transform> transform = Component::Create<Transform>();
     transform->setRotation({ 0.0f,0.0f,90.0f });
@@ -159,17 +159,16 @@ void Application::run()
     while (!m_closeWindow)
     {
         Timer::Start();
-        delta += Timer::GetDeltaTime() * 10000;
-        glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        delta += Timer::GetDeltaTime() * 500000;
+        SystemManager::UpdateSystems();
+
         transform->setRotation( {delta, delta, delta });
         shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
         shader->bind();
         va->bind();
         glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
-        SystemManager::UpdateSystems();
         m_window->update();
-        Logger::Info("FPS:{0}", 1.0 / Timer::GetDeltaTime());
+        Logger::Info("FPS::{0}", 1.0 / Timer::GetDeltaTime());
     }
 }
 

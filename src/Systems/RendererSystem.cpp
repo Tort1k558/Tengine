@@ -10,7 +10,9 @@ void RendererSystem::Init()
 
 void RendererSystem::Update()
 {
-	
+	m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f});
+	m_context->clear();
+
 }
 
 void RendererSystem::UpdateWindowSize(unsigned int widht, unsigned int height)

@@ -23,18 +23,23 @@ void Window::init()
 
 	if (!glfwInit())
 	{
-		Logger::Critical("Failed to load glfw!");
+		Logger::Critical("ERROR::GLFW::Failed to load glfw!");
 		return;
 	}
 
 	m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 	if (!m_window)
 	{
-		Logger::Critical("Failed to create a window!");
+		Logger::Critical("ERROR::GLFW::Failed to create a window!");
 		return;
 	}
+
 	glfwMakeContextCurrent(m_window);
 
+	glfwSetErrorCallback([](int error_code, const char* description) 
+		{
+			Logger::Critical("ERROR::GLFW::{0}",description);
+		});
 	glfwSetWindowUserPointer(m_window, this);
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double x, double y)
 		{

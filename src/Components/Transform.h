@@ -7,6 +7,7 @@ class Transform : public Component
 public:
 	Transform();
 	Transform(Vec3 position, Vec3 rotation, Vec3 scale);
+
 	Transform& setPosition(Vec3 position);
 	Transform& setRotation(Vec3 angles);
 	Transform& setScale(Vec3 scale);
