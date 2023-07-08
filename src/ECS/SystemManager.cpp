@@ -1,20 +1,19 @@
 #include "SystemManager.h"
 
-std::unordered_map<size_t, std::function<void()>> SystemManager::m_systemUpdateCalls = {};
-std::unordered_map<size_t, std::function<void()>> SystemManager::m_systemInitCalls = {};
+std::unordered_map<size_t, std::shared_ptr<System>> SystemManager::m_systems;
 
 void SystemManager::InitSystems()
 {
-	for (const auto& call : m_systemInitCalls)
+	for (auto& system : m_systems)
 	{
-		call.second();
+		system.second->init();
 	}
 }
 
 void SystemManager::UpdateSystems()
 {
-	for (const auto& call : m_systemUpdateCalls)
+	for (auto& system : m_systems)
 	{
-		call.second();
+		system.second->update();
 	}
 }

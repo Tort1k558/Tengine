@@ -6,17 +6,15 @@
 #include<imgui/backends/imgui_impl_glfw.h>
 
 #include"Core/Window.h"
+#include"ECS/System.h"
 
-class UISystem
+class UISystem : public System
 {
 public:
-	UISystem() = delete;
-	UISystem(const UISystem&) = delete;
-	UISystem& operator=(const UISystem&) = delete;
-	
-	static void Init();
-	static void Update();
-	static void SetWindow(std::shared_ptr<Window> window);
+	void init() final;
+	void update() final;
+	void destroy() final;
+	void setWindow(std::shared_ptr<Window> window);
 private:
-	static std::shared_ptr<Window> m_window;
+	std::shared_ptr<Window> m_window;
 };

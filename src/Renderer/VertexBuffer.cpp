@@ -11,7 +11,7 @@ void VertexBuffer::setLayout(BufferLayout layout)
 
 std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int size, BufferUsage usage)
 {
-	switch (RendererSystem::GetType())
+	switch (System::GetInstance<RendererSystem>()->getType())
 	{
 	case RendererType::None:
 		Logger::Critical("ERROR::Renderer not initialized!");

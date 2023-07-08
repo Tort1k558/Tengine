@@ -6,7 +6,7 @@
 
 std::shared_ptr<IndexBuffer> IndexBuffer::Create(unsigned int* indices, unsigned int count)
 {
-	switch (RendererSystem::GetType())
+	switch (System::GetInstance<RendererSystem>()->getType())
 	{
 	case RendererType::None:
 		Logger::Critical("ERROR::Renderer not initialized!");

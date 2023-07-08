@@ -2,6 +2,7 @@
 
 #include<functional>
 #include<unordered_map>
+#include"System.h"
 class SystemManager
 {
 public:
@@ -12,19 +13,16 @@ public:
 	template<typename T>
 	static void AddSystem()
 	{
-		m_systemUpdateCalls[typeid(T).hash_code()] = T::Update;
-		m_systemInitCalls[typeid(T).hash_code()] = T::Init;
+		m_systems[typeid(T).hash_code()] = System::GetInstance<T>();
 	}
 	template<typename T>
 	static void RemoveSystem()
 	{
-		m_systemUpdateCalls.erase(typeid(T));
-		m_systemInitCalls.erase(typeid(T));
+		m_systems.erase(typeid(T));
 	}
 	static void InitSystems();
 	static void UpdateSystems();
-private:
 
-	static std::unordered_map<size_t, std::function<void()>> m_systemUpdateCalls;
-	static std::unordered_map<size_t, std::function<void()>> m_systemInitCalls;
+private:
+	static std::unordered_map<size_t, std::shared_ptr<System>> m_systems;
 };

@@ -106,7 +106,7 @@ void Window::init()
 	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 		{
 			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			RendererSystem::UpdateWindowSize(width, height);
+			System::GetInstance<RendererSystem>()->updateWindowSize(width, height);
 		});
 }
 

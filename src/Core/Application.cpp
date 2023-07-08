@@ -81,8 +81,9 @@ void Application::init()
 {
 	m_window->init();
 
+    System::GetInstance<RendererSystem>()->setRendererType(RendererType::OpenGL);
     SystemManager::AddSystem<RendererSystem>();
-    UISystem::SetWindow(m_window);
+    System::GetInstance<UISystem>()->setWindow(m_window);
     SystemManager::AddSystem<UISystem>();
 
     SystemManager::InitSystems();

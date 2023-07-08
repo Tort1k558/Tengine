@@ -7,7 +7,7 @@
 
 std::shared_ptr<Shader> Shader::Create()
 {
-	switch (RendererSystem::GetType())
+	switch (System::GetInstance<RendererSystem>()->getType())
 	{
 	case RendererType::None:
 		Logger::Critical("ERROR::Renderer not initialized!");

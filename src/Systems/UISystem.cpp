@@ -1,8 +1,6 @@
 #include "UISystem.h"
 
-std::shared_ptr<Window> UISystem::m_window = nullptr;
-
-void UISystem::Init()
+void UISystem::init()
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -10,7 +8,7 @@ void UISystem::Init()
     ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
 }
 
-void UISystem::Update()
+void UISystem::update()
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -22,7 +20,14 @@ void UISystem::Update()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void UISystem::SetWindow(std::shared_ptr<Window> window)
+void UISystem::destroy()
+{
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
+void UISystem::setWindow(std::shared_ptr<Window> window)
 {
     m_window = window;
 }

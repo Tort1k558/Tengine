@@ -1,18 +1,18 @@
 #pragma once
 
 #include"Renderer/RendererContext.h"
+#include"ECS/System.h"
 #include<memory>
-class RendererSystem
+class RendererSystem : public System
 {
 public:
-	RendererSystem() = delete;
-	RendererSystem(const RendererSystem&) = delete;
-	RendererSystem& operator=(const RendererSystem&) = delete;
-
-	static void Init();
-	static void Update();
-	static void UpdateWindowSize(unsigned int widht,unsigned int height);
-	static RendererType GetType();
+	void init() final;
+	void update() final;
+	void destroy() final;
+	void updateWindowSize(unsigned int widht,unsigned int height);
+	void setRendererType(RendererType type);
+	RendererType getType();
 private:
-	static std::unique_ptr<RendererContext> m_context;
+	std::unique_ptr<RendererContext> m_context;
+	RendererType m_rendererType;
 };
