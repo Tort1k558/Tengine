@@ -1,7 +1,6 @@
 #include "Application.h"
 
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
-#include"Window.h"
 #include"Renderer/VertexArray.h"
 #include"Renderer/VertexBuffer.h"
 #include"Renderer/IndexBuffer.h"
@@ -11,12 +10,10 @@
 #include"Timer.h"
 #include"Components/Transform.h"
 #include"Systems/RendererSystem.h"
+#include"Systems/UISystem.h"
 #include"Logger.h"
 
 #include<GLFW/glfw3.h>
-#include<imgui/imgui.h>
-#include<imgui/backends/imgui_impl_opengl3.h>
-#include<imgui/backends/imgui_impl_glfw.h>
 
 
 
@@ -85,12 +82,10 @@ void Application::init()
 	m_window->init();
 
     SystemManager::AddSystem<RendererSystem>();
-    SystemManager::InitSystems();
+    UISystem::SetWindow(m_window);
+    SystemManager::AddSystem<UISystem>();
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGui_ImplOpenGL3_Init();
-    ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(),true);
+    SystemManager::InitSystems();
 
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)

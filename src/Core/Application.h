@@ -4,6 +4,8 @@
 #include<memory>
 #include"Event.h"
 
+class Window;
+
 class Application
 {
 public:
@@ -17,7 +19,7 @@ public:
 	void init();
 	void run();
 private:
-	std::shared_ptr<class Window> m_window;
+	std::shared_ptr<Window> m_window;
 	EventDispatcher m_eventDispatcher;
 	bool m_closeWindow;
 };

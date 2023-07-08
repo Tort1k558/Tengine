@@ -5,9 +5,14 @@
 
 #include"Component.h"
 #include"Object.h"
+
 class ComponentManager
 {
 public:
+	ComponentManager() = delete;
+	ComponentManager(const ComponentManager&) = delete;
+	ComponentManager& operator=(const ComponentManager&) = delete;
+
 	template<typename T>
 	static std::vector<std::shared_ptr<T>> getComponents()
 	{

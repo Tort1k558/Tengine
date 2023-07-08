@@ -8,6 +8,10 @@ class Object;
 class ObjectManager
 {
 public:
+	ObjectManager() = delete;
+	ObjectManager(const ObjectManager&) = delete;
+	ObjectManager& operator=(const ObjectManager&) = delete;
+
 	static std::shared_ptr<Object> getObjectById(size_t id);
 	static std::vector<std::shared_ptr<Object>> getAllObjects();
 private:
