@@ -2,7 +2,7 @@
 
 #include"Systems/RendererSystem.h"
 #include"OpenGL/ShaderOpenGL.h"
-#include<spdlog/spdlog.h>
+#include"Core/Logger.h"
 
 
 std::shared_ptr<Shader> Shader::Create()
@@ -10,7 +10,7 @@ std::shared_ptr<Shader> Shader::Create()
 	switch (RendererSystem::GetType())
 	{
 	case RendererType::None:
-		spdlog::critical("ERROR::Renderer not initialized!");
+		Logger::Critical("ERROR::Renderer not initialized!");
 		return nullptr;
 	case RendererType::OpenGL:
 		return std::make_shared<ShaderOpenGL>();

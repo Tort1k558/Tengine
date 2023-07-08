@@ -1,16 +1,18 @@
 #include "RendererContextOpenGL.h"
 
+#include"Core/Logger.h"
+
 void RendererContextOpenGL::init()
 {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        spdlog::critical("Failed to load glad!");
+        Logger::Critical("Failed to load glad!");
         return;
     }
-    spdlog::info("OpenGL context");
-    spdlog::info("OpenGL version: {0}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
-    spdlog::info("Vendor: {0}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
-    spdlog::info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
+    Logger::Info("OpenGL context");
+    Logger::Info("OpenGL version: {0}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+    Logger::Info("Vendor: {0}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
+    Logger::Info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
 
 }
 

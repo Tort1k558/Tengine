@@ -1,7 +1,5 @@
 #include "Application.h"
 
-#include"Systems/RendererSystem.h"
-#include"Systems/SystemManager.h"
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
 #include"Window.h"
 #include"Renderer/VertexArray.h"
@@ -9,14 +7,17 @@
 #include"Renderer/IndexBuffer.h"
 #include"Renderer/Shader.h"
 #include"ECS/Object.h"
+#include"ECS/SystemManager.h"
 #include"Timer.h"
 #include"Components/Transform.h"
+#include"Systems/RendererSystem.h"
+#include"Logger.h"
 
-#include<spdlog/spdlog.h>
 #include<GLFW/glfw3.h>
 #include<imgui/imgui.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
+
 
 
 Application::Application(unsigned int width, unsigned int height, std::string title) :
@@ -52,12 +53,12 @@ R"(
     
     out vec3 color;
     
-    uniform mat4 u_rotMatrix;
+    uniform mat4 u_modelMatrix;
 
     void main()
     {
         color = vertexColor;
-        gl_Position = u_rotMatrix * vec4(vertexPos,1.0);
+        gl_Position = u_modelMatrix * vec4(vertexPos,1.0);
     }
 )";
 
@@ -92,32 +93,32 @@ void Application::init()
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
         {
-            //spdlog::debug("EVENT::The Mouse Moved to {0}x{1}", event.xPos, event.yPos);
+            //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.xPos, event.yPos);
         });
     m_eventDispatcher.addEvent<EventMouseButtonPressed>([](EventMouseButtonPressed& event)
         {
-            spdlog::debug("EVENT::The mouse button is pressed with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
+            Logger::Debug("EVENT::The mouse button is pressed with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
         });
     m_eventDispatcher.addEvent<EventMouseButtonReleased>([](EventMouseButtonReleased& event)
         {
-            spdlog::debug("EVENT::The mouse button is released with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
+            Logger::Debug("EVENT::The mouse button is released with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
         });
     m_eventDispatcher.addEvent<EventKeyPressed>([&](EventKeyPressed& event)
         {
-            spdlog::debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(event.code));
+            Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(event.code));
         });
     m_eventDispatcher.addEvent<EventKeyReleased>([&](EventKeyReleased& event)
         {
-            spdlog::debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(event.code));;
+            Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(event.code));;
         });
     m_eventDispatcher.addEvent<EventWindowClose>([&](EventWindowClose& event)
         {
-            spdlog::debug("EVENT::The Window closed");
+            Logger::Debug("EVENT::The Window closed");
             m_closeWindow = true;
         });
     m_eventDispatcher.addEvent<EventWindowResize>([&](EventWindowResize& event)
         {
-            spdlog::debug("EVENT::The Window resized to {0}x{1}", event.x, event.y);
+            Logger::Debug("EVENT::The Window resized to {0}x{1}", event.x, event.y);
         });
     m_window->setEventCallback([&](Event& event)
         {
@@ -162,13 +163,13 @@ void Application::run()
         glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         transform->setRotation( {delta, delta, delta });
-        shader->setUniformMat4("u_rotMatrix", transform->getMatrix());
+        shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
         shader->bind();
         va->bind();
         glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
         SystemManager::UpdateSystems();
         m_window->update();
-        spdlog::info("FPS:{0}", 1.0 / Timer::GetDeltaTime());
+        Logger::Info("FPS:{0}", 1.0 / Timer::GetDeltaTime());
     }
 }
 

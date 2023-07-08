@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include<string>
-#include<spdlog/spdlog.h>
+
 enum class ElementType
 {
 	Float,

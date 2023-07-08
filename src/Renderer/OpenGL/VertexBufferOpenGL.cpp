@@ -1,5 +1,7 @@
 #include "VertexBufferOpenGL.h"
 
+#include"Core/Logger.h"
+
 int bufferUsageToOpenGL(BufferUsage usage)
 {
 	switch (usage)
@@ -9,7 +11,7 @@ int bufferUsageToOpenGL(BufferUsage usage)
 	case BufferUsage::Dynamic:
 		return GL_DYNAMIC_DRAW;
 	default:
-		spdlog::critical("ERROR::SHADER::Unknown type of Vertex Buffer: {0}", static_cast<int>(usage));
+		Logger::Critical("ERROR::SHADER::Unknown type of Vertex Buffer: {0}", static_cast<int>(usage));
 		break;
 	}
 	return 0;

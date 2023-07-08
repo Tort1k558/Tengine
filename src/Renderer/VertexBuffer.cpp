@@ -2,7 +2,7 @@
 
 #include"Systems/RendererSystem.h"
 #include"OpenGL/VertexBufferOpenGL.h"
-#include<spdlog/spdlog.h>
+#include"Core/Logger.h"
 
 void VertexBuffer::setLayout(BufferLayout layout)
 {
@@ -14,7 +14,7 @@ std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int
 	switch (RendererSystem::GetType())
 	{
 	case RendererType::None:
-		spdlog::critical("ERROR::Renderer not initialized!");
+		Logger::Critical("ERROR::Renderer not initialized!");
 		return nullptr;
 	case RendererType::OpenGL:
 		return std::make_shared<VertexBufferOpenGL>(vertices, size, usage);

@@ -1,9 +1,10 @@
 #include "Window.h"
 
-#include<spdlog/spdlog.h>
 #include<imgui/imgui.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
+
 #include"Systems/RendererSystem.h"
+#include"Core/Logger.h"
 Window::Window(unsigned int width, unsigned int height, std::string title) :
 	m_width(width), m_height(height), m_title(title), m_window(nullptr)
 {
@@ -18,18 +19,18 @@ Window::~Window()
 
 void Window::init()
 {
-	spdlog::debug("Creating a window named {0} size {1}x{2}", m_title, m_width, m_height);
+	Logger::Info("Creating a window named {0} size {1}x{2}", m_title, m_width, m_height);
 
 	if (!glfwInit())
 	{
-		spdlog::critical("Failed to load glfw!");
+		Logger::Critical("Failed to load glfw!");
 		return;
 	}
 
 	m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 	if (!m_window)
 	{
-		spdlog::critical("Failed to create a window!");
+		Logger::Critical("Failed to create a window!");
 		return;
 	}
 	glfwMakeContextCurrent(m_window);

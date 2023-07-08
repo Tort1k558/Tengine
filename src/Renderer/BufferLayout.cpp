@@ -1,5 +1,5 @@
 #include "BufferLayout.h"
-
+#include "Core/Logger.h"
 
 BufferLayout::BufferLayout() :
 	m_elements({}), m_stride(0)
@@ -79,7 +79,7 @@ unsigned int ElementTypeToSize(ElementType type)
 	case ElementType::Bool:
 		return 1;
 	default:
-		spdlog::critical("ERROR::Unknown element type");
+		Logger::Critical("ERROR::Unknown element type");
 		break;
 	}
 	return 0;

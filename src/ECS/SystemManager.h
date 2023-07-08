@@ -2,10 +2,13 @@
 
 #include<functional>
 #include<unordered_map>
-#include"RendererSystem.h"
 class SystemManager
 {
 public:
+	SystemManager() = delete;
+	SystemManager(const SystemManager&) = delete;
+	SystemManager& operator=(const SystemManager&) = delete;
+
 	template<typename T>
 	static void AddSystem()
 	{
@@ -13,7 +16,7 @@ public:
 		m_systemInitCalls[typeid(T).hash_code()] = T::Init;
 	}
 	template<typename T>
-	static void removeSystem()
+	static void RemoveSystem()
 	{
 		m_systemUpdateCalls.erase(typeid(T));
 		m_systemInitCalls.erase(typeid(T));
@@ -21,6 +24,7 @@ public:
 	static void InitSystems();
 	static void UpdateSystems();
 private:
+
 	static std::unordered_map<size_t, std::function<void()>> m_systemUpdateCalls;
 	static std::unordered_map<size_t, std::function<void()>> m_systemInitCalls;
 };
