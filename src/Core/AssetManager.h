@@ -5,12 +5,13 @@
 #include<variant>
 #include"Renderer/Shader.h"
 
-class ResourceManager
+class AssetManager
 {
 public:
-	ResourceManager() = delete;
-	ResourceManager(const ResourceManager&) = delete;
-	ResourceManager& operator=(const ResourceManager&) = delete;
+	AssetManager() = delete;
+	AssetManager(const AssetManager&) = delete;
+	AssetManager& operator=(const AssetManager&) = delete;
+
 	using Resource = std::variant<std::shared_ptr<Shader>>;
 	static std::shared_ptr<Shader> LoadShader(const std::string& name, const std::string& pathToVertexShader, const std::string& pathToFragmentShader);
 	template<typename T>

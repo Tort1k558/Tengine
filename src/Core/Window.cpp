@@ -114,7 +114,6 @@ void Window::update()
 {
 	glfwSwapBuffers(m_window);
 	glfwPollEvents();
-
 }
 
 void Window::setEventCallback(std::function<void(Event&)> callback)

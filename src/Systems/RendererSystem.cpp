@@ -4,7 +4,7 @@
 #include "Components/Transform.h"
 #include "Core/Logger.h"
 #include "Core/Timer.h"
-#include "Core/ResourceManager.h"
+#include "Core/AssetManager.h"
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
@@ -43,8 +43,8 @@ void RendererSystem::init()
 		}
 	}
 	m_context->init();
-	ResourceManager::LoadShader("DefaultShader", "src/Renderer/OpenGL/Shaders/vs.vs", "src/Renderer/OpenGL/Shaders/fs.fs");
-	shader = ResourceManager::GetResource<Shader>("DefaultShader");
+	AssetManager::LoadShader("DefaultShader", "src/Renderer/OpenGL/Shaders/vs.vs", "src/Renderer/OpenGL/Shaders/fs.fs");
+	shader = AssetManager::GetResource<Shader>("DefaultShader");
 
 	va = VertexArray::Create();
 	vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
@@ -63,7 +63,7 @@ void RendererSystem::update()
 	m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
 	m_context->clear();
 	static double delta = 0.0f;
-	delta += Timer::GetDeltaTime() * 30000;
+	delta += Timer::GetDeltaTime() * 100;
 	std::shared_ptr<Transform> transform = ComponentManager::getComponents<Transform>()[0];
 	transform->setRotation({ delta, delta, delta });
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());

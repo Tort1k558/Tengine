@@ -1,12 +1,12 @@
-#include "ResourceManager.h"
+#include "AssetManager.h"
 
 #include<fstream>
 #include<sstream>
 #include"Core/Logger.h"
 
-std::unordered_map<std::string, ResourceManager::Resource> ResourceManager::m_resources;
+std::unordered_map<std::string, AssetManager::Resource> AssetManager::m_resources;
 
-std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string& name, const std::string& pathToVertexShader, const std::string& pathToFragmentShader)
+std::shared_ptr<Shader> AssetManager::LoadShader(const std::string& name, const std::string& pathToVertexShader, const std::string& pathToFragmentShader)
 {
     std::shared_ptr<Shader> shader = GetResource<Shader>(name);
     if (shader)
@@ -21,7 +21,7 @@ std::shared_ptr<Shader> ResourceManager::LoadShader(const std::string& name, con
     return shader;
 }
 
-std::string ResourceManager::ReadFile(const std::string& path)
+std::string AssetManager::ReadFile(const std::string& path)
 {
     std::ifstream file(path);
     if (file.is_open())
@@ -33,8 +33,6 @@ std::string ResourceManager::ReadFile(const std::string& path)
 
         return buffer.str();
     }
-    else
-    {
-        Logger::Critical("ERROR::Failed to open file::{0}", path);
-    }
+    Logger::Critical("ERROR::Failed to open file::{0}", path);
+    return "";
 }

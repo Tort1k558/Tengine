@@ -7,7 +7,7 @@
 #include "ECS/SystemManager.h"
 #include "Systems/RendererSystem.h"
 #include "Systems/UISystem.h"
-
+#include"Core/UUID.h"
 
 
 Application::Application(unsigned int width, unsigned int height, std::string title) :
@@ -82,8 +82,8 @@ void Application::run()
     while (!m_closeWindow)
     {
         Timer::Start();
-        SystemManager::UpdateSystems();
         m_window->update();
+        SystemManager::UpdateSystems();
     }
 }
 
