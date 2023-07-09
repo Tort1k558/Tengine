@@ -1,7 +1,34 @@
 #include "RendererSystem.h"
 
 #include "Renderer/OpenGL/RendererContextOpenGL.h"
+#include "Components/Transform.h"
 #include "Core/Logger.h"
+#include "Core/Timer.h"
+#include "Core/ResourceManager.h"
+#include "Renderer/VertexArray.h"
+#include "Renderer/VertexBuffer.h"
+#include "Renderer/IndexBuffer.h"
+#include "Renderer/Shader.h"
+#include "ECS/ComponentManager.h"
+
+GLfloat posCol[] =
+{
+	//         Positions              Colors
+		-0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f,
+		 0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 1.0f,
+		-0.5f,  0.5f, 0.0f,      1.0f, 0.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f,      1.0f, 1.0f, 0.0f
+};
+GLuint indices[] =
+{
+	0,1,2,
+	0,1,3
+};
+
+std::shared_ptr<Shader> shader;
+std::shared_ptr<VertexArray> va;
+std::shared_ptr<VertexBuffer> vbPosCol;
+std::shared_ptr<IndexBuffer> ibPosCol;
 
 void RendererSystem::init()
 {
@@ -16,12 +43,33 @@ void RendererSystem::init()
 		}
 	}
 	m_context->init();
+	ResourceManager::LoadShader("DefaultShader", "src/Renderer/OpenGL/Shaders/vs.vs", "src/Renderer/OpenGL/Shaders/fs.fs");
+	shader = ResourceManager::GetResource<Shader>("DefaultShader");
+
+	va = VertexArray::Create();
+	vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
+	BufferLayout posCol;
+	posCol.push({ ElementType::Float3 });
+	posCol.push({ ElementType::Float3 });
+
+	vbPosCol->setLayout(posCol);
+	va->addVertexBuffer(vbPosCol);
+	ibPosCol = IndexBuffer::Create(indices, 6);
+	va->setIndexBuffer(ibPosCol);
 }
 
 void RendererSystem::update()
 {
-	m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f});
+	m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
 	m_context->clear();
+	static double delta = 0.0f;
+	delta += Timer::GetDeltaTime() * 30000;
+	std::shared_ptr<Transform> transform = ComponentManager::getComponents<Transform>()[0];
+	transform->setRotation({ delta, delta, delta });
+	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
+	shader->bind();
+	va->bind();
+	m_context->drawIndexed(va);
 
 }
 

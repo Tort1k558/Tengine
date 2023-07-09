@@ -1,6 +1,6 @@
 #include"ComponentManager.h"
 
-std::vector<std::pair<size_t, std::shared_ptr<Component>>> ComponentManager::m_components = {};
+std::vector<std::pair<size_t, std::shared_ptr<Component>>> ComponentManager::m_components;
 
 std::vector<std::shared_ptr<Component>> ComponentManager::getAllObjectComponents(size_t idObjcet)
 {

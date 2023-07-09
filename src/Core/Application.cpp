@@ -1,19 +1,12 @@
 #include "Application.h"
 
-#include"Renderer/OpenGL/RendererContextOpenGL.h"
-#include"Renderer/VertexArray.h"
-#include"Renderer/VertexBuffer.h"
-#include"Renderer/IndexBuffer.h"
-#include"Renderer/Shader.h"
-#include"ECS/Object.h"
-#include"ECS/SystemManager.h"
-#include"Timer.h"
-#include"Components/Transform.h"
-#include"Systems/RendererSystem.h"
-#include"Systems/UISystem.h"
-#include"Logger.h"
-
-#include<GLFW/glfw3.h>
+#include "Components/Transform.h"
+#include "Core/Timer.h"
+#include "Core/Logger.h"
+#include "ECS/Object.h"
+#include "ECS/SystemManager.h"
+#include "Systems/RendererSystem.h"
+#include "Systems/UISystem.h"
 
 
 
@@ -27,55 +20,6 @@ Application::~Application()
 {
     
 }
-
-GLfloat posCol[] =
-{
-//         Positions              Colors
-    -0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 1.0f,
-    -0.5f,  0.5f, 0.0f,      1.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, 0.0f,      1.0f, 1.0f, 0.0f
-};
-GLuint indices[] =
-{
-    0,1,2,
-    0,1,3
-};
-
-const char* vertexShader =
-R"(
-    #version 460
-    layout(location = 0) in vec3 vertexPos;
-    layout(location = 1) in vec3 vertexColor;
-    
-    out vec3 color;
-    
-    uniform mat4 u_modelMatrix;
-
-    void main()
-    {
-        color = vertexColor;
-        gl_Position = u_modelMatrix * vec4(vertexPos,1.0);
-    }
-)";
-
-const char* fragmentShader =
-R"(
-    #version 460
-
-    in vec3 color;
-    out vec4 fragColor;
-
-    void main()
-    {
-        fragColor = vec4(color,1.0);
-    }
-)";
-
-std::shared_ptr<Shader> shader;
-std::shared_ptr<VertexArray> va;
-std::shared_ptr<VertexBuffer> vbPosCol;
-std::shared_ptr<IndexBuffer> ibPosCol;
 
 void Application::init()
 {
@@ -123,21 +67,6 @@ void Application::init()
             m_eventDispatcher.proccess(event);
         });
     
-    shader = Shader::Create();
-    shader->addShader(vertexShader, ShaderType::VertexShader);
-    shader->addShader(fragmentShader, ShaderType::FragmentShader);
-    shader->compile();
-
-    va = VertexArray::Create();
-    vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
-    BufferLayout posCol;
-    posCol.push({ ElementType::Float3 });
-    posCol.push({ ElementType::Float3 });
-
-    vbPosCol->setLayout(posCol);
-    va->addVertexBuffer(vbPosCol);
-    ibPosCol = IndexBuffer::Create(indices, 6);
-    va->setIndexBuffer(ibPosCol);
 
     std::shared_ptr<Object> object = Object::Create();
 
@@ -150,21 +79,11 @@ void Application::init()
 
 void Application::run()
 {
-    std::shared_ptr<Transform> transform = ComponentManager::getComponents<Transform>()[0];
-    double delta = 0.0f;
     while (!m_closeWindow)
     {
         Timer::Start();
-        delta += Timer::GetDeltaTime() * 500000;
         SystemManager::UpdateSystems();
-
-        transform->setRotation( {delta, delta, delta });
-        shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
-        shader->bind();
-        va->bind();
-        glDrawElements(GL_TRIANGLES,va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
         m_window->update();
-        Logger::Info("FPS::{0}", 1.0 / Timer::GetDeltaTime());
     }
 }
 
