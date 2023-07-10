@@ -15,8 +15,8 @@ class Scene
 public:
 	Scene();
 	void addObject(std::shared_ptr<Object> object);
-	void removeObject();
-	void getObjectByUUID(UUID id);
+	void removeObjectByUUID(UUID id);
+	std::shared_ptr<Object> getObjectByUUID(UUID id);
 
 	template<typename T>
 	std::vector<std::shared_ptr<T>> getComponents()

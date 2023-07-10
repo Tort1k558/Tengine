@@ -23,3 +23,8 @@ void ObjectManager::addObject(std::shared_ptr<Object> object)
 {
 	m_objects[object->getId()] = object;
 }
+
+void ObjectManager::removeObject(std::string idObject)
+{
+	m_objects.erase(idObject);
+}

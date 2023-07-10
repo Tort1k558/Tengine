@@ -22,6 +22,8 @@ public:
 	std::vector<std::shared_ptr<Object>> getAllObjects();
 private:
 	void addObject(std::shared_ptr<Object> object);
+	void removeObject(std::string idObject);
+
 	std::unordered_map<std::string,std::shared_ptr<Object>> m_objects;
 
 	friend class Scene;

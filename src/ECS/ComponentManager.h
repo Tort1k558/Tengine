@@ -34,6 +34,7 @@ public:
 	std::vector<std::shared_ptr<Component>> getAllComponents();
 private:
 	void addComponent(std::shared_ptr<Component> component, std::string idObject);
+	void removeAllObjectComponents(std::string idObject);
 
 	template<typename T>
 	void removeComponent(std::string idObject)

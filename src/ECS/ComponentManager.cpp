@@ -27,3 +27,14 @@ void ComponentManager::addComponent(std::shared_ptr<Component> component, std::s
 {
 	m_components.push_back({ idObject,component });
 }
+
+void ComponentManager::removeAllObjectComponents(std::string idObject)
+{
+	for (size_t i = 0; i < m_components.size(); i++)
+	{
+		if (m_components[i].first == idObject)
+		{
+			m_components.erase(m_components.begin() + i);
+		}
+	}
+}

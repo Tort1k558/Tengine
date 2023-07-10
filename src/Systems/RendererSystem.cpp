@@ -11,6 +11,7 @@
 #include "Renderer/Shader.h"
 #include "ECS/ComponentManager.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 
 GLfloat posCol[] =
 {

@@ -9,6 +9,7 @@
 #include "Systems/UISystem.h"
 #include"Core/UUID.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 
 Application::Application(unsigned int width, unsigned int height, std::string title) :
     m_closeWindow(false)
@@ -78,8 +79,6 @@ void Application::init()
     transform->setPosition({ 0.5f,0.0f,0.0f });
     object->addComponent(transform);
 
-    scene->addObject(object);
-    scene->addObject(object2);
 }
 
 void Application::run()

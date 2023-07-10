@@ -14,21 +14,23 @@ Scene::Scene() :
 void Scene::addObject(std::shared_ptr<Object> object)
 {
 	m_objectManager->addObject(object);
-}
-
-void Scene::removeObject()
-{
-
-}
-
-void Scene::getObjectByUUID(UUID id)
-{
-
+	object->m_parentScene = std::shared_ptr<Scene>(this);
 }
 
 void Scene::addComponent(std::shared_ptr<Component> component, UUID idObject)
 {
 	m_componentManager->addComponent(component, idObject.getID());
+}
+
+void Scene::removeObjectByUUID(UUID id)
+{
+	m_componentManager->removeAllObjectComponents(id.getID());
+	m_objectManager->removeObject(id.getID());
+}
+
+std::shared_ptr<Object> Scene::getObjectByUUID(UUID id)
+{
+	return m_objectManager->getObjectByUUID(id.getID());
 }
 
 std::vector<std::shared_ptr<Component>> Scene::getObjectComponentsByUUID(UUID idObject)
