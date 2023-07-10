@@ -69,7 +69,7 @@ void Application::init()
     
 
     std::shared_ptr<Object> object = Object::Create();
-
+    std::shared_ptr<Object> object2 = Object::Create();
     std::shared_ptr<Transform> transform = Component::Create<Transform>();
     transform->setRotation({ 0.0f,0.0f,90.0f });
     transform->setScale({ 2.0f,1.0f,1.0f });

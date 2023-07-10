@@ -1,8 +1,8 @@
 #include "ObjectManager.h"
 
-std::unordered_map<size_t, std::shared_ptr<Object>> ObjectManager::m_objects;
+std::unordered_map<std::string, std::shared_ptr<Object>> ObjectManager::m_objects;
 
-std::shared_ptr<Object> ObjectManager::getObjectById(size_t id)
+std::shared_ptr<Object> ObjectManager::getObjectById(std::string id)
 {
 	if (m_objects.at(id))
 	{

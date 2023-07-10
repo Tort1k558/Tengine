@@ -2,8 +2,11 @@
 #include<vector>
 #include<memory>
 #include<string>
+
 #include"ObjectManager.h"
 #include"ComponentManager.h"
+
+#include"Core/UUID.h"
 class Object
 {
 public:
@@ -13,7 +16,7 @@ public:
 	template<typename T>
 	void addComponent(std::shared_ptr<T> component)
 	{
-		ComponentManager::addComponent(component, m_id);
+		ComponentManager::addComponent(component, m_id.getID());
 	}
 	template<typename T>
 	std::shared_ptr<T> getComponent()
@@ -35,10 +38,9 @@ public:
 	}
 	void setName(const std::string& name);
 	std::string getName() { return m_name; }
-	unsigned int getId() { return m_id; }
+	std::string getId() { return m_id.getID(); }
 	static std::shared_ptr<Object> Create();
 private:
-	unsigned int m_id;
+	UUID m_id;
 	std::string m_name;
-	static unsigned int s_ids;
 };

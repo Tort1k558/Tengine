@@ -1,9 +1,7 @@
 #include "Object.h"
 
-unsigned int Object::s_ids = 0;
-
 Object::Object() :
-	m_id(s_ids++)
+	m_id()
 {
 }
 

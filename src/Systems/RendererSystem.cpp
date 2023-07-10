@@ -43,7 +43,7 @@ void RendererSystem::init()
 		}
 	}
 	m_context->init();
-	AssetManager::LoadShader("DefaultShader", "src/Renderer/OpenGL/Shaders/vs.vs", "src/Renderer/OpenGL/Shaders/fs.fs");
+	AssetManager::LoadShader("DefaultShader", "src/Shaders/GLSL/vs.vs", "src/Shaders/GLSL/fs.fs");
 	shader = AssetManager::GetResource<Shader>("DefaultShader");
 
 	va = VertexArray::Create();
