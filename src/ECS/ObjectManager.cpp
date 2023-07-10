@@ -1,13 +1,12 @@
 #include "ObjectManager.h"
 
-std::unordered_map<std::string, std::shared_ptr<Object>> ObjectManager::m_objects;
-
-std::shared_ptr<Object> ObjectManager::getObjectById(std::string id)
+std::shared_ptr<Object> ObjectManager::getObjectByUUID(std::string id)
 {
 	if (m_objects.at(id))
 	{
 		return m_objects[id];
 	}
+	return nullptr;
 }
 
 std::vector<std::shared_ptr<Object>> ObjectManager::getAllObjects()

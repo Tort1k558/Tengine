@@ -8,7 +8,7 @@
 #include "Systems/RendererSystem.h"
 #include "Systems/UISystem.h"
 #include"Core/UUID.h"
-
+#include "Scene/Scene.h"
 
 Application::Application(unsigned int width, unsigned int height, std::string title) :
     m_closeWindow(false)
@@ -67,6 +67,8 @@ void Application::init()
             m_eventDispatcher.proccess(event);
         });
     
+    std::shared_ptr<Scene> scene = Scene::Create();
+    SceneManager::SetCurrentScene(scene);
 
     std::shared_ptr<Object> object = Object::Create();
     std::shared_ptr<Object> object2 = Object::Create();
@@ -75,6 +77,9 @@ void Application::init()
     transform->setScale({ 2.0f,1.0f,1.0f });
     transform->setPosition({ 0.5f,0.0f,0.0f });
     object->addComponent(transform);
+
+    scene->addObject(object);
+    scene->addObject(object2);
 }
 
 void Application::run()

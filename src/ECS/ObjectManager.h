@@ -4,19 +4,25 @@
 #include<memory>
 #include<string>
 
-#include"Object.h"
+#include"ECS/Object.h"
+#include"Scene/Scene.h"
+
 class Object;
+
 class ObjectManager
 {
 public:
-	ObjectManager() = delete;
-	ObjectManager(const ObjectManager&) = delete;
-	ObjectManager& operator=(const ObjectManager&) = delete;
+	ObjectManager() = default;
+	ObjectManager(const ObjectManager&) = default;
+	ObjectManager(ObjectManager&&) = default;
+	ObjectManager& operator=(const ObjectManager&) = default;
+	ObjectManager& operator=(ObjectManager&&) = default;
 
-	static std::shared_ptr<Object> getObjectById(std::string id);
-	static std::vector<std::shared_ptr<Object>> getAllObjects();
+	std::shared_ptr<Object> getObjectByUUID(std::string id);
+	std::vector<std::shared_ptr<Object>> getAllObjects();
 private:
-	static void addObject(std::shared_ptr<Object> object);
-	static std::unordered_map<std::string,std::shared_ptr<Object>> m_objects;
-	friend class Object;
+	void addObject(std::shared_ptr<Object> object);
+	std::unordered_map<std::string,std::shared_ptr<Object>> m_objects;
+
+	friend class Scene;
 };

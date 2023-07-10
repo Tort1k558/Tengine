@@ -3,18 +3,22 @@
 #include<vector>
 #include<memory>
 
-#include"Component.h"
-#include"Object.h"
+#include"ECS/Component.h"
+#include"ECS/Object.h"
+
+class Scene;
 
 class ComponentManager
 {
 public:
-	ComponentManager() = delete;
-	ComponentManager(const ComponentManager&) = delete;
-	ComponentManager& operator=(const ComponentManager&) = delete;
+	ComponentManager() = default;
+	ComponentManager(const ComponentManager&) = default;
+	ComponentManager(ComponentManager&&) = default;
+	ComponentManager& operator=(const ComponentManager&) = default;
+	ComponentManager& operator=(ComponentManager&&) = default;
 
 	template<typename T>
-	static std::vector<std::shared_ptr<T>> getComponents()
+	std::vector<std::shared_ptr<T>> getComponents()
 	{
 		std::vector<std::shared_ptr<T>> components;
 		for (const auto& comp : m_components)
@@ -26,13 +30,13 @@ public:
 		}
 		return components;
 	}
-	static std::vector<std::shared_ptr<Component>> getAllObjectComponents(std::string idObject);
-	static std::vector<std::shared_ptr<Component>> getAllComponents();
+	std::vector<std::shared_ptr<Component>> getObjectComponents(std::string idObject);
+	std::vector<std::shared_ptr<Component>> getAllComponents();
 private:
-	static void addComponent(std::shared_ptr<Component> component, std::string idObject);
+	void addComponent(std::shared_ptr<Component> component, std::string idObject);
 
 	template<typename T>
-	static void removeComponent(std::string idObject)
+	void removeComponent(std::string idObject)
 	{
 		for (size_t i = 0; i < m_components.size(); i++)
 		{
@@ -47,7 +51,7 @@ private:
 		}
 	}
 
-	static std::vector<std::pair<std::string, std::shared_ptr<Component>>> m_components;
-
-	friend class Object;
+	std::vector<std::pair<std::string, std::shared_ptr<Component>>> m_components;
+	
+	friend class Scene;
 };

@@ -1,8 +1,6 @@
 #include"ComponentManager.h"
 
-std::vector<std::pair<std::string, std::shared_ptr<Component>>> ComponentManager::m_components;
-
-std::vector<std::shared_ptr<Component>> ComponentManager::getAllObjectComponents(std::string idObjcet)
+std::vector<std::shared_ptr<Component>> ComponentManager::getObjectComponents(std::string idObjcet)
 {
 	std::vector<std::shared_ptr<Component>> components;
 	for (const auto& comp : m_components)

@@ -10,6 +10,7 @@
 #include "Renderer/IndexBuffer.h"
 #include "Renderer/Shader.h"
 #include "ECS/ComponentManager.h"
+#include "Scene/Scene.h"
 
 GLfloat posCol[] =
 {
@@ -64,7 +65,7 @@ void RendererSystem::update()
 	m_context->clear();
 	static double delta = 0.0f;
 	delta += Timer::GetDeltaTime() * 100;
-	std::shared_ptr<Transform> transform = ComponentManager::getComponents<Transform>()[0];
+	std::shared_ptr<Transform> transform = SceneManager::GetCurrentScene()->getComponents<Transform>()[0];
 	transform->setRotation({ delta, delta, delta });
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
 	shader->bind();

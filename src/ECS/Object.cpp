@@ -13,6 +13,5 @@ void Object::setName(const std::string& name)
 std::shared_ptr<Object> Object::Create()
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	ObjectManager::addObject(object);
 	return object;
 }
