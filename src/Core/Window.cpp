@@ -1,10 +1,8 @@
 #include "Window.h"
 
-#include<imgui/imgui.h>
-#include<imgui/backends/imgui_impl_opengl3.h>
-
 #include"Systems/RendererSystem.h"
 #include"Core/Logger.h"
+
 Window::Window(unsigned int width, unsigned int height, std::string title) :
 	m_width(width), m_height(height), m_title(title), m_window(nullptr)
 {

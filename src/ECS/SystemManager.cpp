@@ -17,3 +17,11 @@ void SystemManager::UpdateSystems()
 		system.second->update();
 	}
 }
+
+void SystemManager::DestroySystems()
+{
+	for (auto& system : m_systems)
+	{
+		system.second->destroy();
+	}
+}

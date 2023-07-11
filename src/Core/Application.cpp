@@ -89,5 +89,6 @@ void Application::run()
         m_window->update();
         SystemManager::UpdateSystems();
     }
+    SystemManager::DestroySystems();
 }
 

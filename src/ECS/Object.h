@@ -18,6 +18,7 @@ public:
 	{
 		m_parentScene->addComponent(component, m_id);
 	}
+
 	template<typename T>
 	std::shared_ptr<T> getComponent()
 	{
@@ -31,11 +32,13 @@ public:
 		}
 		return nullptr;
 	}
+
 	template<typename T>
 	void removeComponent()
 	{
 		m_parentScene->removeComponent<T>(m_id);
 	}
+
 	void setName(const std::string& name);
 	std::string getName() { return m_name; }
 	std::string getId() { return m_id.getID(); }
