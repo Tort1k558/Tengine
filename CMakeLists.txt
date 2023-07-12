@@ -15,6 +15,8 @@ set(SOURCE_DIRS
 	"src/Renderer/OpenGL/*.h" "src/Renderer/OpenGL/*.cpp"
 	"src/Systems/*.h" "src/Systems/*.cpp"
 	"src/Scene/*.h" "src/Scene/*.cpp"
+	"src/Utils/*.h" "src/Utils/*.cpp"
+	"src/Utils/Camera/*.h" "src/Utils/Camera/*.cpp"
 	)
 file(GLOB TARGET_SRC ${SOURCE_DIRS})
 

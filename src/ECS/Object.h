@@ -43,6 +43,7 @@ public:
 	std::string getName() { return m_name; }
 	std::string getId() { return m_id.getID(); }
 	static std::shared_ptr<Object> Create();
+
 private:
 	UUID m_id;
 	std::string m_name;

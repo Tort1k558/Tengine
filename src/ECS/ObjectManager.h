@@ -12,19 +12,14 @@ class Object;
 class ObjectManager
 {
 public:
-	ObjectManager() = default;
-	ObjectManager(const ObjectManager&) = default;
-	ObjectManager(ObjectManager&&) = default;
-	ObjectManager& operator=(const ObjectManager&) = default;
-	ObjectManager& operator=(ObjectManager&&) = default;
+	ObjectManager();
 
-	std::shared_ptr<Object> getObjectByUUID(std::string id);
-	std::vector<std::shared_ptr<Object>> getAllObjects();
-private:
+	std::shared_ptr<Object> getObjectByUUID(std::string id) const;
+	std::vector<std::shared_ptr<Object>> getAllObjects() const;
+
 	void addObject(std::shared_ptr<Object> object);
 	void removeObject(std::string idObject);
+private:
 
 	std::unordered_map<std::string,std::shared_ptr<Object>> m_objects;
-
-	friend class Scene;
 };

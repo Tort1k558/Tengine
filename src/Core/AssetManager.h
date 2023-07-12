@@ -10,7 +10,9 @@ class AssetManager
 public:
 	AssetManager() = delete;
 	AssetManager(const AssetManager&) = delete;
+	AssetManager(AssetManager&&) = delete;
 	AssetManager& operator=(const AssetManager&) = delete;
+	AssetManager& operator=(AssetManager&&) = delete;
 
 	using Resource = std::variant<std::shared_ptr<Shader>>;
 	static std::shared_ptr<Shader> LoadShader(const std::string& name, const std::string& pathToVertexShader, const std::string& pathToFragmentShader);
