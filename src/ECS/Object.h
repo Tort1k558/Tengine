@@ -22,7 +22,7 @@ public:
 	template<typename T>
 	std::shared_ptr<T> getComponent()
 	{
-		std::vector<std::shared_ptr<Component>> components = m_parentScene->getObjectComponents(m_id);
+		std::vector<std::shared_ptr<Component>> components = m_parentScene->getObjectComponentsByUUID(m_id);
 		for (const auto& comp : components)
 		{
 			if (std::shared_ptr<T> cmp = std::dynamic_pointer_cast<T>(comp))

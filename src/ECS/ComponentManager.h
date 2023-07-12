@@ -3,8 +3,11 @@
 #include<vector>
 #include<memory>
 
+#include<unordered_map>
+
 #include"ECS/Component.h"
 #include"ECS/Object.h"
+
 
 class Scene;
 
@@ -24,19 +27,21 @@ public:
 	template<typename T>
 	void removeComponent(std::string idObject);
 private:
-	std::vector<std::pair<std::string, std::shared_ptr<Component>>> m_components;
-
+	std::unordered_map<std::string, std::unordered_map<size_t,std::shared_ptr<Component>>> m_components;
 };
 
 template<typename T>
 std::vector<std::shared_ptr<T>> ComponentManager::getComponents() const
 {
 	std::vector<std::shared_ptr<T>> components;
-	for (const auto& comp : m_components)
+	for (const auto& object : m_components)
 	{
-		if (std::shared_ptr<T> cmp = std::dynamic_pointer_cast<T>(comp.second))
+		for (const auto& comp : object.second)
 		{
-			components.push_back(cmp);
+			if (std::shared_ptr<T> cmp = std::dynamic_pointer_cast<T>(comp.second))
+			{
+				components.push_back(cmp);
+			}
 		}
 	}
 	return components;

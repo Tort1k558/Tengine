@@ -11,6 +11,7 @@ public:
 	{
 		return std::make_shared<T>(args...);
 	}
+
 private:
 
 };

@@ -5,15 +5,13 @@ ComponentManager::ComponentManager() :
 {
 }
 
-std::vector<std::shared_ptr<Component>> ComponentManager::getObjectComponents(std::string idObjcet) const
+std::vector<std::shared_ptr<Component>> ComponentManager::getObjectComponents(std::string idObject) const
 {
 	std::vector<std::shared_ptr<Component>> components;
-	for (const auto& comp : m_components)
+	auto objectComponents = m_components.at(idObject);
+	for (auto& component : objectComponents)
 	{
-		if (comp.first == idObjcet)
-		{
-			components.push_back(comp.second);
-		}
+		components.push_back(component.second);
 	}
 	return components;
 }
@@ -21,25 +19,22 @@ std::vector<std::shared_ptr<Component>> ComponentManager::getObjectComponents(st
 std::vector<std::shared_ptr<Component>> ComponentManager::getAllComponents() const
 {
 	std::vector<std::shared_ptr<Component>> components;
-	for (const auto& comp : m_components)
+	for (const auto& object : m_components)
 	{
-		components.push_back(comp.second);
+		for (const auto& comp : object.second)
+		{
+			components.push_back(comp.second);
+		}
 	}
 	return components;
 }
 
 void ComponentManager::addComponent(std::shared_ptr<Component> component, std::string idObject)
 {
-	m_components.push_back({ idObject,component });
+	m_components[idObject][typeid(component).hash_code()] = component;
 }
 
 void ComponentManager::removeAllObjectComponents(std::string idObject)
 {
-	for (size_t i = 0; i < m_components.size(); i++)
-	{
-		if (m_components[i].first == idObject)
-		{
-			m_components.erase(m_components.begin() + i);
-		}
-	}
+	m_components.erase(idObject);
 }

@@ -2,6 +2,7 @@
 
 #include "Renderer/OpenGL/RendererContextOpenGL.h"
 #include "Components/Transform.h"
+#include "Components/Camera.h"
 #include "Core/Logger.h"
 #include "Core/Timer.h"
 #include "Core/AssetManager.h"
@@ -45,7 +46,7 @@ void RendererSystem::init()
 		}
 	}
 	m_context->init();
-	AssetManager::LoadShader("DefaultShader", "src/Shaders/GLSL/vs.vs", "src/Shaders/GLSL/fs.fs");
+	AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
 	shader = AssetManager::GetResource<Shader>("DefaultShader");
 
 	va = VertexArray::Create();
@@ -67,8 +68,11 @@ void RendererSystem::update()
 	static double delta = 0.0f;
 	delta += Timer::GetDeltaTime() * 100;
 	std::shared_ptr<Transform> transform = SceneManager::GetCurrentScene()->getComponents<Transform>()[0];
+	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
 	transform->setRotation({ delta, delta, delta });
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
+	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix({ 0.0f,0.0f,-2.0f }));
+	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
 	shader->bind();
 	va->bind();
 	m_context->drawIndexed(va);

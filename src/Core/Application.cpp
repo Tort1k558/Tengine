@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include "Components/Transform.h"
+#include "Components/Camera.h"
 #include "Core/Timer.h"
 #include "Core/Logger.h"
 #include "ECS/Object.h"
@@ -72,13 +73,13 @@ void Application::init()
     SceneManager::SetCurrentScene(scene);
 
     std::shared_ptr<Object> object = Object::Create();
-    std::shared_ptr<Object> object2 = Object::Create();
-    std::shared_ptr<Transform> transform = Component::Create<Transform>();
+    std::shared_ptr<Transform> transform = object->getComponent<Transform>();
     transform->setRotation({ 0.0f,0.0f,90.0f });
     transform->setScale({ 2.0f,1.0f,1.0f });
     transform->setPosition({ 0.5f,0.0f,0.0f });
-    object->addComponent(transform);
 
+    std::shared_ptr<Object> object2 = Object::Create();
+    object2->addComponent(Component::Create<Camera>(ProjectionType::Perspective));
 }
 
 void Application::run()
