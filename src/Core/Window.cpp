@@ -71,12 +71,17 @@ void Window::init()
 	glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
 		{
 			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-
 			switch (action)
 			{
 			case GLFW_PRESS:
 			{
 				EventKeyPressed event(static_cast<KeyCode>(key));
+				window.getEventCallback()(event);
+				break;
+			}
+			case GLFW_REPEAT:
+			{
+				EventKeyPressed event(static_cast<KeyCode>(key),true);
 				window.getEventCallback()(event);
 				break;
 			}
@@ -110,8 +115,8 @@ void Window::init()
 
 void Window::update()
 {
-	glfwSwapBuffers(m_window);
 	glfwPollEvents();
+	glfwSwapBuffers(m_window);
 }
 
 void Window::setEventCallback(std::function<void(Event&)> callback)

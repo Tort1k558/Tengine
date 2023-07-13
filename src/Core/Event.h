@@ -53,9 +53,10 @@ private:
 class EventKeyPressed : public Event
 {
 public:
-	EventKeyPressed(KeyCode code);
+	EventKeyPressed(KeyCode code,bool repeat = false);
 	static const EventType type = EventType::KeyPressed;
 	KeyCode code;
+	bool repeat;
 };
 
 class EventKeyReleased : public Event

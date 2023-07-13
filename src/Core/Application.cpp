@@ -1,16 +1,16 @@
 #include "Application.h"
 
-#include "Components/Transform.h"
-#include "Components/Camera.h"
-#include "Core/Timer.h"
-#include "Core/Logger.h"
-#include "ECS/Object.h"
-#include "ECS/SystemManager.h"
-#include "Systems/RendererSystem.h"
-#include "Systems/UISystem.h"
-#include"Core/UUID.h"
-#include "Scene/Scene.h"
-#include "Scene/SceneManager.h"
+#include<thread>
+
+#include"Components/Transform.h"
+#include"Components/Camera.h"
+#include"Core/Timer.h"
+#include"Core/Logger.h"
+#include"Core/Input.h"
+#include"ECS/SystemManager.h"
+#include"Systems/RendererSystem.h"
+#include"Systems/UISystem.h"
+#include"Scene/SceneManager.h"
 
 Application::Application(unsigned int width, unsigned int height, std::string title) :
     m_closeWindow(false)
@@ -22,7 +22,7 @@ Application::~Application()
 {
     
 }
-
+std::shared_ptr<Transform> transform2;
 void Application::init()
 {
 	m_window->init();
@@ -44,30 +44,31 @@ void Application::init()
 
     std::shared_ptr<Object> object2 = Object::Create();
     object2->addComponent<Camera>(Component::Create<Camera>(ProjectionType::Perspective));
-    std::shared_ptr<Transform> transform2 = object2->getComponent<Transform>();
+    transform2 = object2->getComponent<Transform>();
     transform2->setRotation({ 0.0f,0.0f, 0.0f });
     transform2->setPosition({ 0.0f,0.0f,-2.0f });
 
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
         {
-            //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.xPos, event.yPos);
+            //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.x, event.y);
+
         });
     m_eventDispatcher.addEvent<EventMouseButtonPressed>([](EventMouseButtonPressed& event)
         {
-            Logger::Debug("EVENT::The mouse button is pressed with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
+            Input::PressMouseButton(event.code);
         });
     m_eventDispatcher.addEvent<EventMouseButtonReleased>([](EventMouseButtonReleased& event)
         {
-            Logger::Debug("EVENT::The mouse button is released with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
+            Input::ReleaseMouseButton(event.code);
         });
     m_eventDispatcher.addEvent<EventKeyPressed>([](EventKeyPressed& event)
         {
-            Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(event.code));
+            Input::PressKey(event.code);
         });
     m_eventDispatcher.addEvent<EventKeyReleased>([](EventKeyReleased& event)
         {
-            Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(event.code));;
+            Input::ReleaseKey(event.code);
         });
     m_eventDispatcher.addEvent<EventWindowClose>([&](EventWindowClose& event)
         {
@@ -86,11 +87,41 @@ void Application::init()
 
 void Application::run()
 {
+    double speed = 50.0;
+    double delta = 0.0;
+    double maxFps = 1.0 / 144.0;
     while (!m_closeWindow)
     {
         Timer::Start();
-        m_window->update();
-        SystemManager::UpdateSystems();
+        if (delta < maxFps)
+        {
+            delta += Timer::GetDeltaTime();
+        }
+        else
+        {
+            Timer::SetDeltaTime(delta);
+            SystemManager::UpdateSystems();
+            if (Input::IsKeyPressed(KeyCode::D))
+            {
+                transform2->setPosition(transform2->getPosition() + Vec3(-speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
+            }
+            if (Input::IsKeyPressed(KeyCode::A))
+            {
+                transform2->setPosition(transform2->getPosition() + Vec3(speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
+            }
+            if (Input::IsKeyPressed(KeyCode::W))
+            {
+                transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, speed * Timer::GetDeltaTime()));
+            }
+            if (Input::IsKeyPressed(KeyCode::S))
+            {
+                transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, -speed * Timer::GetDeltaTime()));
+            }
+            Logger::Debug("{0:.9f}", Timer::GetDeltaTime());
+            m_window->update();
+            delta = 0.0f;
+        }
+        Timer::End();
     }
     SystemManager::DestroySystems();
 }

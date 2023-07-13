@@ -21,8 +21,8 @@ EventMouseMoved::EventMouseMoved(double x, double y) :
 
 }
 
-EventKeyPressed::EventKeyPressed(KeyCode code) :
-	Event(type), code(code)
+EventKeyPressed::EventKeyPressed(KeyCode code, bool repeat) :
+	Event(type), code(code), repeat(repeat)
 {
 
 }
