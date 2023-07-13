@@ -17,6 +17,6 @@ std::shared_ptr<Object> Object::Create()
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
 	SceneManager::GetCurrentScene()->addObject(object);
-	object->addComponent(Component::Create<Transform>());
+	object->addComponent<Transform>(Component::Create<Transform>());
 	return object;
 }

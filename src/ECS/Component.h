@@ -2,6 +2,10 @@
 
 #include<memory>
 
+#include"ECS/Object.h"
+
+class Object;
+
 class Component
 {
 public:
@@ -11,7 +15,8 @@ public:
 	{
 		return std::make_shared<T>(args...);
 	}
-
+	void setParent(std::shared_ptr<Object> parent);
+	std::shared_ptr<Object> getParent() { return m_parent.lock(); }
 private:
-
+	std::weak_ptr<Object> m_parent;
 };

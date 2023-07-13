@@ -35,6 +35,7 @@ void Application::init()
     SystemManager::InitSystems();
 
     m_eventDispatcher = EventDispatcher();
+
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
         {
             //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.xPos, event.yPos);
@@ -47,11 +48,11 @@ void Application::init()
         {
             Logger::Debug("EVENT::The mouse button is released with the code {0} on the cordinates {1}x{2}", static_cast<int>(event.code), event.x, event.y);
         });
-    m_eventDispatcher.addEvent<EventKeyPressed>([&](EventKeyPressed& event)
+    m_eventDispatcher.addEvent<EventKeyPressed>([](EventKeyPressed& event)
         {
             Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(event.code));
         });
-    m_eventDispatcher.addEvent<EventKeyReleased>([&](EventKeyReleased& event)
+    m_eventDispatcher.addEvent<EventKeyReleased>([](EventKeyReleased& event)
         {
             Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(event.code));;
         });
@@ -60,7 +61,7 @@ void Application::init()
             Logger::Debug("EVENT::The Window closed");
             m_closeWindow = true;
         });
-    m_eventDispatcher.addEvent<EventWindowResize>([&](EventWindowResize& event)
+    m_eventDispatcher.addEvent<EventWindowResize>([](EventWindowResize& event)
         {
             Logger::Debug("EVENT::The Window resized to {0}x{1}", event.x, event.y);
         });
@@ -79,7 +80,7 @@ void Application::init()
     transform->setPosition({ 0.5f,0.0f,0.0f });
 
     std::shared_ptr<Object> object2 = Object::Create();
-    object2->addComponent(Component::Create<Camera>(ProjectionType::Perspective));
+    object2->addComponent<Camera>(Component::Create<Camera>(ProjectionType::Perspective));
 }
 
 void Application::run()

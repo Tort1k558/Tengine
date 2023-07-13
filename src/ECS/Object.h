@@ -8,21 +8,21 @@
 #include"Core/UUID.h"
 #include"ECS/Component.h"
 class Scene;
+class Component;
 
-class Object
+class Object : public std::enable_shared_from_this<Object>
 {
 public:
 	Object();
 	virtual ~Object() = default;
 
 	template<typename T>
-	void addComponent(std::shared_ptr<T> component);
+	void addComponent(std::shared_ptr<Component> component);
+	template<typename T>
+	void removeComponent();
 
 	template<typename T>
 	std::shared_ptr<T> getComponent();
-
-	template<typename T>
-	void removeComponent();
 
 	void setName(const std::string& name);
 	std::string getName() { return m_name; }
@@ -38,20 +38,23 @@ private:
 };
 
 template<typename T>
-inline void Object::addComponent(std::shared_ptr<T> component)
+inline void Object::addComponent(std::shared_ptr<Component> component)
 {
-	m_components[typeid(T).hash_code()] = component;
+	component->setParent(shared_from_this());
+	m_components[typeid(T).hash_code()] = std::dynamic_pointer_cast<T>(component);
 }
+
+template<typename T>
+inline void Object::removeComponent()
+{
+	m_components[typeid(T).hash_code()]->setParent(nullptr);
+	m_components.erase(typeid(T).hash_code());
+}
+
 
 template<typename T>
 inline std::shared_ptr<T> Object::getComponent()
 {
 	std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(m_components[typeid(T).hash_code()]);
 	return component;
-}
-
-template<typename T>
-inline void Object::removeComponent()
-{
-	m_components.erase(typeid(T).hash_code());
 }
