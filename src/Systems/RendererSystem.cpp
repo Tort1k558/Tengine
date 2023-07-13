@@ -69,9 +69,9 @@ void RendererSystem::update()
 	delta += Timer::GetDeltaTime() * 100;
 	std::shared_ptr<Transform> transform = SceneManager::GetCurrentScene()->getComponents<Transform>()[0];
 	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
-	transform->setRotation({ delta, delta, delta });
+	//transform->setRotation({ delta, delta, delta });
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
-	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix({ 0.0f,0.0f,-2.0f }));
+	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
 	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
 	shader->bind();
 	va->bind();

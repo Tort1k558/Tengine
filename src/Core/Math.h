@@ -50,3 +50,8 @@ inline Mat4 GetOrthographicMatrix(float left, float right, float bottom, float t
 {
 	return glm::ortho(left, right, bottom, top, zNear, zFar);
 }
+
+inline Mat4 GetLookAtMatrix(Vec3 position, Vec3 direction, Vec3 up)
+{
+	return glm::lookAt(position, position + direction, up);
+}

@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include"Components/Transform.h"
+
 Camera::Camera()
 {
 	setCameraType(ProjectionType::Perspective);
@@ -8,6 +10,14 @@ Camera::Camera()
 Camera::Camera(ProjectionType type)
 {
 	setCameraType(type);
+}
+
+Mat4 Camera::getViewMatrix()
+{
+	Mat4 viewMatrix(1.0f);
+	std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
+	viewMatrix *= GetRotationMatrix(transform->getRotation());
+	return GetLookAtMatrix(transform->getPosition(), viewMatrix*Vec4( 0.0f,0.0f,1.0f ,1.0f), {0.0f,1.0f,0.0f});
 }
 
 void Camera::setCameraType(ProjectionType type)

@@ -34,8 +34,21 @@ void Application::init()
 
     SystemManager::InitSystems();
 
-    m_eventDispatcher = EventDispatcher();
+    std::shared_ptr<Scene> scene = Scene::Create();
+    SceneManager::SetCurrentScene(scene);
 
+    std::shared_ptr<Object> object = Object::Create();
+    std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+    transform->setScale({ 2.0f,1.0f,1.0f });
+    transform->setPosition({ 0.5f,0.0f,0.0f });
+
+    std::shared_ptr<Object> object2 = Object::Create();
+    object2->addComponent<Camera>(Component::Create<Camera>(ProjectionType::Perspective));
+    std::shared_ptr<Transform> transform2 = object2->getComponent<Transform>();
+    transform2->setRotation({ 0.0f,0.0f, 0.0f });
+    transform2->setPosition({ 0.0f,0.0f,-2.0f });
+
+    m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
         {
             //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.xPos, event.yPos);
@@ -69,18 +82,6 @@ void Application::init()
         {
             m_eventDispatcher.proccess(event);
         });
-    
-    std::shared_ptr<Scene> scene = Scene::Create();
-    SceneManager::SetCurrentScene(scene);
-
-    std::shared_ptr<Object> object = Object::Create();
-    std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-    transform->setRotation({ 0.0f,0.0f,90.0f });
-    transform->setScale({ 2.0f,1.0f,1.0f });
-    transform->setPosition({ 0.5f,0.0f,0.0f });
-
-    std::shared_ptr<Object> object2 = Object::Create();
-    object2->addComponent<Camera>(Component::Create<Camera>(ProjectionType::Perspective));
 }
 
 void Application::run()
