@@ -4,6 +4,8 @@
 
 std::unordered_map<KeyCode, bool> Input::m_keys;
 std::unordered_map<MouseCode, bool> Input::m_mouseButtons;
+Vec2 Input::m_mousePosition;
+Vec2 Input::m_deltaMousePosition;
 
 bool Input::IsKeyPressed(KeyCode code)
 {
@@ -22,7 +24,7 @@ void Input::ReleaseKey(KeyCode code)
     m_keys[code] = false;
 }
 
-bool Input::isMouseButtonPressed(MouseCode code)
+bool Input::IsMouseButtonPressed(MouseCode code)
 {
     return m_mouseButtons[code];
 }
@@ -37,4 +39,11 @@ void Input::ReleaseMouseButton(MouseCode code)
 {
     Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));
     m_mouseButtons[code] = false;
+}
+
+void Input::SetMousePosition(Vec2 position)
+{
+    //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.x, event.y);
+    m_deltaMousePosition = m_mousePosition - position;
+    m_mousePosition = position;
 }

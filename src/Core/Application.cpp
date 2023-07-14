@@ -51,8 +51,7 @@ void Application::init()
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
         {
-            //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.x, event.y);
-
+            Input::SetMousePosition({ event.x, event.y });
         });
     m_eventDispatcher.addEvent<EventMouseButtonPressed>([](EventMouseButtonPressed& event)
         {
@@ -89,11 +88,12 @@ void Application::run()
 {
     double speed = 50.0;
     double delta = 0.0;
-    double maxFps = 1.0 / 144.0;
+    unsigned int maxFps = 144;
+    double maxDelta = 1.0 / static_cast<double>(maxFps);
     while (!m_closeWindow)
     {
         Timer::Start();
-        if (delta < maxFps)
+        if (delta < maxDelta)
         {
             delta += Timer::GetDeltaTime();
         }
