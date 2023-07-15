@@ -18,8 +18,14 @@ public:
 
 	void init();
 	void run();
+	void lockFps();
+	void unlockFps();
+	void setMaxFps(size_t fps);
+	size_t getMaxFps() { return m_maxFps; }
 private:
 	std::shared_ptr<Window> m_window;
 	EventDispatcher m_eventDispatcher;
 	bool m_closeWindow;
+	bool m_lockFps;
+	size_t m_maxFps;
 };

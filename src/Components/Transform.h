@@ -9,8 +9,17 @@ public:
 	Transform(Vec3 position, Vec3 rotation, Vec3 scale);
 
 	Transform& setPosition(Vec3 position);
+	Transform& setPositionX(float position);
+	Transform& setPositionY(float position);
+	Transform& setPositionZ(float position);
 	Transform& setRotation(Vec3 angles);
+	Transform& setRotationX(float angle);
+	Transform& setRotationY(float angle);
+	Transform& setRotationZ(float angle);
 	Transform& setScale(Vec3 scale);
+	Transform& setScaleX(float scale);
+	Transform& setScaleY(float scale);
+	Transform& setScaleZ(float scale);
 
 	Vec3 getPosition() { return m_position; }
 	Vec3 getRotation() { return m_rotation; }

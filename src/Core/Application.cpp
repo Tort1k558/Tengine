@@ -45,7 +45,6 @@ void Application::init()
     std::shared_ptr<Object> object2 = Object::Create();
     object2->addComponent<Camera>(Component::Create<Camera>(ProjectionType::Perspective));
     transform2 = object2->getComponent<Transform>();
-    transform2->setRotation({ 0.0f,0.0f, 0.0f });
     transform2->setPosition({ 0.0f,0.0f,-2.0f });
 
     m_eventDispatcher = EventDispatcher();
@@ -86,43 +85,64 @@ void Application::init()
 
 void Application::run()
 {
-    double speed = 50.0;
+    double speed = 35.0;
     double delta = 0.0;
-    unsigned int maxFps = 144;
-    double maxDelta = 1.0 / static_cast<double>(maxFps);
+    double maxDelta = 1.0 / static_cast<double>(m_maxFps);
+    std::chrono::time_point<std::chrono::steady_clock,std::chrono::duration<double>> nextFrame = Timer::GetNowPoint();
     while (!m_closeWindow)
     {
+        if (Timer::GetDeltaTime() < maxDelta && m_lockFps)
+        {
+            std::this_thread::sleep_until(nextFrame);
+            Timer::SetDeltaTime(maxDelta);
+        }
         Timer::Start();
-        if (delta < maxDelta)
+        SystemManager::UpdateSystems();
+        if (Input::IsKeyPressed(KeyCode::D))
         {
-            delta += Timer::GetDeltaTime();
+            transform2->setPosition(transform2->getPosition() + Vec3(-speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
         }
-        else
+        if (Input::IsKeyPressed(KeyCode::A))
         {
-            Timer::SetDeltaTime(delta);
-            SystemManager::UpdateSystems();
-            if (Input::IsKeyPressed(KeyCode::D))
-            {
-                transform2->setPosition(transform2->getPosition() + Vec3(-speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
-            }
-            if (Input::IsKeyPressed(KeyCode::A))
-            {
-                transform2->setPosition(transform2->getPosition() + Vec3(speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
-            }
-            if (Input::IsKeyPressed(KeyCode::W))
-            {
-                transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, speed * Timer::GetDeltaTime()));
-            }
-            if (Input::IsKeyPressed(KeyCode::S))
-            {
-                transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, -speed * Timer::GetDeltaTime()));
-            }
-            Logger::Debug("{0:.9f}", Timer::GetDeltaTime());
-            m_window->update();
-            delta = 0.0f;
+            transform2->setPosition(transform2->getPosition() + Vec3(speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
         }
+        if (Input::IsKeyPressed(KeyCode::W))
+        {
+            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, speed * Timer::GetDeltaTime()));
+        }
+        if (Input::IsKeyPressed(KeyCode::S))
+        {
+            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, -speed * Timer::GetDeltaTime()));
+        }
+        if (Input::IsKeyPressed(KeyCode::LEFT_SHIFT))
+        {
+            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, -speed * Timer::GetDeltaTime(), 0.0f));
+        }
+        if (Input::IsKeyPressed(KeyCode::SPACE))
+        {
+            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
+        }
+        m_window->update();
+        Logger::Debug("{0:.10f}", Timer::GetDeltaTime());
         Timer::End();
+
+        nextFrame += std::chrono::duration<double>(maxDelta);
     }
     SystemManager::DestroySystems();
+}
+
+void Application::lockFps()
+{
+    m_lockFps = true;
+}
+
+void Application::unlockFps()
+{
+    m_lockFps = false;
+}
+
+void Application::setMaxFps(size_t fps)
+{
+    m_maxFps = fps;
 }
 
