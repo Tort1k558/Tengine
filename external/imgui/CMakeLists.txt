@@ -7,7 +7,7 @@ set(IMGUI_INCLUDES
 	imgui/backends/imgui_impl_glfw.h
 	imgui/backends/imgui_impl_opengl3.h
 )
-set(IMGUI_SOURCES
+set(IMGUI_SRC
 	imgui/imgui.cpp
 	imgui/imgui_demo.cpp
 	imgui/imgui_tables.cpp
@@ -16,7 +16,7 @@ set(IMGUI_SOURCES
 	imgui/backends/imgui_impl_glfw.cpp
 	imgui/backends/imgui_impl_opengl3.cpp
 )
-add_library(imgui STATIC ${IMGUI_INCLUDES} ${IMGUI_SOURCES})
+add_library(imgui STATIC ${IMGUI_INCLUDES} ${IMGUI_SRC})
 
 target_include_directories(imgui PUBLIC imgui)
 target_include_directories(imgui PUBLIC /)

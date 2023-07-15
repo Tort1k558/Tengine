@@ -9,18 +9,17 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
-#include "Renderer/Shader.h"
 #include "ECS/ComponentManager.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
 GLfloat posCol[] =
 {
-	//         Positions              Colors
-		-0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f,
-		 0.5f,  0.5f, 0.0f,      0.0f, 0.0f, 1.0f,
-		-0.5f,  0.5f, 0.0f,      1.0f, 0.0f, 1.0f,
-		 0.5f, -0.5f, 0.0f,      1.0f, 1.0f, 0.0f
+	//         Positions              uv
+		-0.5f, -0.5f, 0.0f,      0.0f, 0.0f,
+		 0.5f,  0.5f, 0.0f,      1.0f, 1.0f,
+		-0.5f,  0.5f, 0.0f,      0.0f, 1.0f,
+		 0.5f, -0.5f, 0.0f,      1.0f, 0.0f
 };
 GLuint indices[] =
 {
@@ -29,6 +28,7 @@ GLuint indices[] =
 };
 
 std::shared_ptr<Shader> shader;
+std::shared_ptr<Texture> texture;
 std::shared_ptr<VertexArray> va;
 std::shared_ptr<VertexBuffer> vbPosCol;
 std::shared_ptr<IndexBuffer> ibPosCol;
@@ -46,19 +46,20 @@ void RendererSystem::init()
 		}
 	}
 	m_context->init();
-	AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
-	shader = AssetManager::GetResource<Shader>("DefaultShader");
+	shader = AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
 
 	va = VertexArray::Create();
 	vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
 	BufferLayout posCol;
 	posCol.push({ ElementType::Float3 });
-	posCol.push({ ElementType::Float3 });
+	posCol.push({ ElementType::Float2 });
 
 	vbPosCol->setLayout(posCol);
 	va->addVertexBuffer(vbPosCol);
 	ibPosCol = IndexBuffer::Create(indices, 6);
 	va->setIndexBuffer(ibPosCol);
+
+	texture = AssetManager::LoadTexture("awesomeFace","data/Textures/awesomeface.png");
 }
 
 void RendererSystem::update()
@@ -73,6 +74,7 @@ void RendererSystem::update()
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
 	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
 	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
+	texture->bind(0);
 	shader->bind();
 	va->bind();
 	m_context->drawIndexed(va);

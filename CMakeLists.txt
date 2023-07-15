@@ -7,7 +7,7 @@ set(PROJECT_NAME Tengine)
 
 project(${PROJECT_NAME})
 
-set(SOURCE_DIRS 
+set(DIRS_SRC 
 	"src/Components/*.h" "src/Components/*.cpp" 
 	"src/Core/*.h" "src/Core/*.cpp" 
 	"src/ECS/*.h" "src/ECS/*.cpp" 
@@ -16,11 +16,11 @@ set(SOURCE_DIRS
 	"src/Systems/*.h" "src/Systems/*.cpp"
 	"src/Scene/*.h" "src/Scene/*.cpp"
 	)
-file(GLOB TARGET_SRC ${SOURCE_DIRS})
+file(GLOB TARGET_SRC ${DIRS_SRC})
 
 include_directories(src)
   
-add_executable(${PROJECT_NAME} ${TARGET_SRC} main.cpp)
+add_executable(${PROJECT_NAME} ${TARGET_SRC} ${STBI_SRC} main.cpp)
 
 add_subdirectory(external/glfw ${CMAKE_CURRENT_BINARY_DIR}/external/glfw)
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
@@ -36,3 +36,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
 
 add_subdirectory(external/glm ${CMAKE_CURRENT_BINARY_DIR}/external/glm)
 target_link_libraries(${PROJECT_NAME} PRIVATE glm)
+
+add_subdirectory(external/stbi ${CMAKE_CURRENT_BINARY_DIR}/external/stbi)
+target_link_libraries(${PROJECT_NAME} PRIVATE stbi)

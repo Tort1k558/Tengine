@@ -85,8 +85,7 @@ void Application::init()
 
 void Application::run()
 {
-    double speed = 35.0;
-    double delta = 0.0;
+    double speed = 10.0;
     double maxDelta = 1.0 / static_cast<double>(m_maxFps);
     std::chrono::time_point<std::chrono::steady_clock,std::chrono::duration<double>> nextFrame = Timer::GetNowPoint();
     while (!m_closeWindow)
@@ -123,7 +122,6 @@ void Application::run()
             transform2->setPosition(transform2->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
         }
         m_window->update();
-        Logger::Debug("{0:.10f}", Timer::GetDeltaTime());
         Timer::End();
 
         nextFrame += std::chrono::duration<double>(maxDelta);

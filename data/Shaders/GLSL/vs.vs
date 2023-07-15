@@ -1,13 +1,15 @@
 #version 460
 layout(location = 0) in vec3 vertexPos;
-layout(location = 1) in vec3 vertexColor;
+layout(location = 1) in vec2 vertexUv;
 
-out vec3 color;
+out vec2 uv;
 
 uniform mat4 u_modelMatrix;
+uniform mat4 u_viewMatrix;
+uniform mat4 u_projectionMatrix;
 
 void main()
 {
-    color = vertexColor;
-    gl_Position = u_modelMatrix * vec4(vertexPos,1.0);
+    uv = vertexUv;
+    gl_Position = u_projectionMatrix* u_viewMatrix * u_modelMatrix * vec4(vertexPos,1.0);
 }
