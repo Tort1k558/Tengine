@@ -21,6 +21,7 @@ int TypeOfElementTypeToGL(ElementType type)
 	}
 	return 0;
 }
+
 VertexArrayOpenGL::VertexArrayOpenGL() : 
 	m_elementCount(0)
 {

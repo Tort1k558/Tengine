@@ -9,8 +9,6 @@ int main(int argc,char** argv)
     
     Application app(640, 480, "Tengine");
     app.init();
-    app.lockFps();
-    app.setMaxFps(30);
     app.run();
 
     return 0;
