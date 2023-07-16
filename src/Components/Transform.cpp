@@ -1,7 +1,7 @@
 #include"Transform.h"
 
 Transform::Transform() :
-	m_position(Vec3(0.0f)), m_rotation(Vec3(0.0f)), m_scale(Vec3(1.0f))
+	m_position(Vec3(0.0f)), m_rotation(Vec3(0.0f)), m_scale(Vec3(1.0f,1.0f,1.0f))
 {
 }
 

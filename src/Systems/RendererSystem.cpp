@@ -30,8 +30,8 @@ GLuint indices[] =
 std::shared_ptr<Shader> shader;
 std::shared_ptr<Texture> texture;
 std::shared_ptr<VertexArray> va;
-std::shared_ptr<VertexBuffer> vbPosCol;
-std::shared_ptr<IndexBuffer> ibPosCol;
+std::shared_ptr<VertexBuffer> vbPosUV;
+std::shared_ptr<IndexBuffer> ibPosUV;
 
 void RendererSystem::init()
 {
@@ -49,15 +49,15 @@ void RendererSystem::init()
 	shader = AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
 
 	va = VertexArray::Create();
-	vbPosCol = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
+	vbPosUV = VertexBuffer::Create(posCol, sizeof(posCol), BufferUsage::Static);
 	BufferLayout posCol;
 	posCol.push({ ElementType::Float3 });
 	posCol.push({ ElementType::Float2 });
 
-	vbPosCol->setLayout(posCol);
-	va->addVertexBuffer(vbPosCol);
-	ibPosCol = IndexBuffer::Create(indices, 6);
-	va->setIndexBuffer(ibPosCol);
+	vbPosUV->setLayout(posCol);
+	va->addVertexBuffer(vbPosUV);
+	ibPosUV = IndexBuffer::Create(indices, 6);
+	va->setIndexBuffer(ibPosUV);
 
 	texture = AssetManager::LoadTexture("awesomeFace","data/Textures/awesomeface.png");
 }
@@ -71,19 +71,20 @@ void RendererSystem::update()
 	std::shared_ptr<Transform> transform = SceneManager::GetCurrentScene()->getComponents<Transform>()[0];
 	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
 	//transform->setRotation({ delta, delta, delta });
-	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
-	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
-	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
-	texture->bind(0);
+	camera->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
 	shader->bind();
-	va->bind();
+	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
+	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
+	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
+	texture->bind(0);
 	m_context->drawIndexed(va);
 
 }
 
-void RendererSystem::updateWindowSize(unsigned int widht, unsigned int height)
+void RendererSystem::updateViewport(UVec2 size)
 {
-	m_context->setViewport(0, 0, widht, height);
+	m_viewportSize = size;
+	m_context->setViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
 }
 
 void RendererSystem::setRendererType(RendererType type)

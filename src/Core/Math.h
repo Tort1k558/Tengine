@@ -29,7 +29,7 @@ inline Mat4 TranslateMatrix(Mat4& matrix, Vec3 position)
 //The angle of rotation is indicated in degrees!
 inline Mat4 GetRotationMatrix(Vec3 angles)
 {
-	return glm::yawPitchRoll(glm::radians(angles.y), glm::radians(angles.x), glm::radians(angles.z));
+	return glm::yawPitchRoll(glm::radians(angles.z), glm::radians(angles.y), glm::radians(angles.x));
 }
 
 inline Mat4 GetScaleMatrix(Vec3 scale)
@@ -42,7 +42,7 @@ inline Mat4 GetScaleMatrix(Vec3 scale)
 
 inline Mat4 GetPerspectiveMatrix(float fov, float aspect, float zNear, float zFar)
 {
-	return glm::perspective(fov, aspect, zNear, zFar);
+	return glm::perspective(glm::radians(fov), aspect, zNear, zFar);
 }
 
 inline Mat4 GetOrthographicMatrix(float left, float right, float bottom, float top)

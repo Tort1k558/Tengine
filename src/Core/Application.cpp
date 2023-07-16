@@ -34,18 +34,20 @@ void Application::init()
 
     SystemManager::InitSystems();
 
+    System::GetInstance<RendererSystem>()->updateViewport(m_window->getSize());
+
     std::shared_ptr<Scene> scene = Scene::Create();
     SceneManager::SetCurrentScene(scene);
 
     std::shared_ptr<Object> object = Object::Create();
     std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-    transform->setScale({ 2.0f,1.0f,1.0f });
-    transform->setPosition({ 0.5f,0.0f,0.0f });
+    //transform->setScale({ 2.0f,1.0f,1.0f });
+    //transform->setPosition({ 0.0f,0.0f,0.0f });
 
     std::shared_ptr<Object> object2 = Object::Create();
     object2->addComponent<Camera>(Component::Create<Camera>(ProjectionType::Perspective));
     transform2 = object2->getComponent<Transform>();
-    transform2->setPosition({ 0.0f,0.0f,-2.0f });
+    transform2->setPosition({ 0.0f,0.0f,2.0f });
 
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
@@ -96,22 +98,21 @@ void Application::run()
             Timer::SetDeltaTime(maxDelta);
         }
         Timer::Start();
-        SystemManager::UpdateSystems();
         if (Input::IsKeyPressed(KeyCode::D))
-        {
-            transform2->setPosition(transform2->getPosition() + Vec3(-speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
-        }
-        if (Input::IsKeyPressed(KeyCode::A))
         {
             transform2->setPosition(transform2->getPosition() + Vec3(speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
         }
+        if (Input::IsKeyPressed(KeyCode::A))
+        {
+            transform2->setPosition(transform2->getPosition() + Vec3(-speed * Timer::GetDeltaTime(), 0.0f, 0.0f));
+        }
         if (Input::IsKeyPressed(KeyCode::W))
         {
-            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, speed * Timer::GetDeltaTime()));
+            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, -speed * Timer::GetDeltaTime()));
         }
         if (Input::IsKeyPressed(KeyCode::S))
         {
-            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, -speed * Timer::GetDeltaTime()));
+            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, 0.0f, speed * Timer::GetDeltaTime()));
         }
         if (Input::IsKeyPressed(KeyCode::LEFT_SHIFT))
         {
@@ -121,6 +122,7 @@ void Application::run()
         {
             transform2->setPosition(transform2->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
         }
+        SystemManager::UpdateSystems();
         m_window->update();
         Timer::End();
 

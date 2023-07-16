@@ -4,6 +4,7 @@
 #include<functional>
 #include<GLFW/glfw3.h>
 #include"Event.h"
+#include"Core/Math.h"
 class Window
 {
 public:
@@ -17,16 +18,14 @@ public:
 	void init();
 	void update();
 	void setEventCallback(std::function<void(Event&)> callback);
-	std::function<void(Event&)> getEventCallback();
-	unsigned int getWidth();
-	unsigned int getHeight();
-	GLFWwindow* getWindow();
 	void setWidth(unsigned int width);
 	void setHeight(unsigned int height);
+	std::function<void(Event&)> getEventCallback();
+	GLFWwindow* getWindow();
+	UVec2 getSize() { return m_size; }
 private:
 	GLFWwindow* m_window;
-	unsigned int m_width;
-	unsigned int m_height;
+	UVec2 m_size;
 	std::string m_title;
 	std::function<void(Event&)> m_eventCallback;
 };

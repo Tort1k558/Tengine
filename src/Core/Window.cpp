@@ -4,7 +4,7 @@
 #include"Core/Logger.h"
 
 Window::Window(unsigned int width, unsigned int height, std::string title) :
-	m_width(width), m_height(height), m_title(title), m_window(nullptr)
+	m_size(width,height), m_title(title), m_window(nullptr)
 {
 
 }
@@ -17,7 +17,7 @@ Window::~Window()
 
 void Window::init()
 {
-	Logger::Info("Creating a window named {0} size {1}x{2}", m_title, m_width, m_height);
+	Logger::Info("Creating a window named {0} size {1}x{2}", m_title, m_size.x, m_size.y);
 
 	if (!glfwInit())
 	{
@@ -25,7 +25,7 @@ void Window::init()
 		return;
 	}
 
-	m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+	m_window = glfwCreateWindow(m_size.x, m_size.y, m_title.c_str(), nullptr, nullptr);
 	if (!m_window)
 	{
 		Logger::Critical("ERROR::GLFW::Failed to create a window!");
@@ -109,7 +109,7 @@ void Window::init()
 	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 		{
 			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			System::GetInstance<RendererSystem>()->updateWindowSize(width, height);
+			System::GetInstance<RendererSystem>()->updateViewport({ width, height });
 		});
 }
 
@@ -129,16 +129,6 @@ std::function<void(Event&)> Window::getEventCallback()
 	return m_eventCallback;
 }
 
-unsigned int Window::getWidth()
-{
-	return m_width;
-}
-
-unsigned int Window::getHeight()
-{
-	return m_height;
-}
-
 GLFWwindow* Window::getWindow()
 {
 	return m_window;
@@ -146,10 +136,10 @@ GLFWwindow* Window::getWindow()
 
 void Window::setWidth(unsigned int width)
 {
-	m_width = width;
+	m_size.x = width;
 }
 
 void Window::setHeight(unsigned int height)
 {
-	m_height = height;
+	m_size.y = height;
 }
