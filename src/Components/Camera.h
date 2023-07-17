@@ -18,10 +18,12 @@ public:
 	void setCameraType(ProjectionType type);
 	void setAspectRatio(float aspect);
 	void setFov(float fov);
+	void setUp(Vec3 up);
 
 	Mat4 getProjectionMatrix() { return m_projection; }
 	Mat4 getViewMatrix();
 	Vec3 getDirection();
+	Vec3 getUp() { return m_up; }
 private:
 	Mat4 m_projection;
 	float m_aspect = 16.0f / 9.0f;

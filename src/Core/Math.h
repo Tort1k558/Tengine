@@ -59,3 +59,22 @@ inline Mat4 GetLookAtMatrix(Vec3 position, Vec3 direction, Vec3 up)
 {
 	return glm::lookAt(position, position + direction, up);
 }
+
+inline Vec3 Cross(Vec3 vec1, Vec3 vec2)
+{
+	return glm::cross(vec1, vec2);
+}
+
+inline Vec3 Normalize(Vec3 vec)
+{
+	return glm::normalize(vec);
+}
+
+inline Vec2 Normalize(Vec2 vec)
+{
+	return glm::normalize(vec);
+}
+inline Vec4 Normalize(Vec4 vec)
+{
+	return glm::normalize(vec);
+}

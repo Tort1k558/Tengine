@@ -24,10 +24,8 @@ public:
 
 	static void SetMousePosition(Vec2 position);
 	static Vec2 GetMousePosition() { return m_mousePosition; }
-	static Vec2 GetDeltaMousePosition() { return m_deltaMousePosition; }
 private:
 	static std::unordered_map<KeyCode, bool> m_keys;
 	static std::unordered_map<MouseCode, bool> m_mouseButtons;
 	static Vec2 m_mousePosition;
-	static Vec2 m_deltaMousePosition;
 };

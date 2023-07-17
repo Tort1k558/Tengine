@@ -2,6 +2,7 @@
 
 #include"Systems/RendererSystem.h"
 #include"Core/Logger.h"
+#include"Input.h"
 
 Window::Window(unsigned int width, unsigned int height, std::string title) :
 	m_size(width,height), m_title(title), m_window(nullptr)
@@ -110,7 +111,10 @@ void Window::init()
 		{
 			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
 			System::GetInstance<RendererSystem>()->updateViewport({ width, height });
+			window.setWidth(width);
+			window.setHeight(height);
 		});
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Window::update()
@@ -132,6 +136,12 @@ std::function<void(Event&)> Window::getEventCallback()
 GLFWwindow* Window::getWindow()
 {
 	return m_window;
+}
+
+void Window::setCursorPos(UVec2 pos)
+{
+	glfwSetCursorPos(m_window, pos.x, pos.y);
+	Input::SetMousePosition(pos);
 }
 
 void Window::setWidth(unsigned int width)

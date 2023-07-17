@@ -47,3 +47,8 @@ void Camera::setFov(float fov)
 {
 	m_fov = fov;
 }
+
+void Camera::setUp(Vec3 up)
+{
+	m_up = up;
+}
