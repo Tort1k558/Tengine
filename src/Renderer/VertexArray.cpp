@@ -6,7 +6,7 @@
 
 std::shared_ptr<VertexArray> VertexArray::Create()
 {
-	switch (System::GetInstance<RendererSystem>()->getType())
+	switch (System::GetInstance<RendererSystem>()->getRendererType())
 	{
 	case RendererType::None:
 		Logger::Critical("ERROR::Renderer not initialized!");

@@ -59,7 +59,7 @@ void RendererSystem::init()
 	ibPosUV = IndexBuffer::Create(indices, 6);
 	va->setIndexBuffer(ibPosUV);
 
-	texture = AssetManager::LoadTexture("awesomeFace","data/Textures/awesomeface.png");
+	texture = AssetManager::LoadTexture("awesomeFace","data/Textures/whiteblackquads.png");
 }
 
 void RendererSystem::update()
@@ -92,12 +92,12 @@ void RendererSystem::setRendererType(RendererType type)
 	m_rendererType = type;
 }
 
+void RendererSystem::setTextureFilter(TextureFilter filter)
+{
+	m_textureFilter = filter;
+}
+
 void RendererSystem::destroy()
 {
 
-}
-
-RendererType RendererSystem::getType()
-{
-	return m_context->getType();
 }

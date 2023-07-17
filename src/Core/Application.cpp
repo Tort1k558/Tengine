@@ -29,6 +29,7 @@ void Application::init()
 	m_window->init();
 
     System::GetInstance<RendererSystem>()->setRendererType(RendererType::OpenGL);
+    System::GetInstance<RendererSystem>()->setTextureFilter(TextureFilter::Trilinear);
     SystemManager::AddSystem<RendererSystem>();
     System::GetInstance<UISystem>()->setWindow(m_window);
     SystemManager::AddSystem<UISystem>();
@@ -42,7 +43,8 @@ void Application::init()
 
     std::shared_ptr<Object> object = Object::Create();
     std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-    transform->setScale({ 2.0f,1.0f,1.0f });
+    transform->setScale({ 20.0f,20.0f,1.0f });
+    transform->setRotationY(90.0f);
 
     std::shared_ptr<Object> object2 = Object::Create();
     camera = Component::Create<Camera>(ProjectionType::Perspective);
@@ -88,7 +90,7 @@ void Application::init()
 
 void Application::run()
 {
-    double speed = 10.0;
+    double speed = 7.0;
     double cameraSensitivity= 0.314;
 
     double maxDelta = 1.0 / static_cast<double>(m_maxFps);
@@ -110,6 +112,10 @@ void Application::run()
 
         SystemManager::UpdateSystems();
         m_window->update();
+        if (Input::IsKeyPressed(KeyCode::ESCAPE))
+        {
+            m_closeWindow = true;
+        }
         if (Input::IsKeyPressed(KeyCode::D))
         {
             transform2->setPosition(transform2->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(speed * Timer::GetDeltaTime()));
@@ -140,7 +146,10 @@ void Application::run()
         }
         if (deltaMouse.y != 0)
         {
-            transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
+            if (transform2->getRotation().y + deltaMouse.y * cameraSensitivity < 89.0f && transform2->getRotation().y + deltaMouse.y * cameraSensitivity > -89.0f)
+            {
+                transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
+            }
         }
 
         deltaMouse = prevMousePos - Input::GetMousePosition();

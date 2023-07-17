@@ -10,6 +10,12 @@ enum class TextureType
 	RGBA8,
 };
 
+enum class TextureFilter
+{
+	Bilinear,
+	Trilinear
+};
+
 class Texture
 {
 public:
