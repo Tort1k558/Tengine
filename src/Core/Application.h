@@ -10,7 +10,8 @@ class Application
 {
 public:
 	Application(unsigned int width, unsigned int height, std::string title);
-	virtual ~Application();
+	virtual ~Application() = default;
+
 	Application(const Application&) = delete;
 	Application(Application&&) = delete;
 	Application& operator=(const Application&) = delete;

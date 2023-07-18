@@ -8,7 +8,9 @@ class SystemManager
 public:
 	SystemManager() = delete;
 	SystemManager(const SystemManager&) = delete;
+	SystemManager(SystemManager&&) = delete;
 	SystemManager& operator=(const SystemManager&) = delete;
+	SystemManager& operator=(SystemManager&&) = delete;
 
 	template<typename T>
 	static void AddSystem()

@@ -20,11 +20,6 @@ Application::Application(unsigned int width, unsigned int height, std::string ti
 	m_window = std::make_shared<Window>(width, height, title);
 }
 
-Application::~Application()
-{
-    
-}
-
 void Application::init()
 {
 	m_window->init();

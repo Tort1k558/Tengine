@@ -40,44 +40,48 @@ public:
         transform2->setPosition({ 0.0f,0.0f,2.0f });
 
         double speed = 7.0;
-        double cameraSensitivity = 0.314;
+        float cameraSensitivity = 0.314f;
 
         std::shared_ptr<Controller> controller = Component::Create<Controller>();
         controller->addKeyCallback(KeyCode::W, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(speed * Timer::GetDeltaTime()));
+                transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
             });
         controller->addKeyCallback(KeyCode::S, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(-speed * Timer::GetDeltaTime()));
+                transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
             });
         controller->addKeyCallback(KeyCode::A, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(-speed * Timer::GetDeltaTime()));
+                transform->setPosition(transform->getPosition() 
+                                       + Normalize(Cross(camera->getDirection(), camera->getUp()))
+                                       * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
             });
         controller->addKeyCallback(KeyCode::D, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(speed * Timer::GetDeltaTime()));
+                transform->setPosition(transform->getPosition() 
+                                        + Normalize(Cross(camera->getDirection(), camera->getUp())) 
+                                        * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
             });
         controller->addKeyCallback(KeyCode::LEFT_SHIFT, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() + Vec3(0.0f, -speed * Timer::GetDeltaTime(), 0.0f));
+                transform->setPosition(transform->getPosition() + Vec3(0.0f, static_cast<float>(-speed * Timer::GetDeltaTime()), 0.0f));
             });
         controller->addKeyCallback(KeyCode::SPACE, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
+                transform->setPosition(transform->getPosition() + Vec3(0.0f, static_cast<float>(speed * Timer::GetDeltaTime()), 0.0f));
             });
         controller->setMouseCallback([cameraSensitivity](std::shared_ptr<Object> object)
             {
@@ -105,10 +109,11 @@ public:
         }
     }
 };
+
 int main(int argc,char** argv)
 {
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
+    Logger::SetLevel(LogLevel::Debug);
+    Logger::SetPattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
     
     MyApp app(640, 480, "Tengine");
     app.init();
