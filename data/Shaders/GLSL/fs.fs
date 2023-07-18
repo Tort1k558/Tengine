@@ -1,6 +1,6 @@
 #version 460 
 
-uniform sampler2D ourTexture;
+layout (binding = 0)uniform sampler2D ourTexture;
 
 in  vec2 uv;
 out vec4 fragColor;

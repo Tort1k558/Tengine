@@ -25,9 +25,6 @@ Application::~Application()
     
 }
 
-std::shared_ptr<Transform> transform2;
-std::shared_ptr<Camera> camera;
-
 void Application::init()
 {
 	m_window->init();
@@ -38,89 +35,9 @@ void Application::init()
     System::GetInstance<UISystem>()->setWindow(m_window);
     SystemManager::AddSystem<UISystem>();
     SystemManager::AddSystem<ControllerSystem>();
-
     SystemManager::InitSystems();
 
     System::GetInstance<RendererSystem>()->updateViewport(m_window->getSize());
-
-    std::shared_ptr<Scene> scene = Scene::Create();
-    SceneManager::SetCurrentScene(scene);
-
-    std::shared_ptr<Object> object = Object::Create();
-    std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-    transform->setScale({ 20.0f,20.0f,1.0f });
-    transform->setRotationY(90.0f);
-    std::shared_ptr<Controller> controllerObject = Component::Create<Controller>();
-    controllerObject->addKeyCallback(KeyCode::H, [](std::shared_ptr<Object> object)
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            transform->setPositionX(transform->getPosition().x + 4.0 * Timer::GetDeltaTime());
-        });
-    object->addComponent<Controller>(controllerObject);
-    std::shared_ptr<Object> object2 = Object::Create();
-    camera = Component::Create<Camera>(ProjectionType::Perspective);
-    //camera->getOrthographicalProjection()->setBorders(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10000.0f);
-    object2->addComponent<Camera>(camera);
-    transform2 = object2->getComponent<Transform>();
-    transform2->setPosition({ 0.0f,0.0f,2.0f });
-    
-    double speed = 7.0;
-    double cameraSensitivity = 0.314;
-
-    std::shared_ptr<Controller> controller = Component::Create<Controller>();
-    controller->addKeyCallback(KeyCode::W, [speed](std::shared_ptr<Object> object) 
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-            transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(speed * Timer::GetDeltaTime()));
-        });
-    controller->addKeyCallback(KeyCode::S, [speed](std::shared_ptr<Object> object)
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-            transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(-speed * Timer::GetDeltaTime()));
-        });
-    controller->addKeyCallback(KeyCode::A, [speed](std::shared_ptr<Object> object)
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-            transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(-speed * Timer::GetDeltaTime()));
-        });
-    controller->addKeyCallback(KeyCode::D, [speed](std::shared_ptr<Object> object)
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-            transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(speed * Timer::GetDeltaTime()));
-        });
-    controller->addKeyCallback(KeyCode::LEFT_SHIFT, [speed](std::shared_ptr<Object> object)
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-            transform->setPosition(transform->getPosition() + Vec3(0.0f, -speed * Timer::GetDeltaTime(), 0.0f));
-        });
-    controller->addKeyCallback(KeyCode::SPACE, [speed](std::shared_ptr<Object> object)
-        {
-            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-            transform->setPosition(transform->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
-        });
-    controller->setMouseCallback([cameraSensitivity](std::shared_ptr<Object> object)
-        {
-            static Vec2 deltaMouse(0.0f, 0.0f);
-            if (deltaMouse.x != 0)
-            {
-                transform2->setRotationZ(transform2->getRotation().z + deltaMouse.x * cameraSensitivity);
-            }
-            if (deltaMouse.y != 0)
-            {
-                if (transform2->getRotation().y + deltaMouse.y * cameraSensitivity < 89.0f && transform2->getRotation().y + deltaMouse.y * cameraSensitivity > -89.0f)
-                {
-                    transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
-                }
-            }
-            deltaMouse = Input::GetPrevMousePosition() - Input::GetMousePosition();
-        });
-    object2->addComponent<Controller>(controller);
 
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
@@ -145,17 +62,14 @@ void Application::init()
         });
     m_eventDispatcher.addEvent<EventWindowClose>([&](EventWindowClose& event)
         {
-            Logger::Debug("EVENT::The Window closed");
+            Logger::Info("EVENT::The Window closed");
             m_closeWindow = true;
-        });
-    m_eventDispatcher.addEvent<EventWindowResize>([](EventWindowResize& event)
-        {
-            Logger::Debug("EVENT::The Window resized to {0}x{1}", event.x, event.y);
         });
     m_window->setEventCallback([&](Event& event)
         {
             m_eventDispatcher.proccess(event);
         });
+    create();
 }
 
 void Application::run()
@@ -176,10 +90,7 @@ void Application::run()
         Input::Update();
         m_window->update();
         SystemManager::UpdateSystems();
-        if (Input::IsKeyPressed(KeyCode::ESCAPE))
-        {
-            m_closeWindow = true;
-        }
+        update();
         Timer::End();
 
         if (m_lockFps)
@@ -203,5 +114,10 @@ void Application::unlockFps()
 void Application::setMaxFps(size_t fps)
 {
     m_maxFps = fps;
+}
+
+void Application::close()
+{
+    m_closeWindow = true;
 }
 
