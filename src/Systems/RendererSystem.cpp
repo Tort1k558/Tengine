@@ -71,7 +71,6 @@ void RendererSystem::update()
 	std::shared_ptr<Transform> transform = SceneManager::GetCurrentScene()->getComponents<Transform>()[0];
 	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
 	//transform->setRotation({ delta, delta, delta });
-	camera->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
 	shader->bind();
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
 	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());

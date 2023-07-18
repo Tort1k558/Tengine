@@ -50,9 +50,16 @@ void Application::init()
     std::shared_ptr<Transform> transform = object->getComponent<Transform>();
     transform->setScale({ 20.0f,20.0f,1.0f });
     transform->setRotationY(90.0f);
-
+    std::shared_ptr<Controller> controllerObject = Component::Create<Controller>();
+    controllerObject->addKeyCallback(KeyCode::H, [](std::shared_ptr<Object> object)
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            transform->setPositionX(transform->getPosition().x + 4.0 * Timer::GetDeltaTime());
+        });
+    object->addComponent<Controller>(controllerObject);
     std::shared_ptr<Object> object2 = Object::Create();
     camera = Component::Create<Camera>(ProjectionType::Perspective);
+    //camera->getOrthographicalProjection()->setBorders(-10.0f, 10.0f, -10.0f, 10.0f, 0.1f, 10000.0f);
     object2->addComponent<Camera>(camera);
     transform2 = object2->getComponent<Transform>();
     transform2->setPosition({ 0.0f,0.0f,2.0f });
@@ -61,7 +68,6 @@ void Application::init()
     double cameraSensitivity = 0.314;
 
     std::shared_ptr<Controller> controller = Component::Create<Controller>();
-
     controller->addKeyCallback(KeyCode::W, [speed](std::shared_ptr<Object> object) 
         {
             std::shared_ptr<Transform> transform = object->getComponent<Transform>();
