@@ -4,12 +4,14 @@
 
 #include"Components/Transform.h"
 #include"Components/Camera.h"
+#include"Components/Controller.h"
 #include"Core/Timer.h"
 #include"Core/Logger.h"
 #include"Core/Input.h"
 #include"ECS/SystemManager.h"
 #include"Systems/RendererSystem.h"
 #include"Systems/UISystem.h"
+#include"Systems/ControllerSystem.h"
 #include"Scene/SceneManager.h"
 
 Application::Application(unsigned int width, unsigned int height, std::string title) :
@@ -22,8 +24,10 @@ Application::~Application()
 {
     
 }
+
 std::shared_ptr<Transform> transform2;
 std::shared_ptr<Camera> camera;
+
 void Application::init()
 {
 	m_window->init();
@@ -33,6 +37,7 @@ void Application::init()
     SystemManager::AddSystem<RendererSystem>();
     System::GetInstance<UISystem>()->setWindow(m_window);
     SystemManager::AddSystem<UISystem>();
+    SystemManager::AddSystem<ControllerSystem>();
 
     SystemManager::InitSystems();
 
@@ -51,6 +56,65 @@ void Application::init()
     object2->addComponent<Camera>(camera);
     transform2 = object2->getComponent<Transform>();
     transform2->setPosition({ 0.0f,0.0f,2.0f });
+    
+    double speed = 7.0;
+    double cameraSensitivity = 0.314;
+
+    std::shared_ptr<Controller> controller = Component::Create<Controller>();
+
+    controller->addKeyCallback(KeyCode::W, [speed](std::shared_ptr<Object> object) 
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
+            transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(speed * Timer::GetDeltaTime()));
+        });
+    controller->addKeyCallback(KeyCode::S, [speed](std::shared_ptr<Object> object)
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
+            transform->setPosition(transform->getPosition() + camera->getDirection() * Vec3(-speed * Timer::GetDeltaTime()));
+        });
+    controller->addKeyCallback(KeyCode::A, [speed](std::shared_ptr<Object> object)
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
+            transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(-speed * Timer::GetDeltaTime()));
+        });
+    controller->addKeyCallback(KeyCode::D, [speed](std::shared_ptr<Object> object)
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
+            transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(speed * Timer::GetDeltaTime()));
+        });
+    controller->addKeyCallback(KeyCode::LEFT_SHIFT, [speed](std::shared_ptr<Object> object)
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
+            transform->setPosition(transform->getPosition() + Vec3(0.0f, -speed * Timer::GetDeltaTime(), 0.0f));
+        });
+    controller->addKeyCallback(KeyCode::SPACE, [speed](std::shared_ptr<Object> object)
+        {
+            std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+            std::shared_ptr<Camera> camera = object->getComponent<Camera>();
+            transform->setPosition(transform->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
+        });
+    controller->setMouseCallback([cameraSensitivity](std::shared_ptr<Object> object)
+        {
+            static Vec2 deltaMouse(0.0f, 0.0f);
+            if (deltaMouse.x != 0)
+            {
+                transform2->setRotationZ(transform2->getRotation().z + deltaMouse.x * cameraSensitivity);
+            }
+            if (deltaMouse.y != 0)
+            {
+                if (transform2->getRotation().y + deltaMouse.y * cameraSensitivity < 89.0f && transform2->getRotation().y + deltaMouse.y * cameraSensitivity > -89.0f)
+                {
+                    transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
+                }
+            }
+            deltaMouse = Input::GetPrevMousePosition() - Input::GetMousePosition();
+        });
+    object2->addComponent<Controller>(controller);
 
     m_eventDispatcher = EventDispatcher();
     m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
@@ -90,15 +154,10 @@ void Application::init()
 
 void Application::run()
 {
-    double speed = 7.0;
-    double cameraSensitivity= 0.314;
 
     double maxDelta = 1.0 / static_cast<double>(m_maxFps);
     std::chrono::time_point<std::chrono::steady_clock,std::chrono::duration<double>> nextFrame = Timer::GetNowPoint();
 
-    Vec2 prevMousePos = Input::GetMousePosition();
-    Vec2 mousePos = Input::GetMousePosition();
-    Vec2 deltaMouse(0.0,0.0);
     while (!m_closeWindow)
     {
         if (Timer::GetDeltaTime() < maxDelta && m_lockFps)
@@ -108,51 +167,13 @@ void Application::run()
         }
 
         Timer::Start();
-        prevMousePos = Input::GetMousePosition();
-
-        SystemManager::UpdateSystems();
+        Input::Update();
         m_window->update();
+        SystemManager::UpdateSystems();
         if (Input::IsKeyPressed(KeyCode::ESCAPE))
         {
             m_closeWindow = true;
         }
-        if (Input::IsKeyPressed(KeyCode::D))
-        {
-            transform2->setPosition(transform2->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(speed * Timer::GetDeltaTime()));
-        }
-        if (Input::IsKeyPressed(KeyCode::A))
-        {
-            transform2->setPosition(transform2->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp())) * Vec3(-speed * Timer::GetDeltaTime()));
-        }
-        if (Input::IsKeyPressed(KeyCode::W))
-        {
-            transform2->setPosition(transform2->getPosition() + camera->getDirection() * Vec3(speed * Timer::GetDeltaTime()));
-        }
-        if (Input::IsKeyPressed(KeyCode::S))
-        {
-            transform2->setPosition(transform2->getPosition() + camera->getDirection() * Vec3(-speed * Timer::GetDeltaTime()));
-        }
-        if (Input::IsKeyPressed(KeyCode::LEFT_SHIFT))
-        {
-            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, -speed * Timer::GetDeltaTime(), 0.0f));
-        }
-        if (Input::IsKeyPressed(KeyCode::SPACE))
-        {
-            transform2->setPosition(transform2->getPosition() + Vec3(0.0f, speed * Timer::GetDeltaTime(), 0.0f));
-        }
-        if (deltaMouse.x != 0)
-        {
-            transform2->setRotationZ(transform2->getRotation().z + deltaMouse.x * cameraSensitivity);
-        }
-        if (deltaMouse.y != 0)
-        {
-            if (transform2->getRotation().y + deltaMouse.y * cameraSensitivity < 89.0f && transform2->getRotation().y + deltaMouse.y * cameraSensitivity > -89.0f)
-            {
-                transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
-            }
-        }
-
-        deltaMouse = prevMousePos - Input::GetMousePosition();
         Timer::End();
 
         if (m_lockFps)

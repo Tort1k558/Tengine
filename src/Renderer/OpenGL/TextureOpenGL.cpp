@@ -53,6 +53,7 @@ TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type)
 		if (4 > maxAnisotropy)
 		{
 			Logger::Critical("Max Anisotropy {0} your is {1}", maxAnisotropy, 4);
+			glTextureParameteri(m_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 		}
 		else
 		{
@@ -68,6 +69,7 @@ TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type)
 		if (8 > maxAnisotropy)
 		{
 			Logger::Critical("Max Anisotropy {0} your is {1}", maxAnisotropy, 8);
+			glTextureParameteri(m_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 		}
 		else
 		{
@@ -83,6 +85,7 @@ TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type)
 		if (16 > maxAnisotropy)
 		{
 			Logger::Critical("Max Anisotropy {0} your is {1}", maxAnisotropy, 16);
+			glTextureParameteri(m_id, GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
 		}
 		else
 		{
@@ -101,6 +104,22 @@ TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type)
 TextureOpenGL::~TextureOpenGL()
 {
 	glDeleteTextures(1, &m_id);
+}
+
+TextureOpenGL::TextureOpenGL(TextureOpenGL&& texture) noexcept
+{
+	glDeleteTextures(1, &m_id);
+	m_size = texture.m_size;
+	m_id = texture.m_id;
+	texture.m_id = 0;
+}
+
+TextureOpenGL& TextureOpenGL::operator=(TextureOpenGL&& texture) noexcept
+{
+	m_size = texture.m_size;
+	m_id = texture.m_id;
+	texture.m_id = 0;
+	return *this;
 }
 
 void TextureOpenGL::bind(unsigned int slot)

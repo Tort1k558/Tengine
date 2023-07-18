@@ -5,6 +5,7 @@
 std::unordered_map<KeyCode, bool> Input::m_keys;
 std::unordered_map<MouseCode, bool> Input::m_mouseButtons;
 Vec2 Input::m_mousePosition;
+Vec2 Input::m_prevMousePosition;
 
 bool Input::IsKeyPressed(KeyCode code)
 {
@@ -38,6 +39,11 @@ void Input::ReleaseMouseButton(MouseCode code)
 {
     //Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));
     m_mouseButtons[code] = false;
+}
+
+void Input::Update()
+{
+    m_prevMousePosition = m_mousePosition;
 }
 
 void Input::SetMousePosition(Vec2 position)
