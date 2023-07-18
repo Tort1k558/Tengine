@@ -29,7 +29,7 @@ void Application::init()
 	m_window->init();
 
     System::GetInstance<RendererSystem>()->setRendererType(RendererType::OpenGL);
-    System::GetInstance<RendererSystem>()->setTextureFilter(TextureFilter::Trilinear);
+    System::GetInstance<RendererSystem>()->setTextureFilter(TextureFilter::Anisotropic16);
     SystemManager::AddSystem<RendererSystem>();
     System::GetInstance<UISystem>()->setWindow(m_window);
     SystemManager::AddSystem<UISystem>();

@@ -13,7 +13,10 @@ enum class TextureType
 enum class TextureFilter
 {
 	Bilinear,
-	Trilinear
+	Trilinear,
+	Anisotropic4,
+	Anisotropic8,
+	Anisotropic16
 };
 
 class Texture

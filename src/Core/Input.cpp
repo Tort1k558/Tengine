@@ -13,13 +13,13 @@ bool Input::IsKeyPressed(KeyCode code)
 
 void Input::PressKey(KeyCode code)
 {
-    Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
+    //Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
     m_keys[code] = true;
 }
 
 void Input::ReleaseKey(KeyCode code)
 {
-    Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));;
+    //Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));;
     m_keys[code] = false;
 }
 
@@ -30,13 +30,13 @@ bool Input::IsMouseButtonPressed(MouseCode code)
 
 void Input::PressMouseButton(MouseCode code)
 {
-    Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
+    //Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
     m_mouseButtons[code] = true;
 }
 
 void Input::ReleaseMouseButton(MouseCode code)
 {
-    Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));
+    //Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));
     m_mouseButtons[code] = false;
 }
 
