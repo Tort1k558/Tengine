@@ -125,7 +125,7 @@ enum class KeyCode
 	MENU               = 348
 };
 
-enum class MouseCode
+enum class MouseButton
 {
 	BUTTON_1         = 0,
 	BUTTON_2         = 1,

@@ -41,7 +41,7 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
         Logger::Critical("ERROR::Failed to load the texture: {0}", path);
         return nullptr;
     }
-    TextureType type;
+    TextureType type = TextureType::RGB8;
     switch (channels)
     {
     case 3:

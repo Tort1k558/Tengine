@@ -33,13 +33,13 @@ EventKeyReleased::EventKeyReleased(KeyCode code) :
 
 }
 
-EventMouseButtonPressed::EventMouseButtonPressed(MouseCode code, double x, double y) :
+EventMouseButtonPressed::EventMouseButtonPressed(MouseButton code, double x, double y) :
 	Event(type), code(code), x(x), y(y)
 {
 
 }
 
-EventMouseButtonReleased::EventMouseButtonReleased(MouseCode code, double x, double y) :
+EventMouseButtonReleased::EventMouseButtonReleased(MouseButton code, double x, double y) :
 	Event(type), code(code), x(x), y(y)
 {
 

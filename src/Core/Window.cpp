@@ -26,6 +26,7 @@ void Window::init()
 		return;
 	}
 
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	m_window = glfwCreateWindow(m_size.x, m_size.y, m_title.c_str(), nullptr, nullptr);
 	if (!m_window)
 	{
@@ -57,13 +58,13 @@ void Window::init()
 			{
 			case GLFW_PRESS:
 			{
-				EventMouseButtonPressed event(static_cast<MouseCode>(button), x, y);
+				EventMouseButtonPressed event(static_cast<MouseButton>(button), x, y);
 				window.getEventCallback()(event);
 				break;
 			}
 			case GLFW_RELEASE:
 			{
-				EventMouseButtonReleased event(static_cast<MouseCode>(button), x, y);
+				EventMouseButtonReleased event(static_cast<MouseButton>(button), x, y);
 				window.getEventCallback()(event);
 				break;
 			}

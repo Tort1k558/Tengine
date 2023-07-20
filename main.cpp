@@ -85,19 +85,22 @@ public:
             });
         controller->setMouseCallback([cameraSensitivity](std::shared_ptr<Object> object)
             {
-                static Vec2 deltaMouse(0.0f, 0.0f);
-                if (deltaMouse.x != 0)
+                if (Input::IsMouseButtonPressed(MouseButton::BUTTON_2))
                 {
-                    transform2->setRotationZ(transform2->getRotation().z + deltaMouse.x * cameraSensitivity);
-                }
-                if (deltaMouse.y != 0)
-                {
-                    if (transform2->getRotation().y + deltaMouse.y * cameraSensitivity < 89.0f && transform2->getRotation().y + deltaMouse.y * cameraSensitivity > -89.0f)
+                    static Vec2 deltaMouse(0.0f, 0.0f);
+                    if (deltaMouse.x != 0)
                     {
-                        transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
+                        transform2->setRotationZ(transform2->getRotation().z + deltaMouse.x * cameraSensitivity);
                     }
+                    if (deltaMouse.y != 0)
+                    {
+                        if (transform2->getRotation().y + deltaMouse.y * cameraSensitivity < 89.0f && transform2->getRotation().y + deltaMouse.y * cameraSensitivity > -89.0f)
+                        {
+                            transform2->setRotationY(transform2->getRotation().y + deltaMouse.y * cameraSensitivity);
+                        }
+                    }
+                    deltaMouse = Input::GetPrevMousePosition() - Input::GetMousePosition();
                 }
-                deltaMouse = Input::GetPrevMousePosition() - Input::GetMousePosition();
             });
         object2->addComponent<Controller>(controller);
     }

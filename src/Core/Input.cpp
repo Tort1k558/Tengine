@@ -3,7 +3,7 @@
 #include"Core/Logger.h"
 
 std::unordered_map<KeyCode, bool> Input::m_keys;
-std::unordered_map<MouseCode, bool> Input::m_mouseButtons;
+std::unordered_map<MouseButton, bool> Input::m_mouseButtons;
 Vec2 Input::m_mousePosition;
 Vec2 Input::m_prevMousePosition;
 
@@ -24,18 +24,18 @@ void Input::ReleaseKey(KeyCode code)
     m_keys[code] = false;
 }
 
-bool Input::IsMouseButtonPressed(MouseCode code)
+bool Input::IsMouseButtonPressed(MouseButton code)
 {
     return m_mouseButtons[code];
 }
 
-void Input::PressMouseButton(MouseCode code)
+void Input::PressMouseButton(MouseButton code)
 {
     //Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
     m_mouseButtons[code] = true;
 }
 
-void Input::ReleaseMouseButton(MouseCode code)
+void Input::ReleaseMouseButton(MouseButton code)
 {
     //Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));
     m_mouseButtons[code] = false;

@@ -79,8 +79,8 @@ public:
 class EventMouseButtonPressed : public Event
 {
 public:
-	EventMouseButtonPressed(MouseCode code, double x, double y);
-	MouseCode code;
+	EventMouseButtonPressed(MouseButton code, double x, double y);
+	MouseButton code;
 	double x;
 	double y;
 	static const EventType type = EventType::MouseButtonPressed;
@@ -89,9 +89,9 @@ public:
 class EventMouseButtonReleased : public Event
 {
 public:
-	EventMouseButtonReleased(MouseCode code, double x, double y);
+	EventMouseButtonReleased(MouseButton code, double x, double y);
 
-	MouseCode code;
+	MouseButton code;
 	double x;
 	double y;
 	static const EventType type = EventType::MouseButtonReleased;

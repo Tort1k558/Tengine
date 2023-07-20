@@ -48,7 +48,7 @@ void ShaderOpenGL::addShader(const std::string& shaderSrc, ShaderType type)
         shaderType = GL_FRAGMENT_SHADER;
         break;
     default:
-        Logger::Critical("ERROR::SHADER::Unknown type of shader");
+        Logger::Critical("ERROR::OpenGL::SHADER::Unknown type of shader");
         return;
     }
     GLuint shader = glCreateShader(shaderType);
@@ -64,7 +64,7 @@ void ShaderOpenGL::addShader(const std::string& shaderSrc, ShaderType type)
     {
         char infoLog[1024];
         glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
-        Logger::Critical("ERROR::SHADER::{0}::COMPILATION_FAILED::{1}", shaderType, infoLog);
+        Logger::Critical("ERROR::OpenGL::SHADER::{0}::COMPILATION_FAILED::{1}", shaderType, infoLog);
         return;
     }
 
@@ -81,7 +81,7 @@ void ShaderOpenGL::compile()
     {
         char infoLog[1024];
         glGetProgramInfoLog(m_id, 1024, nullptr, infoLog);
-        Logger::Critical("ERROR::SHADER::COMPILATION_FAILED::{0}", infoLog);
+        Logger::Critical("ERROR::OpenGL::SHADER::COMPILATION_FAILED::{0}", infoLog);
         return;
     }
     for (const auto& shader :m_shaders)

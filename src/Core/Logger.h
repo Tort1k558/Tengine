@@ -25,6 +25,8 @@ public:
 	static void Debug(const std::string& format, Args... args);
 	template<typename... Args>
 	static void Critical(const std::string& format, Args... args);
+	template<typename... Args>
+	static void Warning(const std::string& format, Args... args);
 
 	static void SetLevel(LogLevel level);
 	static void SetPattern(const std::string& pattern);
@@ -46,4 +48,10 @@ template<typename ...Args>
 inline void Logger::Critical(const std::string& format, Args ...args)
 {
 	spdlog::critical(format, args...);
+}
+
+template<typename ...Args>
+inline void Logger::Warning(const std::string& format, Args ...args)
+{
+	spdlog::warn(format, args...);
 }
