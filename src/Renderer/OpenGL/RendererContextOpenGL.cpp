@@ -2,7 +2,7 @@
 
 #include"Core/Logger.h"
 
-const char* glSourceToStr(const GLenum source)
+std::string GlSourceToStr(const GLenum source)
 {
     switch (source)
     {
@@ -17,7 +17,7 @@ const char* glSourceToStr(const GLenum source)
     }
 }
 
-const char* glTypeToStr(const GLenum type)
+std::string GlTypeToStr(const GLenum type)
 {
     switch (type)
     {
@@ -47,23 +47,25 @@ void RendererContextOpenGL::init()
     Logger::Info("Vendor: {0}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
     Logger::Info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
-    glDebugMessageCallback([](GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+    glDebugMessageCallback([](GLenum glSource, GLenum glType, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
         {
+            std::string source = GlSourceToStr(glSource);
+            std::string type = GlTypeToStr(glType);
             switch (severity)
             {
             case GL_DEBUG_SEVERITY_HIGH:
-                Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", glSourceToStr(source), glTypeToStr(type), id, message);
+                Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
                 break;
             case GL_DEBUG_SEVERITY_MEDIUM:
             case GL_DEBUG_SEVERITY_LOW:
-                Logger::Warning("WARNING::OpenGL::{0}::{1}::{2}:: {3}", glSourceToStr(source), glTypeToStr(type), id, message);
+                Logger::Warning("WARNING::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
                 break;
             case GL_DEBUG_SEVERITY_NOTIFICATION:
-                Logger::Info("NOTIFICATION::OpenGL::{0}::{1}::{2}:: {3}", glSourceToStr(source), glTypeToStr(type), id, message);
+                Logger::Info("NOTIFICATION::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
                 break;
             default:
-                Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", glSourceToStr(source), glTypeToStr(type), id, message);
+                Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
             }
         }, nullptr);
 }

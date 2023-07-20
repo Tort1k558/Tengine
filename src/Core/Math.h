@@ -16,6 +16,7 @@ using UVec2 = glm::uvec2;
 using UVec3 = glm::uvec3;
 using UVec4 = glm::uvec4;
 
+
 inline Mat4 RotateMatrix(Mat4& mat, Vec3 axis, float angle)
 {
 	return glm::rotate(mat, angle, axis);

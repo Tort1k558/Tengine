@@ -39,3 +39,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glm)
 
 add_subdirectory(external/stbi ${CMAKE_CURRENT_BINARY_DIR}/external/stbi)
 target_link_libraries(${PROJECT_NAME} PRIVATE stbi)
+
+add_subdirectory(external/Assimp ${CMAKE_CURRENT_BINARY_DIR}/external/Assimp)
+target_include_directories(${PROJECT_NAME} PRIVATE external/Assimp/include)
+target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
