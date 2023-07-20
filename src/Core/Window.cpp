@@ -114,7 +114,8 @@ void Window::init()
 			window.setWidth(width);
 			window.setHeight(height);
 		});
-	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	//glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Window::update()

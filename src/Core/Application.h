@@ -30,7 +30,7 @@ public:
 private:
 	std::shared_ptr<Window> m_window;
 	EventDispatcher m_eventDispatcher;
-	bool m_closeWindow;
-	bool m_lockFps;
-	size_t m_maxFps;
+	bool m_isRunning = true;
+	bool m_lockFps = false;
+	size_t m_maxFps = 0;
 };

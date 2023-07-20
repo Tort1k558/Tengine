@@ -14,8 +14,7 @@
 #include"Systems/ControllerSystem.h"
 #include"Scene/SceneManager.h"
 
-Application::Application(unsigned int width, unsigned int height, std::string title) :
-    m_closeWindow(false)
+Application::Application(unsigned int width, unsigned int height, std::string title)
 {
 	m_window = std::make_shared<Window>(width, height, title);
 }
@@ -58,12 +57,13 @@ void Application::init()
     m_eventDispatcher.addEvent<EventWindowClose>([&](EventWindowClose& event)
         {
             Logger::Info("EVENT::The Window closed");
-            m_closeWindow = true;
+            m_isRunning = false;
         });
     m_window->setEventCallback([&](Event& event)
         {
             m_eventDispatcher.proccess(event);
         });
+
     create();
 }
 
@@ -73,7 +73,7 @@ void Application::run()
     double maxDelta = 1.0 / static_cast<double>(m_maxFps);
     std::chrono::time_point<std::chrono::steady_clock,std::chrono::duration<double>> nextFrame = Timer::GetNowPoint();
 
-    while (!m_closeWindow)
+    while (m_isRunning)
     {
         if (Timer::GetDeltaTime() < maxDelta && m_lockFps)
         {
@@ -82,9 +82,11 @@ void Application::run()
         }
 
         Timer::Start();
+
         Input::Update();
         m_window->update();
         SystemManager::UpdateSystems();
+
         update();
         Timer::End();
 
@@ -113,6 +115,6 @@ void Application::setMaxFps(size_t fps)
 
 void Application::close()
 {
-    m_closeWindow = true;
+    m_isRunning = false;
 }
 

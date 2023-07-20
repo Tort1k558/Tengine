@@ -29,12 +29,22 @@ void RendererContextOpenGL::drawIndexed(std::shared_ptr<VertexArray> va)
 
 void RendererContextOpenGL::clear()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RendererContextOpenGL::clearColor(Vec4 color)
 {
     glClearColor(color.r, color.g, color.b, color.a);
+}
+
+void RendererContextOpenGL::enableDepthTest()
+{
+    glEnable(GL_DEPTH_TEST);
+}
+
+void RendererContextOpenGL::disableDepthTest()
+{
+    glDisable(GL_DEPTH_TEST);
 }
 
 RendererType RendererContextOpenGL::getType()

@@ -46,6 +46,7 @@ void RendererSystem::init()
 		}
 	}
 	m_context->init();
+	m_context->enableDepthTest();
 	shader = AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
 
 	va = VertexArray::Create();
@@ -60,6 +61,7 @@ void RendererSystem::init()
 	va->setIndexBuffer(ibPosUV);
 
 	texture = AssetManager::LoadTexture("awesomeFace","data/Textures/whiteblackquads.png");
+
 }
 
 void RendererSystem::update()
@@ -69,6 +71,7 @@ void RendererSystem::update()
 
 	std::shared_ptr<Transform> transform = SceneManager::GetCurrentScene()->getComponents<Transform>()[0];
 	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
+	camera->getPerspectiveProjection()->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
 	shader->bind();
 	shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
 	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());

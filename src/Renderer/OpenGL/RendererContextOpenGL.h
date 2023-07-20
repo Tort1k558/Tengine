@@ -14,5 +14,7 @@ public:
 	void drawIndexed(std::shared_ptr<VertexArray> va) final;
 	void clear() final;
 	void clearColor(Vec4 color) final;
+	void enableDepthTest() final;
+	void disableDepthTest() final;
 	RendererType getType() final;
 };
