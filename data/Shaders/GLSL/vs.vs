@@ -1,7 +1,8 @@
 #version 460
 
 layout(location = 0) in vec3 vertexPos;
-layout(location = 1) in vec2 vertexUv;
+layout(location = 1) in vec2 vertexNormal;
+layout(location = 2) in vec2 vertexUv;
 
 out vec2 uv;
 

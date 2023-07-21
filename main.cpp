@@ -5,6 +5,7 @@
 #include"Components/Transform.h"
 #include"Components/Camera.h"
 #include"Components/Controller.h"
+#include"Components/Mesh.h"
 #include"Core/Timer.h"
 #include"Core/Logger.h"
 #include"Core/Input.h"
@@ -16,13 +17,14 @@
 
 std::shared_ptr<Transform> transform2;
 std::shared_ptr<Camera> camera;
-
+//Ротейт камер ебануть такой же как у обычных объектов
 class MyApp : public Application
 {
 public:
     MyApp(unsigned int width, unsigned int height, const std::string& title) : 
         Application(width,height,title)
     {}
+
     void create() final
     {
         std::shared_ptr<Scene> scene = Scene::Create();
@@ -103,7 +105,25 @@ public:
                 }
             });
         object2->addComponent<Controller>(controller);
+
+        std::vector<Vertex> vertexes;
+        vertexes.push_back({ Vec3(- 0.5f, -0.5f, 0.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(0.0f, 0.0f)});
+        vertexes.push_back({ Vec3(0.5f,  0.5f, 0.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 1.0f)});
+        vertexes.push_back({ Vec3(-0.5f,  0.5f, 0.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(0.0f, 1.0f)});
+        vertexes.push_back({ Vec3(0.5f, -0.5f, 0.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 0.0f)});
+        std::vector<unsigned int> indices = { 0,1,2,
+                                              0,1,3 };
+
+
+        object->addComponent<Mesh>(Component::Create<Mesh>(vertexes, indices));
+
+        std::shared_ptr<Object> object3 = Object::Create();
+        std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
+        transform3->setScale({ 20.0f,20.0f,1.0f });
+  
+        object3->addComponent<Mesh>(Component::Create<Mesh>(vertexes, indices));
     }
+
     void update() final
     {
         if (Input::IsKeyPressed(KeyCode::ESCAPE))

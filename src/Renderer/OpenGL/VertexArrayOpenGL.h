@@ -16,14 +16,15 @@ public:
 	VertexArrayOpenGL(VertexArrayOpenGL&& array) noexcept;
 	VertexArrayOpenGL& operator=(VertexArrayOpenGL&& array) noexcept;
 
-	void bind() override;
-	void unbind() override;
+	void bind() final;
+	void unbind() final;
 
-	void addVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) override;
-	void setIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) override;
-	unsigned int getCountOfIndices() override { return m_indexBuffer->getCountOfIndices(); }
+	void addVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) final;
+	void setIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) final;
+	unsigned int getCountOfIndices() final;
 private:
 	GLuint m_id;
 	std::shared_ptr<IndexBuffer> m_indexBuffer;
+	std::vector<std::shared_ptr<VertexBuffer>> m_vertexBuffers;
 	unsigned int m_elementCount;
 };

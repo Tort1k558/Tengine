@@ -62,6 +62,7 @@ void VertexArrayOpenGL::unbind()
 void VertexArrayOpenGL::addVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
 {
 	bind();
+	m_vertexBuffers.push_back(vertexBuffer);
 	vertexBuffer->bind();
 	BufferLayout layout = vertexBuffer->getLayout();
 	for (auto& element : layout)
@@ -75,6 +76,16 @@ void VertexArrayOpenGL::addVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuff
 void VertexArrayOpenGL::setIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer)
 {
 	bind();
-	indexBuffer->bind();
+
 	m_indexBuffer = indexBuffer;
+	m_indexBuffer->bind();
+}
+
+unsigned int VertexArrayOpenGL::getCountOfIndices()
+{
+	if (m_indexBuffer)
+	{
+		return m_indexBuffer->getCountOfIndices();
+	}
+	return 0;
 }

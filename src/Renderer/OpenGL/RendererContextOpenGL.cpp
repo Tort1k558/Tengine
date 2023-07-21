@@ -47,6 +47,7 @@ void RendererContextOpenGL::init()
     Logger::Info("Vendor: {0}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
     Logger::Info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
     glDebugMessageCallback([](GLenum glSource, GLenum glType, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
         {
@@ -75,10 +76,10 @@ void RendererContextOpenGL::setViewport(unsigned int x0, unsigned int y0, unsign
     glViewport(x0, y0, x1, y1);
 }
 
-void RendererContextOpenGL::drawIndexed(std::shared_ptr<VertexArray> va)
+void RendererContextOpenGL::drawIndexed(std::shared_ptr<VertexArray> vertexArray)
 {
-    va->bind();
-    glDrawElements(GL_TRIANGLES, va->getCountOfIndices(), GL_UNSIGNED_INT, 0);
+    vertexArray->bind();
+    glDrawElements(GL_TRIANGLES, vertexArray->getCountOfIndices(), GL_UNSIGNED_INT, 0);
 }
 
 void RendererContextOpenGL::clear()

@@ -31,6 +31,7 @@ public:
 	BufferLayout(std::initializer_list<BufferElement> elements);
 	unsigned int getStride() { return m_stride; }
 	void push(BufferElement element);
+	void push(std::initializer_list<BufferElement> elements);
 	std::vector<BufferElement>::iterator begin() { return m_elements.begin(); }
 	std::vector<BufferElement>::iterator end() { return m_elements.end(); }
 private:

@@ -19,6 +19,12 @@ void BufferLayout::push(BufferElement element)
 	calculateStride();
 }
 
+void BufferLayout::push(std::initializer_list<BufferElement> elements)
+{
+	m_elements.insert(m_elements.end(), elements);
+	calculateStride();
+}
+
 void BufferLayout::calculateStride()
 {
 	unsigned int offset = 0;

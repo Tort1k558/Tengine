@@ -4,7 +4,7 @@ IndexBufferOpenGL::IndexBufferOpenGL(GLuint* indices, unsigned int count) :
 	m_count(count)
 {
 	glCreateBuffers(1, &m_id);
-	glBindBuffer(GL_ARRAY_BUFFER,m_id);
+	glBindBuffer(GL_ARRAY_BUFFER, m_id);
 	glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(GLuint), indices, GL_STATIC_DRAW);
 	unbind();
 }
