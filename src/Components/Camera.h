@@ -55,6 +55,16 @@ private:
 	float m_top = 5.0f;
 };
 
+
+enum class RotationOrder
+{
+	XYZ,
+	XZY,
+	YXZ,
+	YZX,
+	ZXY,
+	ZYX
+};
 class Camera: public Component
 {
 public:
@@ -62,18 +72,22 @@ public:
 	Camera(ProjectionType type);
 
 	void setCameraType(ProjectionType type);
-	void setUp(Vec3 up);
+	void setRotationOrder(RotationOrder order);
 
 	Mat4 getProjectionMatrix() { return m_projection->getProjectionMatrix(); }
 	Mat4 getViewMatrix();
 	Vec3 getDirection();
-	Vec3 getUp() { return m_up; }
+	Vec3 getUp();
 	std::shared_ptr<PerspectiveProjection> getPerspectiveProjection();
 	std::shared_ptr<OrthographicalProjection> getOrthographicalProjection();
+	RotationOrder getRotationOrder() { return m_rotationOrder; }
 private:
 	void updateProjection();
+	Mat4 getRotationMatrix(Vec3 rotation);
+
 	ProjectionType m_projectionType;
 	std::shared_ptr<Projection> m_projection;
+	RotationOrder m_rotationOrder = RotationOrder::YXZ;
 	Vec3 m_direction = { 0.0f,0.0f, -1.0f };
 	Vec3 m_up = { 0.0f,1.0f,0.0f };
 };

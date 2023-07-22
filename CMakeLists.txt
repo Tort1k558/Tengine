@@ -15,6 +15,7 @@ set(DIRS_SRC
 	"src/Renderer/OpenGL/*.h" "src/Renderer/OpenGL/*.cpp"
 	"src/Systems/*.h" "src/Systems/*.cpp"
 	"src/Scene/*.h" "src/Scene/*.cpp"
+	"src/Utils/*.h" "src/Utils/*.cpp"
 	)
 file(GLOB TARGET_SRC ${DIRS_SRC})
 

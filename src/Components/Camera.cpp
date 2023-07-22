@@ -15,14 +15,27 @@ Camera::Camera(ProjectionType type)
 Mat4 Camera::getViewMatrix()
 {
 	std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
-	return GetLookAtMatrix(transform->getPosition(), getDirection(), m_up);
+	Vec3 rotation = transform->getRotation();
+	Mat4 rotateMatrix = getRotationMatrix(rotation);
+	Vec3 up = rotateMatrix * Vec4(m_up,1.0f);
+	Vec3 direction = rotateMatrix * Vec4(m_direction, 1.0f);
+	return GetLookAtMatrix(transform->getPosition(), direction, up);
 }
 
 Vec3 Camera::getDirection()
 {
 	std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
-	Mat4 viewMatrix = GetRotationMatrix(transform->getRotation());
-	return viewMatrix* Vec4(m_direction,1.0);
+	Vec3 rotation = transform->getRotation();
+	Mat4 rotateMatrix = getRotationMatrix(rotation);
+	return rotateMatrix * Vec4(m_direction,1.0);
+}
+
+Vec3 Camera::getUp()
+{
+	std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
+	Vec3 rotation = transform->getRotation();
+	Mat4 rotateMatrix = getRotationMatrix(rotation);
+	return rotateMatrix * Vec4(m_up,1.0f);
 }
 
 std::shared_ptr<PerspectiveProjection> Camera::getPerspectiveProjection()
@@ -56,10 +69,34 @@ void Camera::updateProjection()
 	}
 }
 
+Mat4 Camera::getRotationMatrix(Vec3 rotation)
+{
+	switch (m_rotationOrder)
+	{
+	case RotationOrder::XYZ:
+		return GetEulerMatrixXYZ(rotation);
+	case RotationOrder::XZY:
+		return GetEulerMatrixXZY(rotation);
+	case RotationOrder::YXZ:
+		return GetEulerMatrixYXZ(rotation);
+	case RotationOrder::YZX:
+		return GetEulerMatrixYZX(rotation);
+	case RotationOrder::ZXY:
+		return GetEulerMatrixZXY(rotation);
+	case RotationOrder::ZYX:
+		return GetEulerMatrixZYX(rotation);
+	}
+}
+
 void Camera::setCameraType(ProjectionType type)
 {
 	m_projectionType = type;
 	updateProjection();
+}
+
+void Camera::setRotationOrder(RotationOrder order)
+{
+	m_rotationOrder = order;
 }
 
 void PerspectiveProjection::setAspectRatio(float aspect)
@@ -77,11 +114,6 @@ void PerspectiveProjection::setFov(float fov)
 void PerspectiveProjection::updateProjection()
 {
 	m_projection = GetPerspectiveMatrix(m_fov, m_aspect, m_zNear, m_zFar);
-}
-
-void Camera::setUp(Vec3 up)
-{
-	m_up = up;
 }
 
 void Projection::setZNear(float zNear)

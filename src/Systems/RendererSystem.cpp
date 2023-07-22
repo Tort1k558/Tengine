@@ -42,14 +42,15 @@ void RendererSystem::update()
 	m_context->clear();
 	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
 	std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
+
+	camera->getPerspectiveProjection()->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
+	shader->bind();
+	shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
+	shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
 	for (auto& mesh : meshes)
 	{
-		shader->bind();
 		std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
-		camera->getPerspectiveProjection()->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
 		shader->setUniformMat4("u_modelMatrix", transform->getMatrix());
-		shader->setUniformMat4("u_projectionMatrix", camera->getProjectionMatrix());
-		shader->setUniformMat4("u_viewMatrix", camera->getViewMatrix());
 		texture->bind(0);
 		m_context->drawIndexed(mesh->getVertexArray());
 	}

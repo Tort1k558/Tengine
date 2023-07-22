@@ -81,7 +81,10 @@ Transform& Transform::setScaleZ(float scale)
 Mat4 Transform::getMatrix()
 {
 	Mat4 translateMatrix = TranslateMatrix(Mat4(1.0f), m_position);
-	Mat4 rotateMatrix = GetRotationMatrix(m_rotation);
+	Mat4 rotateMatrix(1.0f);
+	rotateMatrix = RotateMatrix(rotateMatrix, Vec3(1.0f, 0.0f, 0.0f), m_rotation.x);
+	rotateMatrix = RotateMatrix(rotateMatrix, Vec3(0.0f, 1.0f, 0.0f), m_rotation.y);
+	rotateMatrix = RotateMatrix(rotateMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
 	Mat4 scaleMatrix = GetScaleMatrix(m_scale);
 	return translateMatrix * rotateMatrix * scaleMatrix;
 }

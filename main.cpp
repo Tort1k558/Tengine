@@ -33,10 +33,12 @@ public:
         std::shared_ptr<Object> object = Object::Create();
         std::shared_ptr<Transform> transform = object->getComponent<Transform>();
         transform->setScale({ 20.0f,20.0f,1.0f });
-        transform->setRotationY(90.0f);
+        transform->setRotationX(90.0f);
+        //transform->setRotationZ(45.0f);
 
         std::shared_ptr<Object> object2 = Object::Create();
         camera = Component::Create<Camera>(ProjectionType::Perspective);
+        camera->setRotationOrder(RotationOrder::XYZ);
         object2->addComponent<Camera>(camera);
         transform2 = object2->getComponent<Transform>();
         transform2->setPosition({ 0.0f,0.0f,2.0f });
@@ -92,7 +94,7 @@ public:
                     static Vec2 deltaMouse(0.0f, 0.0f);
                     if (deltaMouse.x != 0)
                     {
-                        transform2->setRotationZ(transform2->getRotation().z + deltaMouse.x * cameraSensitivity);
+                        transform2->setRotationX(transform2->getRotation().x + deltaMouse.x * cameraSensitivity);
                     }
                     if (deltaMouse.y != 0)
                     {
@@ -121,7 +123,7 @@ public:
         std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
         transform3->setScale({ 20.0f,20.0f,1.0f });
   
-        object3->addComponent<Mesh>(Component::Create<Mesh>(vertexes, indices));
+        //object3->addComponent<Mesh>(Component::Create<Mesh>(vertexes, indices));
     }
 
     void update() final

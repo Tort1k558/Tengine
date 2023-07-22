@@ -16,10 +16,11 @@ using UVec2 = glm::uvec2;
 using UVec3 = glm::uvec3;
 using UVec4 = glm::uvec4;
 
+//The angle of rotation is indicated in degrees!
 
 inline Mat4 RotateMatrix(Mat4& mat, Vec3 axis, float angle)
 {
-	return glm::rotate(mat, angle, axis);
+	return glm::rotate(mat, glm::radians(angle), axis);
 }
 
 inline Mat4 TranslateMatrix(Mat4& matrix, Vec3 position)
@@ -27,8 +28,27 @@ inline Mat4 TranslateMatrix(Mat4& matrix, Vec3 position)
 	return glm::translate(matrix, position);
 }
 
-//The angle of rotation is indicated in degrees!
-inline Mat4 GetRotationMatrix(Vec3 angles)
+inline Mat4 GetEulerMatrixXYZ(Vec3 angles)
+{
+	return glm::yawPitchRoll(glm::radians(angles.x), glm::radians(angles.y), glm::radians(angles.z));
+}
+inline Mat4 GetEulerMatrixXZY(Vec3 angles)
+{
+	return glm::yawPitchRoll(glm::radians(angles.x), glm::radians(angles.z), glm::radians(angles.y));
+}
+inline Mat4 GetEulerMatrixYXZ(Vec3 angles)
+{
+	return glm::yawPitchRoll(glm::radians(angles.y), glm::radians(angles.x), glm::radians(angles.z));
+}
+inline Mat4 GetEulerMatrixYZX(Vec3 angles)
+{
+	return glm::yawPitchRoll(glm::radians(angles.y), glm::radians(angles.z), glm::radians(angles.x));
+}
+inline Mat4 GetEulerMatrixZXY(Vec3 angles)
+{
+	return glm::yawPitchRoll(glm::radians(angles.z), glm::radians(angles.x), glm::radians(angles.y));
+}
+inline Mat4 GetEulerMatrixZYX(Vec3 angles)
 {
 	return glm::yawPitchRoll(glm::radians(angles.z), glm::radians(angles.y), glm::radians(angles.x));
 }

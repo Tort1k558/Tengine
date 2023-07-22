@@ -34,7 +34,6 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
 
     stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
-    UVec2 size;
 
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
     if (data == nullptr)

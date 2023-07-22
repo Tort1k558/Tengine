@@ -16,7 +16,7 @@ void Object::setName(const std::string& name)
 std::shared_ptr<Object> Object::Create()
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
-	SceneManager::GetCurrentScene()->addObject(object);
 	object->addComponent<Transform>(Component::Create<Transform>());
+	SceneManager::GetCurrentScene()->addObject(object);
 	return object;
 }
