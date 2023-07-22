@@ -18,10 +18,10 @@ struct Vertex
 class Mesh : public Component
 {
 public:
-	Mesh(std::vector<Vertex> vertexes, std::vector<unsigned int> indices);
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 	std::shared_ptr<VertexArray> getVertexArray() { return m_vertexArray; }
 private:
-	std::vector<Vertex> m_vertexes;
+	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
 	std::shared_ptr<VertexArray> m_vertexArray;
 	std::shared_ptr<IndexBuffer> m_indexBuffer;

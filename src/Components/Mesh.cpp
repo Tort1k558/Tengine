@@ -1,9 +1,9 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertexes, std::vector<unsigned int> indices) :
-	m_vertexes(vertexes), m_indices(indices)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) :
+	m_vertices(vertices), m_indices(indices)
 {
-	for (const auto& vertex : m_vertexes)
+	for (const auto& vertex : m_vertices)
 	{
 		m_data.push_back(vertex.position.x);
 		m_data.push_back(vertex.position.y);

@@ -17,6 +17,7 @@ public:
 	Transform& setRotationY(float angle);
 	Transform& setRotationZ(float angle);
 	Transform& setScale(Vec3 scale);
+	Transform& setScale(float scale);
 	Transform& setScaleX(float scale);
 	Transform& setScaleY(float scale);
 	Transform& setScaleZ(float scale);

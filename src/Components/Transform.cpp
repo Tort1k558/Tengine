@@ -60,6 +60,12 @@ Transform& Transform::setScale(Vec3 scale)
 	return *this;
 }
 
+Transform& Transform::setScale(float scale)
+{
+	m_scale = Vec3(scale, scale, scale);
+	return *this;
+}
+
 Transform& Transform::setScaleX(float scale)
 {
 	m_scale.x = scale;
