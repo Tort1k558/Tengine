@@ -2,7 +2,7 @@
 
 #include<fstream>
 #include<sstream>
-#include<assimp/Importer.hpp>
+
 #include<stb_image.h>
 
 #include"Core/Logger.h"
@@ -57,6 +57,26 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
     return texture;
 }
 
+std::shared_ptr<Mesh> AssetManager::LoadMesh(const std::string& name, const std::string& path)
+{
+    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(name);
+    if (mesh)
+    {
+        return mesh;
+    }
+    mesh = Component::Create<Mesh>();
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
+        return nullptr;
+    }
+    std::string directory = path.substr(0, path.find_last_of('/'));
+    processNode(mesh,scene->mRootNode, scene);
+    return mesh;
+}
+
 std::string AssetManager::ReadFile(const std::string& path)
 {
     std::ifstream file(path);
@@ -71,4 +91,55 @@ std::string AssetManager::ReadFile(const std::string& path)
     }
     Logger::Critical("ERROR::Failed to open file::{0}", path);
     return "";
+}
+
+SubMesh AssetManager::processSubMesh(aiMesh* mesh, const aiScene* scene)
+{
+    std::vector<Vertex> vertices;
+    for (size_t i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vertex;
+        vertex.position.x = mesh->mVertices[i].x;
+        vertex.position.y = mesh->mVertices[i].y;
+        vertex.position.z = mesh->mVertices[i].z;
+
+        vertex.normal.x = mesh->mNormals[i].x;
+        vertex.normal.y = mesh->mNormals[i].y;
+        vertex.normal.z = mesh->mNormals[i].z;
+        if (mesh->mTextureCoords[0])
+        {
+            vertex.texCoords.x = mesh->mTextureCoords[0][i].x;
+            vertex.texCoords.y = mesh->mTextureCoords[0][i].y;
+        }
+        else
+        {
+            vertex.texCoords = Vec2(0.0f, 0.0f);
+        }
+        vertices.push_back(vertex);
+    }
+
+    std::vector<unsigned int> indices;
+    for (size_t i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace face = mesh->mFaces[i];
+        for (size_t j = 0; j < face.mNumIndices; j++)
+        {
+            indices.push_back(face.mIndices[j]);
+        }
+    }
+    return SubMesh(vertices, indices);
+}
+
+void AssetManager::processNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene)
+{
+    for (unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
+        mesh->addSubmesh(processSubMesh(aimesh, scene));
+    }
+
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        processNode(mesh, node->mChildren[i], scene);
+    }
 }

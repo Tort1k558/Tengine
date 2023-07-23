@@ -1,7 +1,8 @@
 #include<glad/glad.h>
 #include <GLFW/glfw3.h>
 #include<spdlog/spdlog.h>
-#include"src/Core/Application.h"
+
+#include"Core/Application.h"
 #include"Components/Transform.h"
 #include"Components/Camera.h"
 #include"Components/Controller.h"
@@ -15,6 +16,7 @@
 #include"Systems/ControllerSystem.h"
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
+#include"Core/AssetManager.h"
 
 class MyApp : public Application
 {
@@ -114,7 +116,7 @@ public:
         transform3->setPositionY(5.0f);
         //transform3->setRotationX(90.0f);
   
-        object3->addComponent<Mesh>(Primitives::CreateCube());
+        object3->addComponent<Mesh>(AssetManager::LoadMesh("backpack","data/Meshes/backpack/backpack.obj"));
     }
 
     void update() final

@@ -30,7 +30,7 @@ void RendererSystem::init()
 	m_context->init();
 	m_context->enableDepthTest();
 	AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
-	AssetManager::LoadTexture("whiteblackquads","data/Textures/awesomeface.png");
+	AssetManager::LoadTexture("whiteblackquads","data/Textures/whiteblackquads.png");
 
 }
 
@@ -52,7 +52,11 @@ void RendererSystem::update()
 		std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
 		shader->setUniformMat4("u_model", transform->getMatrix());
 		texture->bind(0);
-		m_context->drawIndexed(mesh->getVertexArray());
+		std::vector<SubMesh> submeshes = mesh->getSubmeshes();
+		for (auto& submesh : submeshes)
+		{
+			m_context->drawIndexed(submesh.getVertexArray());
+		}
 	}
 }
 
