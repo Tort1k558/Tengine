@@ -106,17 +106,15 @@ public:
                 }
             });
         object2->addComponent<Controller>(controller);
-
-        std::shared_ptr<Mesh> quad = Primitives::CreateQuad();
-        object->addComponent<Mesh>(quad);
+        object->addComponent<Mesh>(Primitives::CreateQuad());
 
         std::shared_ptr<Object> object3 = Object::Create();
         std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
-        transform3->setScale(3.0f);
+        //transform3->setScale(3.0f);
         transform3->setPositionY(5.0f);
-        transform3->setRotationX(90.0f);
+        //transform3->setRotationX(90.0f);
   
-        object3->addComponent<Mesh>(Primitives::CreateSphere(50,50));
+        object3->addComponent<Mesh>(Primitives::CreateCube());
     }
 
     void update() final

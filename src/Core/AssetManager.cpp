@@ -52,7 +52,7 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
         break;
     }
     texture = Texture::Create(data, { width,height }, type);
-
+    m_resources[name] = texture;
     stbi_image_free(data);
     return texture;
 }

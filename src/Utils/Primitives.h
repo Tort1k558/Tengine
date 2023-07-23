@@ -67,4 +67,47 @@ namespace Primitives
         }
         return Component::Create<Mesh>(vertices, indices);
     }
+
+    std::shared_ptr<Mesh> CreateCube()
+    {
+        std::vector<Vertex> vertices;
+        //                          Front
+        vertices.push_back({ Vec3(-1.0f, -1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(0.0f, 0.0f) });
+        vertices.push_back({ Vec3( 1.0f,  1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3(-1.0f,  1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3( 1.0f, -1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 0.0f) });
+        //                          Back
+        vertices.push_back({ Vec3(-1.0f, -1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(1.0f, 0.0f) });
+        vertices.push_back({ Vec3( 1.0f,  1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3(-1.0f,  1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3( 1.0f, -1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(0.0f, 0.0f) });
+        //                          Left
+        vertices.push_back({ Vec3(-1.0f, -1.0f, -1.0f) ,Vec3(-1.0f,0.0f,0.0f),Vec2(0.0f, 0.0f) });
+        vertices.push_back({ Vec3(-1.0f,  1.0f,  1.0f) ,Vec3(-1.0f,0.0f,0.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3(-1.0f,  1.0f, -1.0f) ,Vec3(-1.0f,0.0f,0.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3(-1.0f, -1.0f,  1.0f) ,Vec3(-1.0f,0.0f,0.0f),Vec2(1.0f, 0.0f) });
+        //                          Right
+        vertices.push_back({ Vec3( 1.0f, -1.0f, -1.0f) ,Vec3(1.0f,0.0f,0.0f),Vec2(1.0f, 0.0f) });
+        vertices.push_back({ Vec3( 1.0f,  1.0f,  1.0f) ,Vec3(1.0f,0.0f,0.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3( 1.0f,  1.0f, -1.0f) ,Vec3(1.0f,0.0f,0.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3( 1.0f, -1.0f,  1.0f) ,Vec3(1.0f,0.0f,0.0f),Vec2(0.0f, 0.0f) });
+        //                          Top
+        vertices.push_back({ Vec3(-1.0f,  1.0f, -1.0f) ,Vec3(0.0f,1.0f,0.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3( 1.0f,  1.0f,  1.0f) ,Vec3(0.0f,1.0f,0.0f),Vec2(1.0f, 0.0f) });
+        vertices.push_back({ Vec3( 1.0f,  1.0f, -1.0f) ,Vec3(0.0f,1.0f,0.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3(-1.0f,  1.0f,  1.0f) ,Vec3(0.0f,1.0f,0.0f),Vec2(0.0f, 0.0f) });
+        //                          Bottom
+        vertices.push_back({ Vec3(-1.0f, -1.0f, -1.0f) ,Vec3(0.0f,-1.0f,0.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3( 1.0f, -1.0f,  1.0f) ,Vec3(0.0f,-1.0f,0.0f),Vec2(1.0f, 0.0f) });
+        vertices.push_back({ Vec3( 1.0f, -1.0f, -1.0f) ,Vec3(0.0f,-1.0f,0.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3(-1.0f, -1.0f,  1.0f) ,Vec3(0.0f,-1.0f,0.0f),Vec2(0.0f, 0.0f) });
+        std::vector<unsigned int> indices = { 0, 1, 2,  0, 1, 3,
+                                              4, 5, 6,  4, 5, 7,
+                                              8, 9, 10, 8, 9, 11,
+                                              12,13,14, 12,13,15,
+                                              16,17,18, 16,17,19,
+                                              20,21,22, 20,21,23};
+
+        return Component::Create<Mesh>(vertices, indices);
+    }
 }

@@ -14,8 +14,6 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
-std::shared_ptr<Shader> shader;
-std::shared_ptr<Texture> texture;
 
 void RendererSystem::init()
 {
@@ -31,8 +29,8 @@ void RendererSystem::init()
 	}
 	m_context->init();
 	m_context->enableDepthTest();
-	shader = AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
-	texture = AssetManager::LoadTexture("awesomeFace","data/Textures/whiteblackquads.png");
+	AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
+	AssetManager::LoadTexture("whiteblackquads","data/Textures/awesomeface.png");
 
 }
 
@@ -44,6 +42,8 @@ void RendererSystem::update()
 	std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
 
 	camera->getPerspectiveProjection()->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
+	std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("DefaultShader");
+	std::shared_ptr<Texture> texture = AssetManager::GetResource<Texture>("whiteblackquads");
 	shader->bind();
 	shader->setUniformMat4("u_view", camera->getViewMatrix());
 	shader->setUniformMat4("u_projection", camera->getProjectionMatrix());
