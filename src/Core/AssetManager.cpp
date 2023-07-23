@@ -72,7 +72,6 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(const std::string& name, const std:
         Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
         return nullptr;
     }
-    std::string directory = path.substr(0, path.find_last_of('/'));
     processNode(mesh,scene->mRootNode, scene);
     return mesh;
 }
@@ -93,7 +92,7 @@ std::string AssetManager::ReadFile(const std::string& path)
     return "";
 }
 
-SubMesh AssetManager::processSubMesh(aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<SubMesh> AssetManager::processSubMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<Vertex> vertices;
     for (size_t i = 0; i < mesh->mNumVertices; i++)
@@ -127,7 +126,7 @@ SubMesh AssetManager::processSubMesh(aiMesh* mesh, const aiScene* scene)
             indices.push_back(face.mIndices[j]);
         }
     }
-    return SubMesh(vertices, indices);
+    return std::make_shared<SubMesh>(vertices, indices);
 }
 
 void AssetManager::processNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene)

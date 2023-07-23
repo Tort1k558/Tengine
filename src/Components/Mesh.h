@@ -32,9 +32,9 @@ class Mesh : public Component
 public:
 	Mesh() = default;
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
-	Mesh(SubMesh submesh);
-	void addSubmesh(SubMesh submesh);
-	std::vector<SubMesh> getSubmeshes() { return m_submeshes; }
+	Mesh(std::shared_ptr<SubMesh> submesh);
+	void addSubmesh(std::shared_ptr<SubMesh> submesh);
+	std::vector<std::shared_ptr<SubMesh>> getSubmeshes() { return m_submeshes; }
 private:
-	std::vector<SubMesh> m_submeshes;
+	std::vector<std::shared_ptr<SubMesh>> m_submeshes;
 };

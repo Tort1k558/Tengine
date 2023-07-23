@@ -52,10 +52,10 @@ void RendererSystem::update()
 		std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
 		shader->setUniformMat4("u_model", transform->getMatrix());
 		texture->bind(0);
-		std::vector<SubMesh> submeshes = mesh->getSubmeshes();
+		std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
 		for (auto& submesh : submeshes)
 		{
-			m_context->drawIndexed(submesh.getVertexArray());
+			m_context->drawIndexed(submesh->getVertexArray());
 		}
 	}
 }

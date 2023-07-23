@@ -33,7 +33,7 @@ public:
 private:
 	static std::string ReadFile(const std::string& path);
 	static std::unordered_map<std::string, Resource> m_resources;
-	static SubMesh processSubMesh(aiMesh* mesh, const aiScene* scene);
+	static std::shared_ptr<SubMesh> processSubMesh(aiMesh* mesh, const aiScene* scene);
 	static void processNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene);
 };
 

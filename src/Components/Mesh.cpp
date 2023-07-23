@@ -20,15 +20,15 @@ SubMesh::SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices
 }
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
 {
-	m_submeshes.push_back(SubMesh(vertices, indices));
+	m_submeshes.push_back(std::make_shared<SubMesh>(vertices, indices));
 }
 
-Mesh::Mesh(SubMesh submesh)
+Mesh::Mesh(std::shared_ptr<SubMesh> submesh)
 {
 	m_submeshes.push_back(submesh);
 }
 
-void Mesh::addSubmesh(SubMesh submesh)
+void Mesh::addSubmesh(std::shared_ptr<SubMesh> submesh)
 {
 	m_submeshes.push_back(submesh);
 }
