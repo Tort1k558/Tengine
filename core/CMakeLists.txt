@@ -7,13 +7,13 @@ set(PROJECT_NAME TengineCore)
 
 project(${PROJECT_NAME})
 
-set(DIRS_SRC 
-	"Components/*.cpp" 			"Components/*.h"	
+set(DIRS_SRC 	
 	"Core/*.cpp"                "Core/*.h"			
 	"ECS/*.cpp"                 "ECS/*.h" 			
+	"ECS/Components/*.cpp"      "ECS/Components/*.h" 			
+	"ECS/Systems/*.cpp"      "ECS/Systems/*.h" 			
 	"Renderer/*.cpp"            "Renderer/*.h"		
-	"Renderer/OpenGL/*.cpp"     "Renderer/OpenGL/*.h"
-	"Systems/*.cpp"             "Systems/*.h" 		
+	"Renderer/OpenGL/*.cpp"     "Renderer/OpenGL/*.h"		
 	"Scene/*.cpp"               "Scene/*.h" 		
 	"Utils/*.cpp"               "Utils/*.h"          
 	)

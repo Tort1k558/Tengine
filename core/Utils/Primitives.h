@@ -2,7 +2,7 @@
 
 
 #include"Core/Math.h"
-#include"Components/Mesh.h"
+#include"ECS/Components/Mesh.h"
 namespace Primitives
 {
     std::shared_ptr<Mesh> CreateQuad();

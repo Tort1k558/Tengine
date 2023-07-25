@@ -1,7 +1,7 @@
 #include "TextureOpenGL.h"
 
 #include"Core/Logger.h"
-#include"Systems/RendererSystem.h"
+#include"ECS/Systems/RendererSystem.h"
 
 GLenum TextureTypeToOpenGLDataType(TextureType type)
 {

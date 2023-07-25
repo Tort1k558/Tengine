@@ -2,6 +2,16 @@
 
 #include"UISystem.h"
 #include"ECS/SystemManager.h"
+#include"ECS/Components/Transform.h"
+#include"ECS/Components/Camera.h"
+#include"ECS/Components/Controller.h"
+#include"ECS/Components/Mesh.h"
+#include"Core/Timer.h"
+#include"Core/Logger.h"
+#include"Core/Input.h"
+#include"Scene/SceneManager.h"
+#include"Utils/Primitives.h"
+#include"Core/AssetManager.h"
 
 Editor::Editor(unsigned int width, unsigned int height, const std::string& title) :
 Application(width, height, title)

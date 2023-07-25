@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include"Components/Transform.h"
+#include"ECS/Components/Transform.h"
 
 Camera::Camera()
 {

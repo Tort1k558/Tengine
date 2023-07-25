@@ -5,7 +5,7 @@
 #include"ECS/Object.h"
 #include"ECS/ComponentManager.h"
 #include"ECS/ObjectManager.h"
-#include"Components/Transform.h"
+#include"ECS/Components/Transform.h"
 
 class Object;
 class ObjectManager;

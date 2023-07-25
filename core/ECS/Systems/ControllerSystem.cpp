@@ -1,6 +1,6 @@
 #include "ControllerSystem.h"
 
-#include"Components/Controller.h"
+#include"ECS/Components/Controller.h"
 #include"Scene/SceneManager.h"
 #include"Core/Input.h"
 

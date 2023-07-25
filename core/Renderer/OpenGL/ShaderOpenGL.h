@@ -21,7 +21,7 @@ public:
 
 	void bind() override;
 	void unbind() override;
-	void addShader(const std::string& shaderSrc, ShaderType type) override;
+	void addShader(std::string_view shaderSrc, ShaderType type) override;
 	void compile() override;
 
 	void setUniformInt(const std::string& name, const int value) override;

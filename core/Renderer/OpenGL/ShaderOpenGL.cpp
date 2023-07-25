@@ -36,7 +36,7 @@ void ShaderOpenGL::unbind()
 	glUseProgram(0);
 }
 
-void ShaderOpenGL::addShader(const std::string& shaderSrc, ShaderType type)
+void ShaderOpenGL::addShader(std::string_view shaderSrc, ShaderType type)
 {
     int shaderType = 0;
     switch (type)
@@ -53,7 +53,7 @@ void ShaderOpenGL::addShader(const std::string& shaderSrc, ShaderType type)
     }
     GLuint shader = glCreateShader(shaderType);
 
-    const char* src = shaderSrc.c_str();
+    const char* src = shaderSrc.data();
     glShaderSource(shader, 1, &src, nullptr);
 
     glCompileShader(shader);

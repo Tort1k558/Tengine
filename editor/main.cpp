@@ -1,11 +1,12 @@
 #include"Editor.h"
+#include"Core/Logger.h"
 
 int main(int argc, char** argv)
 {
     Logger::SetLevel(LogLevel::Debug);
     Logger::SetPattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
 
-    Editor editor(640, 480, "Tengine");
+    Editor editor(800, 600, "Tengine");
     editor.init();
     editor.run();
 

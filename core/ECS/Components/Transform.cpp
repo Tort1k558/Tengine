@@ -6,82 +6,70 @@ Transform::Transform(Vec3 position, Vec3 rotation, Vec3 scale) :
 
 }
 
-Transform& Transform::setPosition(Vec3 position)
+void Transform::setPosition(Vec3 position)
 {
 	m_position = position;
-	return *this;
 }
 
-Transform& Transform::setPositionX(float position)
+void Transform::setPositionX(float position)
 {
 	m_position.x = position;
-	return *this;
 }
 
-Transform& Transform::setPositionY(float position)
+void Transform::setPositionY(float position)
 {
 	m_position.y = position;
-	return *this;
 }
 
-Transform& Transform::setPositionZ(float position)
+void Transform::setPositionZ(float position)
 {
 	m_position.z = position;
-	return *this;
 }
 
-Transform& Transform::setRotation(Vec3 angles)
+void Transform::setRotation(Vec3 angles)
 {
 	m_rotation = angles;
-	return *this;
 }
 
-Transform& Transform::setRotationX(float angle)
+void Transform::setRotationX(float angle)
 {
 	m_rotation.x = angle;
-	return *this;
 }
 
-Transform& Transform::setRotationY(float angle)
+void Transform::setRotationY(float angle)
 {
 	m_rotation.y = angle;
-	return *this;
 }
 
-Transform& Transform::setRotationZ(float angle)
+void Transform::setRotationZ(float angle)
 {
 	m_rotation.z = angle;
-	return *this;
 }
 
-Transform& Transform::setScale(Vec3 scale)
+void Transform::setScale(Vec3 scale)
 {
 	m_scale = scale;
-	return *this;
 }
 
-Transform& Transform::setScale(float scale)
+void Transform::setScale(float scale)
 {
 	m_scale = Vec3(scale, scale, scale);
-	return *this;
 }
 
-Transform& Transform::setScaleX(float scale)
+void Transform::setScaleX(float scale)
 {
 	m_scale.x = scale;
-	return *this;
 }
 
-Transform& Transform::setScaleY(float scale)
+void Transform::setScaleY(float scale)
 {
 	m_scale.y = scale;
-	return *this;
 }
 
-Transform& Transform::setScaleZ(float scale)
+void Transform::setScaleZ(float scale)
 {
 	m_scale.z = scale;
-	return *this;
+	
 }
 
 Mat4 Transform::getMatrix()

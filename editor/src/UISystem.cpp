@@ -89,6 +89,12 @@ void UISystem::update()
     {
         nameOfSelectedObject = objectNames[currentItem];
     }
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y - 25.0f);
+
+    if (ImGui::Button("Create object",{0.0f,25.0f}))
+    {
+        Object::Create();
+    }
     ImGui::End();
 
 

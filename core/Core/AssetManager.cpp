@@ -9,7 +9,7 @@
 
 std::unordered_map<std::string, AssetManager::Resource> AssetManager::m_resources;
 
-std::shared_ptr<Shader> AssetManager::LoadShader(const std::string& name, const std::string& pathToVertexShader, const std::string& pathToFragmentShader)
+std::shared_ptr<Shader> AssetManager::LoadShader(std::string_view name, std::string_view pathToVertexShader, std::string_view pathToFragmentShader)
 {
     std::shared_ptr<Shader> shader = GetResource<Shader>(name);
     if (shader)
@@ -17,16 +17,16 @@ std::shared_ptr<Shader> AssetManager::LoadShader(const std::string& name, const 
         return shader;
     }
     shader = Shader::Create();
-    shader->addShader(ReadFile(pathToVertexShader), ShaderType::VertexShader);
-    shader->addShader(ReadFile(pathToFragmentShader), ShaderType::FragmentShader);
+    shader->addShader(ReadFile(pathToVertexShader.data()), ShaderType::VertexShader);
+    shader->addShader(ReadFile(pathToFragmentShader.data()), ShaderType::FragmentShader);
     shader->compile();
-    m_resources[name] = shader;
+    m_resources[name.data()] = shader;
     return shader;
 }
 
-std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, const std::string& path)
+std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view name, std::string_view path)
 {
-    std::shared_ptr<Texture> texture = GetResource<Texture>(name);
+    std::shared_ptr<Texture> texture = GetResource<Texture>(name.data());
     if (texture)
     {
         return texture;
@@ -35,7 +35,7 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
     stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
 
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    unsigned char* data = stbi_load(path.data(), &width, &height, &channels, 0);
     if (data == nullptr)
     {
         Logger::Critical("ERROR::Failed to load the texture: {0}", path);
@@ -54,20 +54,20 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
     texture = Texture::Create(data, { width,height }, type);
     stbi_image_free(data);
 
-    m_resources[name] = texture;
+    m_resources[name.data()] = texture;
     return texture;
 }
 
-std::shared_ptr<Mesh> AssetManager::LoadMesh(const std::string& name, const std::string& path)
+std::shared_ptr<Mesh> AssetManager::LoadMesh(std::string_view name, std::string_view path)
 {
-    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(name);
+    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(name.data());
     if (mesh)
     {
         return mesh;
     }
     mesh = Component::Create<Mesh>();
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+    const aiScene* scene = importer.ReadFile(path.data(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
@@ -75,13 +75,13 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(const std::string& name, const std:
     }
     processNode(mesh,scene->mRootNode, scene);
 
-    m_resources[name] = mesh;
+    m_resources[name.data()] = mesh;
     return std::shared_ptr<Mesh>(mesh);
 }
 
-std::string AssetManager::ReadFile(const std::string& path)
+std::string AssetManager::ReadFile(std::string_view path)
 {
-    std::ifstream file(path);
+    std::ifstream file(path.data());
     if (file.is_open())
     {
         std::stringstream buffer;
@@ -91,7 +91,7 @@ std::string AssetManager::ReadFile(const std::string& path)
 
         return buffer.str();
     }
-    Logger::Critical("ERROR::Failed to open file::{0}", path);
+    Logger::Critical("ERROR::Failed to open file::{0}", path.data());
     return "";
 }
 

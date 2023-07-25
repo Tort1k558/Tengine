@@ -16,7 +16,7 @@ public:
 
 	virtual void bind() = 0;
 	virtual void unbind() = 0;
-	virtual void addShader(const std::string& shaderSrc, ShaderType type) = 0;
+	virtual void addShader(std::string_view shaderSrc, ShaderType type) = 0;
 	virtual void compile() = 0;
 
 	virtual void setUniformInt(const std::string& name, const int value) = 0;
