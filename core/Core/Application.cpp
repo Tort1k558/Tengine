@@ -10,7 +10,6 @@
 #include"Core/Input.h"
 #include"ECS/SystemManager.h"
 #include"Systems/RendererSystem.h"
-#include"Systems/UISystem.h"
 #include"Systems/ControllerSystem.h"
 #include"Scene/SceneManager.h"
 
@@ -26,11 +25,8 @@ void Application::init()
     System::GetInstance<RendererSystem>()->setRendererType(RendererType::OpenGL);
     System::GetInstance<RendererSystem>()->setTextureFilter(TextureFilter::Anisotropic16);
     SystemManager::AddSystem<RendererSystem>();
-    System::GetInstance<UISystem>()->setWindow(m_window);
-    SystemManager::AddSystem<UISystem>();
     SystemManager::AddSystem<ControllerSystem>();
     SystemManager::InitSystems();
-
     System::GetInstance<RendererSystem>()->updateViewport(m_window->getSize());
 
     m_eventDispatcher = EventDispatcher();
@@ -117,4 +113,11 @@ void Application::close()
 {
     m_isRunning = false;
 }
-
+size_t Application::getMaxFps()
+{
+    return m_maxFps;
+}
+std::shared_ptr<Window> Application::getWindow()
+{
+    return m_window;
+}

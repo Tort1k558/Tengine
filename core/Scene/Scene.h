@@ -19,13 +19,14 @@ public:
 	void removeObjectByUUID(UUID id);
 
 	std::shared_ptr<Object> getObjectByUUID(UUID id);
+	std::shared_ptr<Object> getObjectByName(const std::string& name);
+	std::vector<std::shared_ptr<Object>> getAllObjects();
 	template<typename T>
 	std::vector<std::shared_ptr<T>> getComponents();
 
 	static std::shared_ptr<Scene> Create();
 private:
 	std::shared_ptr<ObjectManager> m_objectManager;
-	friend class Object;
 };
 
 template<typename T>

@@ -7,9 +7,10 @@
 
 #include"ECS/Component.h"
 #include"ECS/Object.h"
-
+#include"Scene/Scene.h"
 
 class Scene;
+class Component;
 
 class ComponentManager
 {
@@ -24,6 +25,7 @@ public:
 
 	template<typename T>
 	std::vector<std::shared_ptr<T>> getComponents() const;
+
 	template<typename T>
 	void removeComponent(std::string idObject);
 private:

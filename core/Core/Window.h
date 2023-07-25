@@ -5,6 +5,7 @@
 #include<GLFW/glfw3.h>
 #include"Event.h"
 #include"Core/Math.h"
+
 class Window
 {
 public:

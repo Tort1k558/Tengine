@@ -5,7 +5,9 @@
 #include<imgui/backends/imgui_impl_glfw.h>
 
 #include"Core/Timer.h"
-
+#include"Core/Logger.h"
+#include"ECS/Object.h"
+#include"Scene/SceneManager.h"
 void UISystem::init()
 {
     IMGUI_CHECKVERSION();
@@ -58,8 +60,49 @@ void UISystem::update()
     ImGui::EndMenuBar();
     ImGui::End();
 
-    ImGui::Begin("info",nullptr);
+    ImGui::Begin("info", nullptr);
     ImGui::Text("FPS::%d", static_cast<unsigned int>(1.0 / Timer::GetDeltaTime()));
+    ImGui::End();
+
+    std::vector<std::shared_ptr<Object>> objects = SceneManager::GetCurrentScene()->getAllObjects();
+
+    //Objects
+    ImGui::Begin("Objects", nullptr);
+    std::vector<std::string> objectNames;
+    for (const auto& object : objects)
+    {
+        objectNames.push_back(object->getName());
+    }
+    std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
+    static int currentItem = 0;
+    static std::string nameOfSelectedObject;
+    if (ImGui::ListBox("##", &currentItem, [](void* data, int idx, const char** out_text) {
+        auto& items = *static_cast<std::vector<std::string>*>(data);
+        if (idx < 0 || idx >= static_cast<int>(items.size())) {
+            *out_text = nullptr;
+        }
+        else {
+            *out_text = items[idx].c_str();
+        }
+        return true;
+        }, static_cast<void*>(&objectNames), static_cast<int>(objectNames.size())))
+    {
+        nameOfSelectedObject = objectNames[currentItem];
+    }
+    ImGui::End();
+
+
+    //Components
+    ImGui::Begin("Components", nullptr);
+    if (!nameOfSelectedObject.empty())
+    {
+        std::shared_ptr<Object> object = SceneManager::GetCurrentScene()->getObjectByName(nameOfSelectedObject);
+        std::vector<std::shared_ptr<Component>> components = object->getComponents();
+        for (const auto& component : components)
+        {
+            ImGui::Text(object->getName().c_str());
+        }
+    }
     ImGui::End();
 
 

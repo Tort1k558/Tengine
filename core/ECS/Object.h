@@ -24,6 +24,7 @@ public:
 	template<typename T>
 	std::shared_ptr<T> getComponent();
 
+	std::vector<std::shared_ptr<Component>> getComponents();
 	void setName(const std::string& name);
 	std::string getName() { return m_name; }
 	std::string getId() { return m_id.getID(); }
@@ -33,8 +34,6 @@ private:
 	UUID m_id;
 	std::string m_name;
 	std::unordered_map<size_t, std::shared_ptr<Component>> m_components;
-
-	friend class Scene;
 };
 
 template<typename T>
@@ -55,6 +54,10 @@ inline void Object::removeComponent()
 template<typename T>
 inline std::shared_ptr<T> Object::getComponent()
 {
+	if (m_components.find(typeid(T).hash_code()) == m_components.end())
+	{
+		return nullptr;
+	}
 	std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(m_components[typeid(T).hash_code()]);
 	return component;
 }

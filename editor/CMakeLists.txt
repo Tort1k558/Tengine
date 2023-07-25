@@ -13,4 +13,4 @@ include_directories(src)
 
 add_executable(${PROJECT_NAME_EDITOR} ${TARGET_SRC_EDITOR} main.cpp)
 
-target_link_libraries(${PROJECT_NAME_EDITOR} TengineCore glm imgui spdlog assimp)
+target_link_libraries(${PROJECT_NAME_EDITOR} TengineCore glm imgui spdlog assimp glfw)

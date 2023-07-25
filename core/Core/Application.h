@@ -3,7 +3,7 @@
 #include<string>
 #include<memory>
 #include"Event.h"
-
+#include"Core/Window.h"
 class Window;
 
 class Application
@@ -25,8 +25,10 @@ public:
 	void lockFps();
 	void unlockFps();
 	void setMaxFps(size_t fps);
-	size_t getMaxFps() { return m_maxFps; }
 	void close();
+
+	size_t getMaxFps();
+	std::shared_ptr<Window> getWindow();
 private:
 	std::shared_ptr<Window> m_window;
 	EventDispatcher m_eventDispatcher;

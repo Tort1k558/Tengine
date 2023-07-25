@@ -25,3 +25,21 @@ std::shared_ptr<Object> Scene::getObjectByUUID(UUID id)
 {
 	return m_objectManager->getObjectByUUID(id.getID());
 }
+
+std::shared_ptr<Object> Scene::getObjectByName(const std::string& name)
+{
+	std::vector<std::shared_ptr<Object>> objects = m_objectManager->getAllObjects();
+	for (const auto& object : objects)
+	{
+		if (object->getName() == name)
+		{
+			return object;
+		}
+	}
+	return nullptr;
+}
+
+std::vector<std::shared_ptr<Object>> Scene::getAllObjects()
+{
+	return m_objectManager->getAllObjects();
+}

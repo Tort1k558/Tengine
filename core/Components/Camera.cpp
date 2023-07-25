@@ -86,6 +86,7 @@ Mat4 Camera::getRotationMatrix(Vec3 rotation)
 	case RotationOrder::ZYX:
 		return GetEulerMatrixZYX(rotation);
 	}
+	return Mat4(1.0f);
 }
 
 void Camera::setCameraType(ProjectionType type)
