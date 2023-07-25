@@ -1,8 +1,5 @@
-#include<glad/glad.h>
-#include <GLFW/glfw3.h>
-#include<spdlog/spdlog.h>
-
 #include"Core/Application.h"
+
 #include"Components/Transform.h"
 #include"Components/Camera.h"
 #include"Components/Controller.h"
@@ -10,10 +7,6 @@
 #include"Core/Timer.h"
 #include"Core/Logger.h"
 #include"Core/Input.h"
-#include"ECS/SystemManager.h"
-#include"Systems/RendererSystem.h"
-#include"Systems/UISystem.h"
-#include"Systems/ControllerSystem.h"
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
 #include"Core/AssetManager.h"
@@ -21,8 +14,8 @@
 class MyApp : public Application
 {
 public:
-    MyApp(unsigned int width, unsigned int height, const std::string& title) : 
-        Application(width,height,title)
+    MyApp(unsigned int width, unsigned int height, const std::string& title) :
+        Application(width, height, title)
     {}
 
     void create() final
@@ -63,17 +56,17 @@ public:
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() 
-                                       + Normalize(Cross(camera->getDirection(), camera->getUp()))
-                                       * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
+                transform->setPosition(transform->getPosition()
+                    + Normalize(Cross(camera->getDirection(), camera->getUp()))
+                    * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
             });
         controller->addKeyCallback(KeyCode::D, [speed](std::shared_ptr<Object> object)
             {
                 std::shared_ptr<Transform> transform = object->getComponent<Transform>();
                 std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-                transform->setPosition(transform->getPosition() 
-                                        + Normalize(Cross(camera->getDirection(), camera->getUp())) 
-                                        * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
+                transform->setPosition(transform->getPosition()
+                    + Normalize(Cross(camera->getDirection(), camera->getUp()))
+                    * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
             });
         controller->addKeyCallback(KeyCode::LEFT_SHIFT, [speed](std::shared_ptr<Object> object)
             {
@@ -115,8 +108,8 @@ public:
         //transform3->setScale(3.0f);
         transform3->setPositionY(5.0f);
         //transform3->setRotationX(90.0f);
-  
-        object3->addComponent<Mesh>(AssetManager::LoadMesh("backpack","data/Meshes/backpack/backpack.obj"));
+
+        object3->addComponent<Mesh>(AssetManager::LoadMesh("backpack", "data/Meshes/backpack/backpack.obj"));
     }
 
     void update() final
@@ -128,11 +121,11 @@ public:
     }
 };
 
-int main(int argc,char** argv)
+int main(int argc, char** argv)
 {
     Logger::SetLevel(LogLevel::Debug);
     Logger::SetPattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
-    
+
     MyApp app(640, 480, "Tengine");
     app.init();
     app.run();

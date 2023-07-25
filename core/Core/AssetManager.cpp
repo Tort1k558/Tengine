@@ -52,8 +52,9 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(const std::string& name, cons
         break;
     }
     texture = Texture::Create(data, { width,height }, type);
-    m_resources[name] = texture;
     stbi_image_free(data);
+
+    m_resources[name] = texture;
     return texture;
 }
 
@@ -66,14 +67,16 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(const std::string& name, const std:
     }
     mesh = Component::Create<Mesh>();
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
         return nullptr;
     }
     processNode(mesh,scene->mRootNode, scene);
-    return mesh;
+
+    m_resources[name] = mesh;
+    return std::shared_ptr<Mesh>(mesh);
 }
 
 std::string AssetManager::ReadFile(const std::string& path)
@@ -105,7 +108,7 @@ std::shared_ptr<SubMesh> AssetManager::processSubMesh(aiMesh* mesh, const aiScen
         vertex.normal.x = mesh->mNormals[i].x;
         vertex.normal.y = mesh->mNormals[i].y;
         vertex.normal.z = mesh->mNormals[i].z;
-        if (mesh->mTextureCoords[0])
+        if (mesh->HasTextureCoords(0))
         {
             vertex.texCoords.x = mesh->mTextureCoords[0][i].x;
             vertex.texCoords.y = mesh->mTextureCoords[0][i].y;
