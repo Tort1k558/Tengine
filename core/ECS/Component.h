@@ -8,20 +8,32 @@
 enum class DisplayTypeElement
 {
 	None,
-	Int,
-	Bool,
-	Float,
-	Double,
-	Vec2,
-	Vec3,
-	Vec4
+	Slider,
+	Slider2,
+	Slider3,
+	Slider4,
+	Combo
 };
 
 struct DisplayInfoElement
 {
+	virtual ~DisplayInfoElement() = default;
 	DisplayTypeElement type;
 	std::string name;
+	std::function<void()> function;
+};
+
+struct DisplayInfoElementSlider : public DisplayInfoElement
+{
 	void* data;
+	float minValue;
+	float maxValue;
+};
+
+struct DisplayInfoElementCombo : public DisplayInfoElement
+{
+	std::vector<std::string> elements;
+	int* currentElement;
 	float minValue;
 	float maxValue;
 };
@@ -30,12 +42,12 @@ class DisplayInfo
 {
 public:
 	DisplayInfo() = default;
-	void addElement(DisplayInfoElement element);
+	void addElement(std::shared_ptr<DisplayInfoElement> element);
 	void setComponentName(const std::string& name);
 	std::string getComponentName();
-	std::vector<DisplayInfoElement> getElements();
+	std::vector< std::shared_ptr<DisplayInfoElement>> getElements();
 private:
-	std::vector<DisplayInfoElement> m_elements;
+	std::vector<std::shared_ptr<DisplayInfoElement>> m_elements;
 	std::string m_componentName;
 };
 
@@ -52,10 +64,8 @@ public:
 	template<typename T, typename... Args>
 	static std::shared_ptr<T> Create(Args... args);
 
-	std::shared_ptr<DisplayInfo> getDisplayInfo() { return m_displayInfo; }
-	bool hasDisplayInfo() { return m_displayInfo.get() != nullptr; }
-protected:
-	std::shared_ptr<DisplayInfo> m_displayInfo;
+	virtual DisplayInfo getDisplayInfo() { return DisplayInfo(); }
+	virtual bool hasDisplayInfo() { return false; }
 private:
 	std::weak_ptr<Object> m_parent;
 };

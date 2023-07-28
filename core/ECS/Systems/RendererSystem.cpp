@@ -40,8 +40,6 @@ void RendererSystem::update()
 	m_context->clear();
 	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
 	std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
-
-	camera->getPerspectiveProjection()->setAspectRatio(static_cast<float>(m_viewportSize.x) / static_cast<float>(m_viewportSize.y));
 	std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("DefaultShader");
 	std::shared_ptr<Texture> texture = AssetManager::GetResource<Texture>("whiteblackquads");
 	shader->bind();

@@ -5,7 +5,7 @@ void Component::setParent(std::shared_ptr<Object> parent)
 	m_parent = parent;
 }
 
-void DisplayInfo::addElement(DisplayInfoElement element)
+void DisplayInfo::addElement(std::shared_ptr<DisplayInfoElement> element)
 {
 	m_elements.push_back(element);
 }
@@ -19,7 +19,7 @@ std::string DisplayInfo::getComponentName()
 	return m_componentName;
 }
 
-std::vector<DisplayInfoElement> DisplayInfo::getElements()
+std::vector<std::shared_ptr<DisplayInfoElement>> DisplayInfo::getElements()
 {
 	return m_elements;
 }

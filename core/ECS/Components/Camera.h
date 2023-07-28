@@ -8,6 +8,7 @@ enum class ProjectionType
 	Perspective,
 	Orthographical
 };
+class Camera;
 
 class Projection
 {
@@ -20,8 +21,10 @@ public:
 	void setZFar(float zFar);
 protected:
 	Mat4 m_projection;
-	float m_zNear = 0.1f;
+	float m_zNear = 0.01f;
 	float m_zFar = 10000.0f;
+
+	friend class Camera;
 };
 
 class PerspectiveProjection : public Projection
@@ -35,6 +38,8 @@ public:
 private:
 	float m_aspect = 16.0f / 9.0f;
 	float m_fov = 60.0f;
+
+	friend class Camera;
 };
 
 class OrthographicalProjection : public Projection
@@ -53,6 +58,8 @@ private:
 	float m_right = 5.0f;
 	float m_bottom = -5.0f;
 	float m_top = 5.0f;
+
+	friend class Camera;
 };
 
 
@@ -80,9 +87,12 @@ public:
 	Vec3 getUp();
 	std::shared_ptr<PerspectiveProjection> getPerspectiveProjection();
 	std::shared_ptr<OrthographicalProjection> getOrthographicalProjection();
+	std::shared_ptr<Projection> getProjection();
 	RotationOrder getRotationOrder() { return m_rotationOrder; }
+
+	DisplayInfo getDisplayInfo() final;
+	bool hasDisplayInfo() final;
 private:
-	void updateProjection();
 	Mat4 getRotationMatrix(Vec3 rotation);
 
 	ProjectionType m_projectionType;

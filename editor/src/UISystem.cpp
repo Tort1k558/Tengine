@@ -106,29 +106,67 @@ void UISystem::update()
         {
             if (component->hasDisplayInfo())
             {
-                std::shared_ptr<DisplayInfo> info = component->getDisplayInfo();
-                ImGui::Text(info->getComponentName().c_str());
-                for (const auto& element : info->getElements())
+                DisplayInfo info = component->getDisplayInfo();
+                ImGui::Text(info.getComponentName().c_str());
+                for (const auto& element : info.getElements())
                 {
-                    switch (element.type)
+                    switch (element->type)
                     {
                     case DisplayTypeElement::None:
                         break;
-                    case DisplayTypeElement::Int:
+                    case DisplayTypeElement::Slider:
+                    {
+                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+                        if (ImGui::SliderFloat(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue))
+                        {
+                            if (slider->function)
+                            {
+                                slider->function();
+                            }
+                        }
                         break;
-                    case DisplayTypeElement::Bool:
+                    }
+                    case DisplayTypeElement::Slider2:
+                    {
+                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+                        ImGui::SliderFloat2(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
                         break;
-                    case DisplayTypeElement::Float:
+                    }
+                    case DisplayTypeElement::Slider3:
+                    {
+                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+                        ImGui::SliderFloat3(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
                         break;
-                    case DisplayTypeElement::Double:
+                    }
+                    case DisplayTypeElement::Slider4:
+                    {
+                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+                        ImGui::SliderFloat4(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
                         break;
-                    case DisplayTypeElement::Vec2:
+                    }
+                    case DisplayTypeElement::Combo:
+                    {
+                        std::shared_ptr<DisplayInfoElementCombo> combo = std::dynamic_pointer_cast<DisplayInfoElementCombo>(element);
+                        if (ImGui::BeginCombo(combo->name.c_str(), combo->elements[*combo->currentElement].c_str()))
+                        {
+                            for (int i = 0; i < combo->elements.size(); ++i)
+                            {
+                                const bool isSelected = (*combo->currentElement == i);
+                                if (ImGui::Selectable(combo->elements[i].c_str(), isSelected))
+                                {
+                                    *combo->currentElement = i;
+                                    combo->function();
+                                }
+
+                                if (isSelected)
+                                {
+                                    ImGui::SetItemDefaultFocus();
+                                }
+                            }
+                            ImGui::EndCombo();
+                        }
                         break;
-                    case DisplayTypeElement::Vec3:
-                        ImGui::SliderFloat3(element.name.c_str(), static_cast<float*>(element.data), element.minValue, element.maxValue);
-                        break;
-                    case DisplayTypeElement::Vec4:
-                        break;
+                    }
                     default:
                         break;
                     }

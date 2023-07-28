@@ -26,6 +26,9 @@ public:
 	Vec3 getRotation() { return m_rotation; }
 	Vec3 getScale() { return m_scale; }
 	Mat4 getMatrix();
+
+	DisplayInfo getDisplayInfo() final;
+	bool hasDisplayInfo() final;
 private:
 	Vec3 m_position = Vec3(0.0f);
 	Vec3 m_rotation = Vec3(0.0f);

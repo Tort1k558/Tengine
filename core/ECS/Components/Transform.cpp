@@ -2,21 +2,11 @@
 
 Transform::Transform()
 {
-	m_displayInfo = std::make_shared<DisplayInfo>();
-	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Position",&m_position,-10.0f,10.0f });
-	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Rotation",&m_rotation,-360.0f,360.0f });
-	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Scale",&m_scale,0.0f,10.0f });
-	m_displayInfo->setComponentName("Transform");
 }
 
 Transform::Transform(Vec3 position, Vec3 rotation, Vec3 scale) :
 	m_position(position), m_rotation(rotation), m_scale(scale)
 {
-	m_displayInfo = std::make_shared<DisplayInfo>();
-	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Position",&m_position,-10.0f,10.0f });
-	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Rotation",&m_rotation,-360.0f,360.0f });
-	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Scale",&m_scale,0.0f,10.0f });
-	m_displayInfo->setComponentName("Transform");
 }
 
 void Transform::setPosition(Vec3 position)
@@ -94,4 +84,37 @@ Mat4 Transform::getMatrix()
 	rotateMatrix = RotateMatrix(rotateMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
 	Mat4 scaleMatrix = GetScaleMatrix(m_scale);
 	return translateMatrix * rotateMatrix * scaleMatrix;
+}
+
+DisplayInfo Transform::getDisplayInfo()
+{
+	DisplayInfo displayInfo;
+	displayInfo.setComponentName("Transform");
+	std::shared_ptr<DisplayInfoElementSlider> positionSlider = std::make_shared<DisplayInfoElementSlider>();
+	positionSlider->minValue = -10.0f;
+	positionSlider->maxValue = 10.0f;
+	positionSlider->name = "Position";
+	positionSlider->data = &m_position;
+	positionSlider->type = DisplayTypeElement::Slider3;
+	displayInfo.addElement(positionSlider);
+	std::shared_ptr<DisplayInfoElementSlider> rotationSlider = std::make_shared<DisplayInfoElementSlider>();
+	rotationSlider->minValue = -360.0f;
+	rotationSlider->maxValue = 360.0f;
+	rotationSlider->name = "Rotation";
+	rotationSlider->data = &m_rotation;
+	rotationSlider->type = DisplayTypeElement::Slider3;
+	displayInfo.addElement(rotationSlider);
+	std::shared_ptr<DisplayInfoElementSlider> scaleSlider = std::make_shared<DisplayInfoElementSlider>();
+	scaleSlider->minValue = 0.0f;
+	scaleSlider->maxValue = 10.0f;
+	scaleSlider->name = "Scale";
+	scaleSlider->data = &m_scale;
+	scaleSlider->type = DisplayTypeElement::Slider3;
+	displayInfo.addElement(scaleSlider);
+	return displayInfo;
+}
+
+bool Transform::hasDisplayInfo()
+{
+	return true;
 }
