@@ -21,8 +21,6 @@ void UISystem::init()
 
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
-
-
 }
 
 void UISystem::update()
@@ -106,7 +104,36 @@ void UISystem::update()
         std::vector<std::shared_ptr<Component>> components = object->getComponents();
         for (const auto& component : components)
         {
-            ImGui::Text(object->getName().c_str());
+            if (component->hasDisplayInfo())
+            {
+                std::shared_ptr<DisplayInfo> info = component->getDisplayInfo();
+                ImGui::Text(info->getComponentName().c_str());
+                for (const auto& element : info->getElements())
+                {
+                    switch (element.type)
+                    {
+                    case DisplayTypeElement::None:
+                        break;
+                    case DisplayTypeElement::Int:
+                        break;
+                    case DisplayTypeElement::Bool:
+                        break;
+                    case DisplayTypeElement::Float:
+                        break;
+                    case DisplayTypeElement::Double:
+                        break;
+                    case DisplayTypeElement::Vec2:
+                        break;
+                    case DisplayTypeElement::Vec3:
+                        ImGui::SliderFloat3(element.name.c_str(), static_cast<float*>(element.data), element.minValue, element.maxValue);
+                        break;
+                    case DisplayTypeElement::Vec4:
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
         }
     }
     ImGui::End();

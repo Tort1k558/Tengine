@@ -4,7 +4,7 @@
 #include "Components/Transform.h"
 
 Object::Object() :
-	m_id(),m_components({})
+	m_id()
 {
 	static size_t counterObject = 0;
 	m_name = "Object" + std::to_string(counterObject);

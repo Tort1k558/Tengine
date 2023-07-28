@@ -1,6 +1,8 @@
 #include"Editor.h"
 #include"Core/Logger.h"
 
+//Избавиться от статичного дисплей инфо в компоненте
+
 int main(int argc, char** argv)
 {
     Logger::SetLevel(LogLevel::Debug);

@@ -1,9 +1,22 @@
 #include"Transform.h"
 
+Transform::Transform()
+{
+	m_displayInfo = std::make_shared<DisplayInfo>();
+	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Position",&m_position,-10.0f,10.0f });
+	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Rotation",&m_rotation,-360.0f,360.0f });
+	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Scale",&m_scale,0.0f,10.0f });
+	m_displayInfo->setComponentName("Transform");
+}
+
 Transform::Transform(Vec3 position, Vec3 rotation, Vec3 scale) :
 	m_position(position), m_rotation(rotation), m_scale(scale)
 {
-
+	m_displayInfo = std::make_shared<DisplayInfo>();
+	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Position",&m_position,-10.0f,10.0f });
+	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Rotation",&m_rotation,-360.0f,360.0f });
+	m_displayInfo->addElement({ DisplayTypeElement::Vec3,"Scale",&m_scale,0.0f,10.0f });
+	m_displayInfo->setComponentName("Transform");
 }
 
 void Transform::setPosition(Vec3 position)

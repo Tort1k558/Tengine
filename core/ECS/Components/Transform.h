@@ -5,7 +5,7 @@
 class Transform : public Component
 {
 public:
-	Transform() = default;
+	Transform();
 	Transform(Vec3 position, Vec3 rotation, Vec3 scale);
 
 	void setPosition(Vec3 position);
