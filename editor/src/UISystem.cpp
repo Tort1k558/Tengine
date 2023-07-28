@@ -17,7 +17,57 @@ void UISystem::init()
     io.ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_ViewportsEnable;
 
-    ImGui::StyleColorsClassic();
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4* colors = style.Colors;
+
+    style.WindowPadding = { 15, 15 };
+    style.WindowRounding = 6.0f;
+    style.FramePadding = { 5, 5 };
+    style.FrameRounding = 4.0f;
+    style.ItemSpacing = { 12, 8 };
+    style.ItemInnerSpacing = { 8, 6 };
+    style.IndentSpacing = 25.0f;
+    style.ScrollbarSize = 15.0f;
+    style.ScrollbarRounding = 9.0f;
+    style.GrabMinSize = 5.0f;
+    style.GrabRounding = 3.0f;
+    style.WindowMenuButtonPosition = ImGuiDir_None;
+    
+    colors[ImGuiCol_Text] = { 0.80f, 0.80f, 0.83f, 1.00f };
+    colors[ImGuiCol_TextDisabled] = { 0.24f, 0.23f, 0.29f, 1.00f };
+    colors[ImGuiCol_WindowBg] = { 0.06f, 0.05f, 0.07f, 1.00f };
+    colors[ImGuiCol_ChildBg] = { 0.07f, 0.07f, 0.09f, 1.00f };
+    colors[ImGuiCol_PopupBg] = { 0.07f, 0.07f, 0.09f, 1.00f };
+    colors[ImGuiCol_Border] = { 0.80f, 0.80f, 0.83f, 0.88f };
+    colors[ImGuiCol_BorderShadow] = { 0.92f, 0.91f, 0.88f, 0.00f };
+    colors[ImGuiCol_FrameBg] = { 0.10f, 0.09f, 0.12f, 1.00f };
+    colors[ImGuiCol_FrameBgHovered] = { 0.24f, 0.23f, 0.29f, 1.00f };
+    colors[ImGuiCol_FrameBgActive] = { 0.56f, 0.56f, 0.58f, 1.00f };
+    colors[ImGuiCol_TitleBg] = { 0.76f, 0.31f, 0.00f, 1.00f };
+    colors[ImGuiCol_TitleBgCollapsed] = { 1.00f, 0.98f, 0.95f, 0.75f };
+    colors[ImGuiCol_TitleBgActive] = { 0.80f, 0.33f, 0.00f, 1.00f };
+    colors[ImGuiCol_MenuBarBg] = { 0.10f, 0.09f, 0.12f, 1.00f };
+    colors[ImGuiCol_ScrollbarBg] = { 0.10f, 0.09f, 0.12f, 1.00f };
+    colors[ImGuiCol_ScrollbarGrab] = { 0.80f, 0.80f, 0.83f, 0.31f };
+    colors[ImGuiCol_ScrollbarGrabHovered] = { 0.56f, 0.56f, 0.58f, 1.00f };
+    colors[ImGuiCol_ScrollbarGrabActive] = { 0.06f, 0.05f, 0.07f, 1.00f };
+    colors[ImGuiCol_CheckMark] = { 1.00f, 0.42f, 0.00f, 0.53f };
+    colors[ImGuiCol_SliderGrab] = { 1.00f, 0.42f, 0.00f, 0.53f };
+    colors[ImGuiCol_SliderGrabActive] = { 1.00f, 0.42f, 0.00f, 1.00f };
+    colors[ImGuiCol_Button] = { 0.10f, 0.09f, 0.12f, 1.00f };
+    colors[ImGuiCol_ButtonHovered] = { 0.24f, 0.23f, 0.29f, 1.00f };
+    colors[ImGuiCol_ButtonActive] = { 0.56f, 0.56f, 0.58f, 1.00f };
+    colors[ImGuiCol_Header] = { 0.10f, 0.09f, 0.12f, 1.00f };
+    colors[ImGuiCol_HeaderHovered] = { 0.56f, 0.56f, 0.58f, 1.00f };
+    colors[ImGuiCol_HeaderActive] = { 0.06f, 0.05f, 0.07f, 1.00f };
+    colors[ImGuiCol_ResizeGrip] = { 0.00f, 0.00f, 0.00f, 0.00f };
+    colors[ImGuiCol_ResizeGripHovered] = { 0.56f, 0.56f, 0.58f, 1.00f };
+    colors[ImGuiCol_ResizeGripActive] = { 0.06f, 0.05f, 0.07f, 1.00f };
+    colors[ImGuiCol_PlotLines] = { 0.40f, 0.39f, 0.38f, 0.63f };
+    colors[ImGuiCol_PlotLinesHovered] = { 0.25f, 1.00f, 0.00f, 1.00f };
+    colors[ImGuiCol_PlotHistogram] = { 0.40f, 0.39f, 0.38f, 0.63f };
+    colors[ImGuiCol_PlotHistogramHovered] = { 0.25f, 1.00f, 0.00f, 1.00f };
+
 
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
@@ -48,16 +98,21 @@ void UISystem::update()
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
-    ImGui::BeginMenuBar();
-    if (ImGui::BeginMenu("File"))
-    {
-        ImGui::MenuItem("hi",0);
-        ImGui::EndMenu();
-        ImGui::Separator();
+    
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("Scene")) {
+            if (ImGui::MenuItem("Save Scene")) {
+            }
+            if (ImGui::MenuItem("Load Scene")) {
+            }
+            if (ImGui::MenuItem("Create Scene")) {
+                SceneManager::SetCurrentScene(Scene::Create());
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
     }
-    ImGui::EndMenuBar();
     ImGui::End();
-
     ImGui::Begin("info", nullptr);
     ImGui::Text("FPS::%d", static_cast<unsigned int>(1.0 / Timer::GetDeltaTime()));
     ImGui::End();

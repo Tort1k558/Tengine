@@ -38,22 +38,25 @@ void RendererSystem::update()
 {
 	m_context->clearColor({ 0.1f,0.1f,0.1f, 1.0f });
 	m_context->clear();
-	std::shared_ptr<Camera> camera = SceneManager::GetCurrentScene()->getComponents<Camera>()[0];
-	std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
-	std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("DefaultShader");
-	std::shared_ptr<Texture> texture = AssetManager::GetResource<Texture>("whiteblackquads");
-	shader->bind();
-	shader->setUniformMat4("u_view", camera->getViewMatrix());
-	shader->setUniformMat4("u_projection", camera->getProjectionMatrix());
-	for (auto& mesh : meshes)
+	std::vector<std::shared_ptr<Camera>> cameras = SceneManager::GetCurrentScene()->getComponents<Camera>();
+	for (auto& camera : cameras)
 	{
-		std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
-		shader->setUniformMat4("u_model", transform->getMatrix());
-		texture->bind(0);
-		std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
-		for (auto& submesh : submeshes)
+		std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
+		std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("DefaultShader");
+		std::shared_ptr<Texture> texture = AssetManager::GetResource<Texture>("whiteblackquads");
+		shader->bind();
+		shader->setUniformMat4("u_view", camera->getViewMatrix());
+		shader->setUniformMat4("u_projection", camera->getProjectionMatrix());
+		for (auto& mesh : meshes)
 		{
-			m_context->drawIndexed(submesh->getVertexArray());
+			std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
+			shader->setUniformMat4("u_model", transform->getMatrix());
+			texture->bind(0);
+			std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
+			for (auto& submesh : submeshes)
+			{
+				m_context->drawIndexed(submesh->getVertexArray());
+			}
 		}
 	}
 }
