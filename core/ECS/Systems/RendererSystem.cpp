@@ -29,8 +29,8 @@ void RendererSystem::init()
 	}
 	m_context->init();
 	m_context->enableDepthTest();
-	AssetManager::LoadShader("DefaultShader", "data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
-	AssetManager::LoadTexture("whiteblackquads","data/Textures/whiteblackquads.png");
+	AssetManager::LoadShader("data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
+	AssetManager::LoadTexture("data/Textures/whiteblackquads.png");
 
 }
 
@@ -42,8 +42,7 @@ void RendererSystem::update()
 	for (auto& camera : cameras)
 	{
 		std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
-		std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("DefaultShader");
-		std::shared_ptr<Texture> texture = AssetManager::GetResource<Texture>("whiteblackquads");
+		std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("data/Shaders/GLSL/vs.vsdata/Shaders/GLSL/fs.fs");
 		shader->bind();
 		shader->setUniformMat4("u_view", camera->getViewMatrix());
 		shader->setUniformMat4("u_projection", camera->getProjectionMatrix());
@@ -51,10 +50,18 @@ void RendererSystem::update()
 		{
 			std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
 			shader->setUniformMat4("u_model", transform->getMatrix());
-			texture->bind(0);
+			
 			std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
 			for (auto& submesh : submeshes)
 			{
+				if (submesh->hasMaterial())
+				{
+					std::shared_ptr<Material> material = submesh->getMaterial();
+					if (material->hasTexture(MaterialTexture::Diffuse))
+					{
+						material->getTexture(MaterialTexture::Diffuse)->bind(0);
+					}
+				}
 				m_context->drawIndexed(submesh->getVertexArray());
 			}
 		}

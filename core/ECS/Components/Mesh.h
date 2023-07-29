@@ -7,6 +7,7 @@
 #include"Renderer/VertexArray.h"
 #include"Renderer/VertexBuffer.h"
 #include"Renderer/IndexBuffer.h"
+#include"Utils/Material.h"
 
 struct Vertex
 {
@@ -20,11 +21,15 @@ class SubMesh
 public:
 	SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 	std::shared_ptr<VertexArray> getVertexArray() { return m_vertexArray; }
+	std::shared_ptr<Material> getMaterial();
+	void setMaterial(std::shared_ptr<Material> material);
+	bool hasMaterial();
 private:
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
 	std::shared_ptr<VertexArray> m_vertexArray;
 	std::shared_ptr<IndexBuffer> m_indexBuffer;
+	std::shared_ptr<Material> m_material;
 };
 
 class Mesh : public Component

@@ -9,9 +9,11 @@
 
 std::unordered_map<std::string, AssetManager::Resource> AssetManager::m_resources;
 
-std::shared_ptr<Shader> AssetManager::LoadShader(std::string_view name, std::string_view pathToVertexShader, std::string_view pathToFragmentShader)
+std::shared_ptr<Shader> AssetManager::LoadShader(std::string_view pathToVertexShader, std::string_view pathToFragmentShader)
 {
-    std::shared_ptr<Shader> shader = GetResource<Shader>(name);
+    std::string paths = pathToVertexShader.data();
+    paths += pathToFragmentShader.data();
+    std::shared_ptr<Shader> shader = GetResource<Shader>(paths);
     if (shader)
     {
         return shader;
@@ -20,13 +22,13 @@ std::shared_ptr<Shader> AssetManager::LoadShader(std::string_view name, std::str
     shader->addShader(ReadFile(pathToVertexShader.data()), ShaderType::VertexShader);
     shader->addShader(ReadFile(pathToFragmentShader.data()), ShaderType::FragmentShader);
     shader->compile();
-    m_resources[name.data()] = shader;
+    m_resources[paths] = shader;
     return shader;
 }
 
-std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view name, std::string_view path)
+std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view path)
 {
-    std::shared_ptr<Texture> texture = GetResource<Texture>(name.data());
+    std::shared_ptr<Texture> texture = GetResource<Texture>(path.data());
     if (texture)
     {
         return texture;
@@ -54,13 +56,13 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view name, std::s
     texture = Texture::Create(data, { width,height }, type);
     stbi_image_free(data);
 
-    m_resources[name.data()] = texture;
+    m_resources[path.data()] = texture;
     return texture;
 }
 
-std::shared_ptr<Mesh> AssetManager::LoadMesh(std::string_view name, std::string_view path)
+std::shared_ptr<Mesh> AssetManager::LoadMesh(std::string_view path)
 {
-    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(name.data());
+    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path.data());
     if (mesh)
     {
         return mesh;
@@ -73,9 +75,11 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(std::string_view name, std::string_
         Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
         return nullptr;
     }
-    processNode(mesh,scene->mRootNode, scene);
+    std::string directory = path.data();
+    directory = directory.substr(0, directory.find_last_of("/"));
+    ProcessNode(mesh, scene->mRootNode, scene, directory);
 
-    m_resources[name.data()] = mesh;
+    m_resources[path.data()] = mesh;
     return std::shared_ptr<Mesh>(mesh);
 }
 
@@ -95,7 +99,7 @@ std::string AssetManager::ReadFile(std::string_view path)
     return "";
 }
 
-std::shared_ptr<SubMesh> AssetManager::processSubMesh(aiMesh* mesh, const aiScene* scene)
+std::shared_ptr<SubMesh> AssetManager::ProcessSubMesh(aiMesh* mesh, const aiScene* scene, const std::string& directory)
 {
     std::vector<Vertex> vertices;
     for (size_t i = 0; i < mesh->mNumVertices; i++)
@@ -129,19 +133,42 @@ std::shared_ptr<SubMesh> AssetManager::processSubMesh(aiMesh* mesh, const aiScen
             indices.push_back(face.mIndices[j]);
         }
     }
-    return std::make_shared<SubMesh>(vertices, indices);
+    std::shared_ptr<SubMesh> submesh = std::make_shared<SubMesh>(vertices, indices);
+    std::shared_ptr<Material> material = std::make_shared<Material>();
+    if (mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial* aimaterial = scene->mMaterials[mesh->mMaterialIndex];
+        std::shared_ptr<Texture> diffuse = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE, directory);
+        if (diffuse)
+        {
+            material->setTextureMaterial(MaterialTexture::Diffuse, diffuse);
+        }
+    }
+    submesh->setMaterial(material);
+    return submesh;
 }
 
-void AssetManager::processNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene)
+void AssetManager::ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, const std::string& directory)
 {
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
-        mesh->addSubmesh(processSubMesh(aimesh, scene));
+        mesh->addSubmesh(ProcessSubMesh(aimesh, scene, directory));
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        processNode(mesh, node->mChildren[i], scene);
+        ProcessNode(mesh, node->mChildren[i], scene, directory);
     }
+}
+
+std::shared_ptr<Texture> AssetManager::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::string& directory)
+{
+    if (material->GetTextureCount(type) != 0)
+    {
+        aiString pathToTexture;
+        material->GetTexture(type, 0, &pathToTexture);
+        return LoadTexture(directory + "/" + pathToTexture.C_Str());
+    }
+    return nullptr;
 }

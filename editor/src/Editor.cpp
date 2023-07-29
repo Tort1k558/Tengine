@@ -111,7 +111,7 @@ void Editor::create()
     std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
     transform3->setPositionY(2.0f);
 
-    object3->addComponent<Mesh>(AssetManager::LoadMesh("backpack", "data/Meshes/backpack/backpack.obj"));
+    object3->addComponent<Mesh>(AssetManager::LoadMesh("data/Meshes/backpack/backpack.obj"));
 }
 
 void Editor::update()
