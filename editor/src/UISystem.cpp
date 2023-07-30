@@ -117,9 +117,10 @@ void UISystem::update()
     ImGui::Text("FPS::%d", static_cast<unsigned int>(1.0 / Timer::GetDeltaTime()));
     ImGui::End();
 
-    std::vector<std::shared_ptr<Object>> objects = SceneManager::GetCurrentScene()->getAllObjects();
 
     //Objects
+    std::vector<std::shared_ptr<Object>> objects = SceneManager::GetCurrentScene()->getAllObjects();
+
     ImGui::Begin("Objects", nullptr);
     std::vector<std::string> objectNames;
     for (const auto& object : objects)
@@ -144,9 +145,15 @@ void UISystem::update()
     }
     ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y - 25.0f);
 
-    if (ImGui::Button("Create object",{0.0f,25.0f}))
+    if (ImGui::Button("Create object"))
     {
         Object::Create();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Delete object"))
+    {
+        SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(nameOfSelectedObject)->getName());
+        nameOfSelectedObject.clear();
     }
     ImGui::End();
 
@@ -172,7 +179,7 @@ void UISystem::update()
     }
     ImGui::End();
 
-
+    //Render
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_::ImGuiConfigFlags_ViewportsEnable)
@@ -261,7 +268,11 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
         ImGui::Text(image->name.c_str());
         if (image->texture)
         {
-            ImGui::Image(image->texture->getId(),{50,50});
+            ImGui::Image(reinterpret_cast<void*>(image->texture->getId()),{75,75});
+        }
+        else
+        {
+            ImGui::Text("No Texture");
         }
         break;
     }

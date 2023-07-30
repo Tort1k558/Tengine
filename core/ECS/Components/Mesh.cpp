@@ -65,12 +65,19 @@ DisplayInfo Mesh::getDisplayInfo()
 		std::shared_ptr<Material> material = m_submeshes[i]->getMaterial();
 		std::shared_ptr<DisplayInfoElementImage> diffuse = std::make_shared<DisplayInfoElementImage>();
 		diffuse->name = "Diffuse Texture";
+		std::shared_ptr<DisplayInfoElementImage> specular = std::make_shared<DisplayInfoElementImage>();
+		specular->name = "Specular Texture";
+		std::shared_ptr<DisplayInfoElementImage> normals = std::make_shared<DisplayInfoElementImage>();
+		normals->name = "Normal Texture";
 		if (material)
 		{
 			diffuse->texture = material->getTexture(MaterialTexture::Diffuse);
+			specular->texture = material->getTexture(MaterialTexture::Specular);
+			normals->texture = material->getTexture(MaterialTexture::Normal);
 		}
-
 		submeshHeader->elements.push_back(diffuse);
+		submeshHeader->elements.push_back(specular);
+		submeshHeader->elements.push_back(normals);
 		submeshesHeader->elements.push_back(submeshHeader);
 	}
 	displayInfo.addElement(submeshesHeader);

@@ -3,13 +3,11 @@
 #include"ECS/Component.h"
 #include"Core/UUID.h"
 #include"ECS/Object.h"
-#include"ECS/ComponentManager.h"
 #include"ECS/ObjectManager.h"
 #include"ECS/Components/Transform.h"
 
 class Object;
 class ObjectManager;
-class ComponentManager;
 
 class Scene
 {
@@ -17,9 +15,10 @@ public:
 	Scene();
 	void addObject(std::shared_ptr<Object> object);
 	void removeObjectByUUID(UUID id);
+	void removeObjectByName(std::string_view name);
 
 	std::shared_ptr<Object> getObjectByUUID(UUID id);
-	std::shared_ptr<Object> getObjectByName(const std::string& name);
+	std::shared_ptr<Object> getObjectByName(std::string_view name);
 	std::vector<std::shared_ptr<Object>> getAllObjects();
 	template<typename T>
 	std::vector<std::shared_ptr<T>> getComponents();

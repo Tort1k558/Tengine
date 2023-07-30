@@ -30,7 +30,7 @@ public:
 
 	UVec2 getSize();
 	void* getData();
-	virtual void* getId() = 0;
+	virtual intptr_t getId() = 0;
 	static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type);
 
 protected:

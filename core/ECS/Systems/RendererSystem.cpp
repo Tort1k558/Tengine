@@ -10,7 +10,6 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/IndexBuffer.h"
-#include "ECS/ComponentManager.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 

@@ -18,8 +18,7 @@ public:
 	std::vector<std::shared_ptr<Object>> getAllObjects() const;
 
 	void addObject(std::shared_ptr<Object> object);
-	void removeObject(std::string idObject);
+	void removeObjectByUUID(std::string idObject);
 private:
-
 	std::unordered_map<std::string,std::shared_ptr<Object>> m_objects;
 };
