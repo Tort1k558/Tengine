@@ -26,8 +26,8 @@ public:
 
 	std::vector<std::shared_ptr<Component>> getComponents();
 	void setName(const std::string& name);
-	std::string getName() { return m_name; }
-	std::string getId() { return m_id.getID(); }
+	std::string getName();
+	UUID getId();
 	static std::shared_ptr<Object> Create();
 
 private:

@@ -16,6 +16,16 @@ void Object::setName(const std::string& name)
 	m_name = name;
 }
 
+std::string Object::getName()
+{
+	return m_name;
+}
+
+UUID Object::getId()
+{
+	return m_id;
+}
+
 std::shared_ptr<Object> Object::Create()
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();

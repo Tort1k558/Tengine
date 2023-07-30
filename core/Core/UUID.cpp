@@ -21,7 +21,7 @@ UUID::UUID(size_t id) :
 	m_ids.insert(m_id);
 }
 
-std::string UUID::getID()
+std::string UUID::getId()
 {
 	return std::to_string(m_id);
 }

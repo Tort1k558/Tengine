@@ -9,7 +9,7 @@ class UUID
 public:
 	UUID();
 	UUID(size_t id);
-	std::string getID();
+	std::string getId();
 private:
 	size_t m_id;
 	static std::unordered_set<size_t> m_ids;
