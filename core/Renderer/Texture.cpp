@@ -16,3 +16,13 @@ std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType typ
 	}
 	return nullptr;
 }
+
+UVec2 Texture::getSize()
+{
+	return m_size;
+}
+
+void* Texture::getData()
+{
+	return m_data;
+}

@@ -1,55 +1,9 @@
 #pragma once
 
 #include<memory>
-#include<vector>
-#include<functional>
+
 #include"ECS/Object.h"
-
-enum class DisplayTypeElement
-{
-	None,
-	Slider,
-	Slider2,
-	Slider3,
-	Slider4,
-	Combo
-};
-
-struct DisplayInfoElement
-{
-	virtual ~DisplayInfoElement() = default;
-	DisplayTypeElement type;
-	std::string name;
-	std::function<void()> function;
-};
-
-struct DisplayInfoElementSlider : public DisplayInfoElement
-{
-	void* data;
-	float minValue;
-	float maxValue;
-};
-
-struct DisplayInfoElementCombo : public DisplayInfoElement
-{
-	std::vector<std::string> elements;
-	int* currentElement;
-	float minValue;
-	float maxValue;
-};
-
-class DisplayInfo
-{
-public:
-	DisplayInfo() = default;
-	void addElement(std::shared_ptr<DisplayInfoElement> element);
-	void setComponentName(const std::string& name);
-	std::string getComponentName();
-	std::vector< std::shared_ptr<DisplayInfoElement>> getElements();
-private:
-	std::vector<std::shared_ptr<DisplayInfoElement>> m_elements;
-	std::string m_componentName;
-};
+#include"Utils/EditorElements/DisplayInfo.h"
 
 class Object;
 

@@ -70,7 +70,7 @@ DisplayInfo Camera::getDisplayInfo()
 	projectionType->type = DisplayTypeElement::Combo;
 	projectionType->elements = { "Perspective","Orthographical" };
 	projectionType->currentElement = reinterpret_cast<int*>(&m_projectionType);
-	projectionType->function = [this]()
+	projectionType->callback = [this]()
 	{
 		this->setCameraType(m_projectionType);
 	};
@@ -82,7 +82,7 @@ DisplayInfo Camera::getDisplayInfo()
 	projectionSettingsZNear->maxValue = 10000.0f;
 	projectionSettingsZNear->name = "zNear";
 	projectionSettingsZNear->type = DisplayTypeElement::Slider;
-	projectionSettingsZNear->function = [this]() {m_projection->updateProjection(); };
+	projectionSettingsZNear->callback = [this]() {m_projection->updateProjection(); };
 	displayInfo.addElement(projectionSettingsZNear);
 	std::shared_ptr<DisplayInfoElementSlider> projectionSettingsZFar = std::make_shared<DisplayInfoElementSlider>();
 	projectionSettingsZFar->data = &m_projection->m_zFar;
@@ -90,7 +90,7 @@ DisplayInfo Camera::getDisplayInfo()
 	projectionSettingsZFar->maxValue = 10000.0f;
 	projectionSettingsZFar->name = "zFar";
 	projectionSettingsZFar->type = DisplayTypeElement::Slider;
-	projectionSettingsZFar->function = [this]() {m_projection->updateProjection(); };
+	projectionSettingsZFar->callback = [this]() {m_projection->updateProjection(); };
 	displayInfo.addElement(projectionSettingsZFar);
 
 	if (m_projectionType == ProjectionType::Perspective)
@@ -102,7 +102,7 @@ DisplayInfo Camera::getDisplayInfo()
 		projectionSettingsAspect->maxValue = 3.0f;
 		projectionSettingsAspect->name = "Aspect";
 		projectionSettingsAspect->type = DisplayTypeElement::Slider;
-		projectionSettingsAspect->function = [this]() {m_projection->updateProjection(); };
+		projectionSettingsAspect->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsAspect);
 		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsFov = std::make_shared<DisplayInfoElementSlider>();
 		projectionSettingsFov->data = &projection->m_fov;
@@ -110,7 +110,7 @@ DisplayInfo Camera::getDisplayInfo()
 		projectionSettingsFov->maxValue = 360.0f;
 		projectionSettingsFov->name = "Fov";
 		projectionSettingsFov->type = DisplayTypeElement::Slider;
-		projectionSettingsFov->function = [this]() {m_projection->updateProjection(); };
+		projectionSettingsFov->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsFov);
 
 	}

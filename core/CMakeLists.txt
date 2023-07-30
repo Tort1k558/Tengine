@@ -11,11 +11,12 @@ set(DIRS_SRC
 	"Core/*.cpp"                "Core/*.h"			
 	"ECS/*.cpp"                 "ECS/*.h" 			
 	"ECS/Components/*.cpp"      "ECS/Components/*.h" 			
-	"ECS/Systems/*.cpp"      "ECS/Systems/*.h" 			
+	"ECS/Systems/*.cpp"     	"ECS/Systems/*.h" 			
 	"Renderer/*.cpp"            "Renderer/*.h"		
 	"Renderer/OpenGL/*.cpp"     "Renderer/OpenGL/*.h"		
 	"Scene/*.cpp"               "Scene/*.h" 		
 	"Utils/*.cpp"               "Utils/*.h"          
+	"Utils/EditorElements/*.cpp""Utils/EditorElements/*.h"          
 	)
 file(GLOB TARGET_SRC ${DIRS_SRC})
 

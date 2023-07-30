@@ -14,7 +14,7 @@ public:
 	TextureOpenGL& operator=(TextureOpenGL&& texture) noexcept;
 
 	void bind(unsigned int slot) final;
-
+	void* getId() final;
 private:
 	GLuint m_id;
 };

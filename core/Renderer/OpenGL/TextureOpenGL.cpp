@@ -7,6 +7,10 @@ GLenum TextureTypeToOpenGLDataType(TextureType type)
 {
 	switch (type)
 	{
+	case TextureType::R8:
+		return GL_RED;
+	case TextureType::RG8:
+		return GL_RG;
 	case TextureType::RGB8:
 		return GL_RGB;
 	case TextureType::RGBA8:
@@ -21,6 +25,10 @@ GLenum TextureTypeToOpenGLInternalType(TextureType type)
 {
 	switch (type)
 	{
+	case TextureType::R8:
+		return GL_R8;
+	case TextureType::RG8:
+		return GL_RG8;
 	case TextureType::RGB8:
 		return GL_RGB8;
 	case TextureType::RGBA8:
@@ -125,4 +133,9 @@ TextureOpenGL& TextureOpenGL::operator=(TextureOpenGL&& texture) noexcept
 void TextureOpenGL::bind(unsigned int slot)
 {
 	glBindTextureUnit(slot, m_id);
+}
+
+void* TextureOpenGL::getId()
+{
+	return reinterpret_cast<void*>(static_cast<intptr_t>(m_id));
 }

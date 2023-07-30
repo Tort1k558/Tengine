@@ -24,6 +24,7 @@ public:
 	std::shared_ptr<Material> getMaterial();
 	void setMaterial(std::shared_ptr<Material> material);
 	bool hasMaterial();
+
 private:
 	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
@@ -40,6 +41,9 @@ public:
 	Mesh(std::shared_ptr<SubMesh> submesh);
 	void addSubmesh(std::shared_ptr<SubMesh> submesh);
 	std::vector<std::shared_ptr<SubMesh>> getSubmeshes() { return m_submeshes; }
+
+	DisplayInfo getDisplayInfo() final;
+	bool hasDisplayInfo() final;
 private:
 	std::vector<std::shared_ptr<SubMesh>> m_submeshes;
 };

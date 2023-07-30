@@ -46,6 +46,12 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view path)
     TextureType type = TextureType::RGB8;
     switch (channels)
     {
+    case 1:
+        type = TextureType::R8;
+        break;
+    case 2:
+        type = TextureType::RG8;
+        break;
     case 3:
         type = TextureType::RGB8;
         break;
@@ -143,6 +149,26 @@ std::shared_ptr<SubMesh> AssetManager::ProcessSubMesh(aiMesh* mesh, const aiScen
         {
             material->setTextureMaterial(MaterialTexture::Diffuse, diffuse);
         }
+        std::shared_ptr<Texture> specular = LoadMaterialTexture(aimaterial, aiTextureType_SPECULAR, directory);
+        if (specular)
+        {
+            material->setTextureMaterial(MaterialTexture::Specular, specular);
+        }
+        std::shared_ptr<Texture> normals = LoadMaterialTexture(aimaterial, aiTextureType_NORMALS, directory);
+        if (normals)
+        {
+            material->setTextureMaterial(MaterialTexture::Normal, normals);
+        }
+        std::shared_ptr<Texture> roughness = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE_ROUGHNESS, directory);
+        if (roughness)
+        {
+            material->setTextureMaterial(MaterialTexture::Roughness, roughness);
+        }
+        std::shared_ptr<Texture> occlusion = LoadMaterialTexture(aimaterial, aiTextureType_AMBIENT_OCCLUSION, directory);
+        if (occlusion)
+        {
+            material->setTextureMaterial(MaterialTexture::Occlusion, occlusion);
+        }
     }
     submesh->setMaterial(material);
     return submesh;
@@ -164,7 +190,7 @@ void AssetManager::ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const a
 
 std::shared_ptr<Texture> AssetManager::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::string& directory)
 {
-    if (material->GetTextureCount(type) != 0)
+    if (material->GetTextureCount(type) > 0)
     {
         aiString pathToTexture;
         material->GetTexture(type, 0, &pathToTexture);

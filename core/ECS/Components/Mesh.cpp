@@ -51,3 +51,33 @@ void Mesh::addSubmesh(std::shared_ptr<SubMesh> submesh)
 {
 	m_submeshes.push_back(submesh);
 }
+
+DisplayInfo Mesh::getDisplayInfo()
+{
+	DisplayInfo displayInfo;
+	displayInfo.setComponentName("Mesh");
+	std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshesHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();
+	submeshesHeader->name = "Submeshes";
+	for (size_t i = 0; i < m_submeshes.size(); i++)
+	{
+		std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();
+		submeshHeader->name = "Submesh" + std::to_string(i);
+		std::shared_ptr<Material> material = m_submeshes[i]->getMaterial();
+		std::shared_ptr<DisplayInfoElementImage> diffuse = std::make_shared<DisplayInfoElementImage>();
+		diffuse->name = "Diffuse Texture";
+		if (material)
+		{
+			diffuse->texture = material->getTexture(MaterialTexture::Diffuse);
+		}
+
+		submeshHeader->elements.push_back(diffuse);
+		submeshesHeader->elements.push_back(submeshHeader);
+	}
+	displayInfo.addElement(submeshesHeader);
+	return displayInfo;
+}
+
+bool Mesh::hasDisplayInfo()
+{
+	return true;
+}

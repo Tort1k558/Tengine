@@ -165,66 +165,7 @@ void UISystem::update()
                 ImGui::Text(info.getComponentName().c_str());
                 for (const auto& element : info.getElements())
                 {
-                    switch (element->type)
-                    {
-                    case DisplayTypeElement::None:
-                        break;
-                    case DisplayTypeElement::Slider:
-                    {
-                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
-                        if (ImGui::SliderFloat(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue))
-                        {
-                            if (slider->function)
-                            {
-                                slider->function();
-                            }
-                        }
-                        break;
-                    }
-                    case DisplayTypeElement::Slider2:
-                    {
-                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
-                        ImGui::SliderFloat2(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
-                        break;
-                    }
-                    case DisplayTypeElement::Slider3:
-                    {
-                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
-                        ImGui::SliderFloat3(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
-                        break;
-                    }
-                    case DisplayTypeElement::Slider4:
-                    {
-                        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
-                        ImGui::SliderFloat4(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
-                        break;
-                    }
-                    case DisplayTypeElement::Combo:
-                    {
-                        std::shared_ptr<DisplayInfoElementCombo> combo = std::dynamic_pointer_cast<DisplayInfoElementCombo>(element);
-                        if (ImGui::BeginCombo(combo->name.c_str(), combo->elements[*combo->currentElement].c_str()))
-                        {
-                            for (int i = 0; i < combo->elements.size(); ++i)
-                            {
-                                const bool isSelected = (*combo->currentElement == i);
-                                if (ImGui::Selectable(combo->elements[i].c_str(), isSelected))
-                                {
-                                    *combo->currentElement = i;
-                                    combo->function();
-                                }
-
-                                if (isSelected)
-                                {
-                                    ImGui::SetItemDefaultFocus();
-                                }
-                            }
-                            ImGui::EndCombo();
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                    }
+                    displayElement(element);
                 }
             }
         }
@@ -253,4 +194,90 @@ void UISystem::destroy()
 void UISystem::setWindow(std::shared_ptr<Window> window)
 {
     m_window = window;
+}
+
+void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
+{
+    switch (element->type)
+    {
+    case DisplayTypeElement::None:
+        break;
+    case DisplayTypeElement::Slider:
+    {
+        std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+        if (ImGui::SliderFloat(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue))
+        {
+            if (slider->callback)
+            {
+                slider->callback();
+            }
+        }
+        break;
+    }
+    case DisplayTypeElement::Slider2:
+    {
+        std::shared_ptr<DisplayInfoElementSlider2> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider2>(element);
+        ImGui::SliderFloat2(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
+        break;
+    }
+    case DisplayTypeElement::Slider3:
+    {
+        std::shared_ptr<DisplayInfoElementSlider3> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider3>(element);
+        ImGui::SliderFloat3(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
+        break;
+    }
+    case DisplayTypeElement::Slider4:
+    {
+        std::shared_ptr<DisplayInfoElementSlider4> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider4>(element);
+        ImGui::SliderFloat4(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue);
+        break;
+    }
+    case DisplayTypeElement::Combo:
+    {
+        std::shared_ptr<DisplayInfoElementCombo> combo = std::dynamic_pointer_cast<DisplayInfoElementCombo>(element);
+        if (ImGui::BeginCombo(combo->name.c_str(), combo->elements[*combo->currentElement].c_str()))
+        {
+            for (int i = 0; i < combo->elements.size(); ++i)
+            {
+                const bool isSelected = (*combo->currentElement == i);
+                if (ImGui::Selectable(combo->elements[i].c_str(), isSelected))
+                {
+                    *combo->currentElement = i;
+                    combo->callback();
+                }
+
+                if (isSelected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        break;
+    }
+    case DisplayTypeElement::Image:
+    {
+        std::shared_ptr<DisplayInfoElementImage> image = std::dynamic_pointer_cast<DisplayInfoElementImage>(element);
+        ImGui::Text(image->name.c_str());
+        if (image->texture)
+        {
+            ImGui::Image(image->texture->getId(),{50,50});
+        }
+        break;
+    }
+    case DisplayTypeElement::CollapsingHeader:
+    {
+        std::shared_ptr<DisplayInfoElementCollapsingHeader> header = std::dynamic_pointer_cast<DisplayInfoElementCollapsingHeader>(element);
+        if (ImGui::CollapsingHeader(header->name.c_str()))
+        {
+            for (size_t i = 0; i < header->elements.size(); i++)
+            {
+                displayElement(header->elements[i]);
+            }
+        };
+        break;
+    }
+    default:
+        break;
+    }
 }

@@ -7,8 +7,11 @@
 enum class MaterialTexture
 {
 	Diffuse,
+	Specular,
 	Height,
-	Normal
+	Normal,
+	Roughness,
+	Occlusion
 };
 
 class Material
