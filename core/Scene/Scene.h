@@ -24,7 +24,7 @@ public:
 
 	static std::shared_ptr<Scene> Create();
 private:
-	std::unordered_map<std::string, std::shared_ptr<Object>> m_objects;
+	std::unordered_map<UUID, std::shared_ptr<Object>> m_objects;
 };
 
 template<typename T>

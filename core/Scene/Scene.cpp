@@ -7,12 +7,12 @@ std::shared_ptr<Scene> Scene::Create()
 
 void Scene::addObject(std::shared_ptr<Object> object)
 {
-	m_objects[object->getId().getId()] = object;
+	m_objects[object->getId()] = object;
 }
 
 void Scene::removeObjectByUUID(UUID id)
 {
-	m_objects.erase(id.getId());
+	m_objects.erase(id);
 }
 
 void Scene::removeObjectByName(std::string_view name)
@@ -29,9 +29,9 @@ void Scene::removeObjectByName(std::string_view name)
 
 std::shared_ptr<Object> Scene::getObjectByUUID(UUID id)
 {
-	if (m_objects.at(id.getId()))
+	if (m_objects.at(id))
 	{
-		return m_objects.at(id.getId());
+		return m_objects.at(id);
 	}
 	return nullptr;
 }
