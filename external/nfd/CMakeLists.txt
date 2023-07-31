@@ -11,7 +11,7 @@ elseif (APPLE)
 elseif (UNIX)
     list(APPEND SOURCES nfd/src/nfd_gtk.c)
 elseif (UNIX)
-    message(FATAL_ERROR "Cannot detect your system, please report to https://github.com/aarcangeli/nativefiledialog-cmake/issues")
+    message(FATAL_ERROR "Unknown system")
 endif ()
 
 add_library(nfd STATIC ${SOURCES})

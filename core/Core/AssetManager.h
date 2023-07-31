@@ -34,10 +34,11 @@ public:
 	static std::shared_ptr<T> GetResource(std::filesystem::path path);
 private:
 	static std::string ReadFile(std::filesystem::path path);
-	static std::unordered_map<std::string, Resource> m_resources;
 	static std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory);
 	static void ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::filesystem::path directory);
 	static std::shared_ptr<Texture> LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory);
+
+	static std::unordered_map<std::filesystem::path, Resource> m_resources;
 };
 
 template<typename T>
@@ -50,3 +51,15 @@ inline std::shared_ptr<T> AssetManager::GetResource(std::filesystem::path path)
 	}
 	return *resource;
 }
+
+template<>
+inline std::shared_ptr<Mesh> AssetManager::GetResource<Mesh>(std::filesystem::path path)
+{
+	std::shared_ptr<Mesh>* resource = std::get_if<std::shared_ptr<Mesh>>(&m_resources[path.string()]);
+	if (!resource)
+	{
+		return nullptr;
+	}
+	return std::make_shared<Mesh>(**resource);
+}
+

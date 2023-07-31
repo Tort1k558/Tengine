@@ -73,7 +73,10 @@ DisplayInfo Mesh::getDisplayInfo()
 	loadMeshButton->callback = [this](const std::string& path)
 	{
 		std::shared_ptr<Mesh> newMesh = AssetManager::LoadMesh(path);
-		newMesh->setParent(this->getParent());
+		if (newMesh)
+		{
+			newMesh->setParent(this->getParent());
+		}
 		this->getParent()->addComponent<Mesh>(newMesh);
 	};
 	displayInfo.addElement(loadMeshButton);

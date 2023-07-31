@@ -353,8 +353,8 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
             if (result == NFD_OKAY) {
                 fileDialog->callback(outPath);
             }
-            break;
         };
+        break;
     }
     default:
         break;

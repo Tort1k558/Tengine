@@ -39,15 +39,21 @@ private:
 template<typename T>
 inline void Object::addComponent(std::shared_ptr<Component> component)
 {
-	component->setParent(shared_from_this());
-	m_components[typeid(T).hash_code()] = std::dynamic_pointer_cast<T>(component);
+	if (component)
+	{
+		component->setParent(shared_from_this());
+		m_components[typeid(T).hash_code()] = std::dynamic_pointer_cast<T>(component);
+	}
 }
 
 template<typename T>
 inline void Object::removeComponent()
 {
-	m_components[typeid(T).hash_code()]->setParent(nullptr);
-	m_components.erase(typeid(T).hash_code());
+	if (m_components.find(typeid(T).hash_code()) != m_components.end())
+	{
+		m_components[typeid(T).hash_code()]->setParent(nullptr);
+		m_components.erase(typeid(T).hash_code());
+	}
 }
 
 

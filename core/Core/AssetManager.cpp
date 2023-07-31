@@ -7,7 +7,7 @@
 
 #include"Core/Logger.h"
 
-std::unordered_map<std::string, AssetManager::Resource> AssetManager::m_resources;
+std::unordered_map<std::filesystem::path, AssetManager::Resource> AssetManager::m_resources;
 
 std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
 {
@@ -60,7 +60,7 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
     texture = Texture::Create(data, { width,height }, type);
     stbi_image_free(data);
 
-    m_resources[path.string()] = texture;
+    m_resources[path] = texture;
     return texture;
 }
 
@@ -80,8 +80,8 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
         return nullptr;
     }
     ProcessNode(mesh, scene->mRootNode, scene, path.parent_path());
-    m_resources[path.string()] = mesh;
-    return std::shared_ptr<Mesh>(mesh);
+    m_resources[path] = std::make_shared<Mesh>(*mesh);
+    return mesh;
 }
 
 std::string AssetManager::ReadFile(std::filesystem::path path)
