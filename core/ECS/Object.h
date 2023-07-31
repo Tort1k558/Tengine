@@ -14,6 +14,7 @@ class Object : public std::enable_shared_from_this<Object>
 {
 public:
 	Object();
+	Object(UUID uuid);
 	virtual ~Object() = default;
 
 	template<typename T>
@@ -24,11 +25,18 @@ public:
 	template<typename T>
 	std::shared_ptr<T> getComponent();
 
+	template<typename T>
+	bool hasComponent();
+
 	std::vector<std::shared_ptr<Component>> getComponents();
+
 	void setName(const std::string& name);
 	std::string getName();
+	
 	UUID getId();
+	
 	static std::shared_ptr<Object> Create();
+	static std::shared_ptr<Object> Create(UUID id);
 
 private:
 	UUID m_id;
@@ -66,4 +74,14 @@ inline std::shared_ptr<T> Object::getComponent()
 	}
 	std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(m_components[typeid(T).hash_code()]);
 	return component;
+}
+
+template<typename T>
+inline bool Object::hasComponent()
+{
+	if (m_components.find(typeid(T).hash_code()) == m_components.end())
+	{
+		return false;
+	}
+	return true;
 }

@@ -44,7 +44,7 @@ void RendererSystem::update()
 		std::shared_ptr<Shader> shader = AssetManager::GetResource<Shader>("data/Shaders/GLSL/vs.vsdata/Shaders/GLSL/fs.fs");
 		shader->bind();
 		shader->setUniformMat4("u_view", camera->getViewMatrix());
-		shader->setUniformMat4("u_projection", camera->getProjectionMatrix());
+		shader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
 		for (auto& mesh : meshes)
 		{
 			std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();

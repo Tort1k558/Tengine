@@ -5,7 +5,7 @@
 
 enum class ProjectionType
 {
-	Perspective,
+	Perspective = 0,
 	Orthographical
 };
 class Camera;
@@ -16,9 +16,12 @@ public:
 	virtual ~Projection() = default;
 	virtual void updateProjection() = 0;
 
-	Mat4 getProjectionMatrix() { return m_projection; }
+	Mat4 getProjectionMatrix();
 	void setZNear(float zNear);
 	void setZFar(float zFar);
+
+	float getZNear();
+	float getZFar();
 protected:
 	Mat4 m_projection;
 	float m_zNear = 0.01f;
@@ -31,12 +34,14 @@ class PerspectiveProjection : public Projection
 {
 public:
 	PerspectiveProjection();
-	PerspectiveProjection(float fov, float aspect, float zNear, float zFar);
+	PerspectiveProjection(float fov, float aspectRatio, float zNear, float zFar);
 	void setAspectRatio(float aspect);
 	void setFov(float fov);
 	void updateProjection() final;
+	float getFov();
+	float getAspectRatio();
 private:
-	float m_aspect = 16.0f / 9.0f;
+	float m_aspectRatio = 16.0f / 9.0f;
 	float m_fov = 60.0f;
 
 	friend class Camera;
@@ -52,6 +57,11 @@ public:
 	void setBottom(float bottom);
 	void setTop(float top);
 	void setBorders(float left, float right, float bottom, float top, float zNear, float zFar);
+
+	float getLeft();
+	float getRight();
+	float getBottom();
+	float getTop();
 	void updateProjection() final;
 private:
 	float m_left = -5.0f;
@@ -81,14 +91,14 @@ public:
 	void setCameraType(ProjectionType type);
 	void setRotationOrder(RotationOrder order);
 
-	Mat4 getProjectionMatrix() { return m_projection->getProjectionMatrix(); }
 	Mat4 getViewMatrix();
 	Vec3 getDirection();
 	Vec3 getUp();
 	std::shared_ptr<PerspectiveProjection> getPerspectiveProjection();
 	std::shared_ptr<OrthographicalProjection> getOrthographicalProjection();
 	std::shared_ptr<Projection> getProjection();
-	RotationOrder getRotationOrder() { return m_rotationOrder; }
+	RotationOrder getRotationOrder();
+	ProjectionType getProjectionType();
 
 	DisplayInfo getDisplayInfo() final;
 	bool hasDisplayInfo() final;

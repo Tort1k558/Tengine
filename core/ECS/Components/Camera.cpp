@@ -12,6 +12,11 @@ Camera::Camera(ProjectionType type)
 	setCameraType(type);
 }
 
+ProjectionType Camera::getProjectionType()
+{
+	return m_projectionType;
+}
+
 Mat4 Camera::getViewMatrix()
 {
 	std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
@@ -61,6 +66,11 @@ std::shared_ptr<Projection> Camera::getProjection()
 	return m_projection;
 }
 
+RotationOrder Camera::getRotationOrder()
+{
+	return m_rotationOrder;
+}
+
 DisplayInfo Camera::getDisplayInfo()
 {
 	DisplayInfo displayInfo;
@@ -97,7 +107,7 @@ DisplayInfo Camera::getDisplayInfo()
 	{
 		std::shared_ptr<PerspectiveProjection> projection = std::dynamic_pointer_cast<PerspectiveProjection>(m_projection);
 		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsAspect = std::make_shared<DisplayInfoElementSlider>();
-		projectionSettingsAspect->data = &projection->m_aspect;
+		projectionSettingsAspect->data = &projection->m_aspectRatio;
 		projectionSettingsAspect->minValue = 0.0f;
 		projectionSettingsAspect->maxValue = 3.0f;
 		projectionSettingsAspect->name = "Aspect";
@@ -163,9 +173,9 @@ void Camera::setRotationOrder(RotationOrder order)
 	m_rotationOrder = order;
 }
 
-void PerspectiveProjection::setAspectRatio(float aspect)
+void PerspectiveProjection::setAspectRatio(float aspectRatio)
 {
-	m_aspect = aspect;
+	m_aspectRatio = aspectRatio;
 	updateProjection();
 }
 
@@ -177,7 +187,22 @@ void PerspectiveProjection::setFov(float fov)
 
 void PerspectiveProjection::updateProjection()
 {
-	m_projection = GetPerspectiveMatrix(m_fov, m_aspect, m_zNear, m_zFar);
+	m_projection = GetPerspectiveMatrix(m_fov, m_aspectRatio, m_zNear, m_zFar);
+}
+
+float PerspectiveProjection::getFov()
+{
+	return m_fov;
+}
+
+float PerspectiveProjection::getAspectRatio()
+{
+	return m_aspectRatio;
+}
+
+Mat4 Projection::getProjectionMatrix()
+{
+	return m_projection;
 }
 
 void Projection::setZNear(float zNear)
@@ -192,13 +217,23 @@ void Projection::setZFar(float zFar)
 	updateProjection();
 }
 
+float Projection::getZNear()
+{
+	return m_zNear;
+}
+
+float Projection::getZFar()
+{
+	return m_zFar;
+}
+
 PerspectiveProjection::PerspectiveProjection()
 {
 	updateProjection();
 }
 
-PerspectiveProjection::PerspectiveProjection(float fov, float aspect, float zNear, float zFar) :
-	m_fov(fov),m_aspect(aspect)
+PerspectiveProjection::PerspectiveProjection(float fov, float aspectRatio, float zNear, float zFar) :
+	m_fov(fov),m_aspectRatio(aspectRatio)
 {
 	m_zNear = zNear;
 	m_zFar = zFar;
@@ -251,6 +286,26 @@ void OrthographicalProjection::setBorders(float left, float right, float bottom,
 	m_zNear = zNear;
 	m_zFar = zFar;
 	updateProjection();
+}
+
+float OrthographicalProjection::getLeft()
+{
+	return m_left;
+}
+
+float OrthographicalProjection::getRight()
+{
+	return m_right;
+}
+
+float OrthographicalProjection::getBottom()
+{
+	return m_bottom;
+}
+
+float OrthographicalProjection::getTop()
+{
+	return m_top;
 }
 
 void OrthographicalProjection::updateProjection()

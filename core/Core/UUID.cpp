@@ -32,7 +32,7 @@ UUID::UUID(std::string_view id) :
 	m_ids.insert(m_id);
 }
 
-std::string UUID::getId() const
+std::string UUID::string() const
 {
 	return m_id;
 }

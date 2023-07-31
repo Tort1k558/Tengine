@@ -112,7 +112,11 @@ void UISystem::update()
             }
             if (ImGui::MenuItem("Load Scene")) 
             {
-                SceneManager::SetCurrentScene(SceneSerializer::Deserialize(""));
+                nfdchar_t* outPath = nullptr;
+                nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
+                if (result == NFD_OKAY) {
+                    SceneSerializer::Deserialize(outPath);
+                }
             }
             if (ImGui::MenuItem("Create Scene")) {
                 SceneManager::SetCurrentScene(Scene::Create());

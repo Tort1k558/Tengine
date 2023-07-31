@@ -11,6 +11,11 @@ Object::Object() :
 	counterObject++;
 }
 
+Object::Object(UUID id)
+{
+	m_id = id;
+}
+
 void Object::setName(const std::string& name)
 {
 	m_name = name;
@@ -29,6 +34,14 @@ UUID Object::getId()
 std::shared_ptr<Object> Object::Create()
 {
 	std::shared_ptr<Object> object = std::make_shared<Object>();
+	object->addComponent<Transform>(Component::Create<Transform>());
+	SceneManager::GetCurrentScene()->addObject(object);
+	return object;
+}
+
+std::shared_ptr<Object> Object::Create(UUID id)
+{
+	std::shared_ptr<Object> object = std::make_shared<Object>(id);
 	object->addComponent<Transform>(Component::Create<Transform>());
 	SceneManager::GetCurrentScene()->addObject(object);
 	return object;

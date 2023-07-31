@@ -1,5 +1,15 @@
 #include "Scene.h"
 
+Scene::Scene()
+{
+	static size_t counter = 0;
+	m_name = "Scene" + std::to_string(counter);
+}
+std::string Scene::getName()
+{
+	return m_name;
+}
+
 std::shared_ptr<Scene> Scene::Create()
 {
 	return std::make_shared<Scene>();
@@ -25,6 +35,11 @@ void Scene::removeObjectByName(std::string_view name)
 			return;
 		}
 	}
+}
+
+void Scene::setName(std::string_view name)
+{
+	m_name = name;
 }
 
 std::shared_ptr<Object> Scene::getObjectByUUID(UUID id)

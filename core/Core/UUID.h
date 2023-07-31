@@ -9,7 +9,7 @@ class UUID
 public:
 	UUID();
 	UUID(std::string_view id);
-	std::string getId() const;
+	std::string string() const;
 
 	bool operator==(const UUID& other) const {
 		return m_id == other.m_id;
@@ -31,7 +31,7 @@ namespace std
 	{
 		std::size_t operator()(const UUID& uuid) const
 		{
-			return hash<string>{}(uuid.getId());
+			return hash<string>{}(uuid.string());
 		}
 	};
 }
