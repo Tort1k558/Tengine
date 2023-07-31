@@ -11,8 +11,8 @@
 #include"ECS/Components/Camera.h"
 #include"ECS/Object.h"
 #include"Scene/SceneManager.h"
+#include"Scene/SceneSerializer.h"
 #include"Core/AssetManager.h"
-
 void UISystem::init()
 {
     IMGUI_CHECKVERSION();
@@ -106,9 +106,13 @@ void UISystem::update()
     
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("Scene")) {
-            if (ImGui::MenuItem("Save Scene")) {
+            if (ImGui::MenuItem("Save Scene"))
+            {
+                SceneSerializer::Serialize(SceneManager::GetCurrentScene());
             }
-            if (ImGui::MenuItem("Load Scene")) {
+            if (ImGui::MenuItem("Load Scene")) 
+            {
+                SceneManager::SetCurrentScene(SceneSerializer::Deserialize(""));
             }
             if (ImGui::MenuItem("Create Scene")) {
                 SceneManager::SetCurrentScene(Scene::Create());

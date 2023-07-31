@@ -45,3 +45,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE stbi)
 add_subdirectory(../external/Assimp ${CMAKE_CURRENT_BINARY_DIR}/bin/Assimp)
 target_include_directories(${PROJECT_NAME} PUBLIC ../external/Assimp/include)
 target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
+
+add_subdirectory(../external/nlohmann ${CMAKE_CURRENT_BINARY_DIR}/bin/nlohmann)
+target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json)

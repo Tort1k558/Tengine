@@ -16,3 +16,6 @@
 [submodule "external/nfd/nfd"]
 	path = external/nfd/nfd
 	url = https://github.com/mlabbe/nativefiledialog.git
+[submodule "external/nlohmann"]
+	path = external/nlohmann
+	url = https://github.com/nlohmann/json.git
