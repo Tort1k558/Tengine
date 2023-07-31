@@ -70,7 +70,7 @@ DisplayInfo Camera::getDisplayInfo()
 	projectionType->type = DisplayTypeElement::Combo;
 	projectionType->elements = { "Perspective","Orthographical" };
 	projectionType->currentElement = reinterpret_cast<int*>(&m_projectionType);
-	projectionType->callback = [this]()
+	projectionType->callback = [this](int element)
 	{
 		this->setCameraType(m_projectionType);
 	};

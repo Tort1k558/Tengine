@@ -40,7 +40,8 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 	Mesh(std::shared_ptr<SubMesh> submesh);
 	void addSubmesh(std::shared_ptr<SubMesh> submesh);
-	std::vector<std::shared_ptr<SubMesh>> getSubmeshes() { return m_submeshes; }
+	bool hasSubmeshes();
+	std::vector<std::shared_ptr<SubMesh>> getSubmeshes();
 
 	DisplayInfo getDisplayInfo() final;
 	bool hasDisplayInfo() final;

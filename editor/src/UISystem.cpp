@@ -3,11 +3,16 @@
 #include<imgui/imgui.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
+#include<nfd.h>
 
 #include"Core/Timer.h"
 #include"Core/Logger.h"
+#include"ECS/Components/Mesh.h"
+#include"ECS/Components/Camera.h"
 #include"ECS/Object.h"
 #include"Scene/SceneManager.h"
+#include"Core/AssetManager.h"
+
 void UISystem::init()
 {
     IMGUI_CHECKVERSION();
@@ -176,6 +181,46 @@ void UISystem::update()
                 }
             }
         }
+        if (ImGui::Button("Add component"))
+        {
+            ImGui::OpenPopup("Select Component");
+        }
+
+        if (ImGui::BeginPopup("Select Component"))
+        {
+            std::vector<std::string> items = { "Mesh","Camera" };
+            static int selectedItem = 0;
+            if (ImGui::BeginCombo("Components", items[selectedItem].c_str()))
+            {
+                for (int i = 0; i < items.size(); ++i)
+                {
+                    const bool isSelected = (selectedItem == i);
+                    if (ImGui::Selectable(items[i].c_str(), isSelected))
+                    {
+                        selectedItem = i;
+                    }
+
+                    if (isSelected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            if (ImGui::Button("Add"))
+            {
+                if (selectedItem == 0)
+                {
+                    object->addComponent<Mesh>(Component::Create<Mesh>());
+                }
+                if (selectedItem == 1)
+                {
+                    object->addComponent<Camera>(Component::Create<Camera>());
+                }
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
     }
     ImGui::End();
 
@@ -250,7 +295,7 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
                 if (ImGui::Selectable(combo->elements[i].c_str(), isSelected))
                 {
                     *combo->currentElement = i;
-                    combo->callback();
+                    combo->callback(i);
                 }
 
                 if (isSelected)
@@ -268,7 +313,7 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
         ImGui::Text(image->name.c_str());
         if (image->texture)
         {
-            ImGui::Image(reinterpret_cast<void*>(image->texture->getId()),{75,75});
+            ImGui::Image(reinterpret_cast<void*>(image->texture->getId()),{image->size.x,image->size.y});
         }
         else
         {
@@ -287,6 +332,29 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
             }
         };
         break;
+    }
+    case DisplayTypeElement::Button:
+    {
+        std::shared_ptr<DisplayInfoElementButton> button = std::dynamic_pointer_cast<DisplayInfoElementButton>(element);
+        if (ImGui::Button(button->name.c_str()))
+        {
+            button->callback();
+        };
+        break;
+    }
+    case DisplayTypeElement::FileDialog:
+    {
+        std::shared_ptr<DisplayInfoElementFileDialog> fileDialog = std::dynamic_pointer_cast<DisplayInfoElementFileDialog>(element);
+        
+        if (ImGui::Button(fileDialog->name.c_str()))
+        {
+            nfdchar_t* outPath = nullptr;
+            nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
+            if (result == NFD_OKAY) {
+                fileDialog->callback(outPath);
+            }
+            break;
+        };
     }
     default:
         break;

@@ -135,7 +135,7 @@ void TextureOpenGL::bind(unsigned int slot)
 	glBindTextureUnit(slot, m_id);
 }
 
-intptr_t TextureOpenGL::getId()
+unsigned int TextureOpenGL::getId()
 {
-	return static_cast<intptr_t>(m_id);
+	return m_id;
 }

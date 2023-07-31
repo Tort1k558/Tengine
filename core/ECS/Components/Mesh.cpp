@@ -1,5 +1,7 @@
 #include "Mesh.h"
 
+#include"Core/AssetManager.h"
+
 SubMesh::SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) :
 	m_vertices(vertices), m_indices(indices)
 {
@@ -52,10 +54,29 @@ void Mesh::addSubmesh(std::shared_ptr<SubMesh> submesh)
 	m_submeshes.push_back(submesh);
 }
 
+bool Mesh::hasSubmeshes()
+{
+	return !m_submeshes.empty();
+}
+
+std::vector<std::shared_ptr<SubMesh>> Mesh::getSubmeshes()
+{
+	return m_submeshes;
+}
+
 DisplayInfo Mesh::getDisplayInfo()
 {
 	DisplayInfo displayInfo;
 	displayInfo.setComponentName("Mesh");
+	std::shared_ptr<DisplayInfoElementFileDialog> loadMeshButton = std::make_shared<DisplayInfoElementFileDialog>();
+	loadMeshButton->name = "Load Mesh";
+	loadMeshButton->callback = [this](const std::string& path)
+	{
+		std::shared_ptr<Mesh> newMesh = AssetManager::LoadMesh(path);
+		newMesh->setParent(this->getParent());
+		this->getParent()->addComponent<Mesh>(newMesh);
+	};
+	displayInfo.addElement(loadMeshButton);
 	std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshesHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();
 	submeshesHeader->name = "Submeshes";
 	for (size_t i = 0; i < m_submeshes.size(); i++)
@@ -65,10 +86,13 @@ DisplayInfo Mesh::getDisplayInfo()
 		std::shared_ptr<Material> material = m_submeshes[i]->getMaterial();
 		std::shared_ptr<DisplayInfoElementImage> diffuse = std::make_shared<DisplayInfoElementImage>();
 		diffuse->name = "Diffuse Texture";
+		diffuse->size = { 75,75 };
 		std::shared_ptr<DisplayInfoElementImage> specular = std::make_shared<DisplayInfoElementImage>();
 		specular->name = "Specular Texture";
+		specular->size = { 75,75 };
 		std::shared_ptr<DisplayInfoElementImage> normals = std::make_shared<DisplayInfoElementImage>();
 		normals->name = "Normal Texture";
+		normals->size = { 75,75 };
 		if (material)
 		{
 			diffuse->texture = material->getTexture(MaterialTexture::Diffuse);

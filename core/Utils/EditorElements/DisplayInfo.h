@@ -15,7 +15,9 @@ enum class DisplayTypeElement
 	Slider4,
 	Combo,
 	Image,
-	CollapsingHeader
+	CollapsingHeader,
+	Button,
+	FileDialog
 };
 
 struct DisplayInfoElement
@@ -23,7 +25,6 @@ struct DisplayInfoElement
 	virtual ~DisplayInfoElement() = default;
 	DisplayTypeElement type;
 	std::string name;
-	std::function<void()> callback;
 };
 
 struct DisplayElementSlider
@@ -32,6 +33,7 @@ struct DisplayElementSlider
 	void* data;
 	float minValue;
 	float maxValue;
+	std::function<void()> callback;
 };
 
 struct DisplayInfoElementSlider : public DisplayInfoElement, DisplayElementSlider
@@ -74,6 +76,7 @@ struct DisplayInfoElementCombo : public DisplayInfoElement
 	int* currentElement;
 	float minValue;
 	float maxValue;
+	std::function<void(int element)> callback;
 };
 
 struct DisplayInfoElementImage : public DisplayInfoElement
@@ -83,6 +86,7 @@ struct DisplayInfoElementImage : public DisplayInfoElement
 		type = DisplayTypeElement::Image;
 	}
 	std::shared_ptr<Texture> texture;
+	Vec2 size;
 };
 
 struct DisplayInfoElementCollapsingHeader : public DisplayInfoElement
@@ -92,6 +96,24 @@ struct DisplayInfoElementCollapsingHeader : public DisplayInfoElement
 		type = DisplayTypeElement::CollapsingHeader;
 	}
 	std::vector<std::shared_ptr<DisplayInfoElement>> elements;
+};
+
+struct DisplayInfoElementButton : public DisplayInfoElement
+{
+	DisplayInfoElementButton()
+	{
+		type = DisplayTypeElement::Button;
+	}
+	std::function<void()> callback;
+};
+
+struct DisplayInfoElementFileDialog : public DisplayInfoElement
+{
+	DisplayInfoElementFileDialog()
+	{
+		type = DisplayTypeElement::FileDialog;
+	}
+	std::function<void(const std::string& path)> callback;
 };
 
 class DisplayInfo

@@ -9,26 +9,24 @@
 
 std::unordered_map<std::string, AssetManager::Resource> AssetManager::m_resources;
 
-std::shared_ptr<Shader> AssetManager::LoadShader(std::string_view pathToVertexShader, std::string_view pathToFragmentShader)
+std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
 {
-    std::string paths = pathToVertexShader.data();
-    paths += pathToFragmentShader.data();
-    std::shared_ptr<Shader> shader = GetResource<Shader>(paths);
+    std::shared_ptr<Shader> shader = GetResource<Shader>(pathToVertexShader.string() + pathToFragmentShader.string());
     if (shader)
     {
         return shader;
     }
     shader = Shader::Create();
-    shader->addShader(ReadFile(pathToVertexShader.data()), ShaderType::VertexShader);
-    shader->addShader(ReadFile(pathToFragmentShader.data()), ShaderType::FragmentShader);
+    shader->addShader(ReadFile(pathToVertexShader), ShaderType::VertexShader);
+    shader->addShader(ReadFile(pathToFragmentShader), ShaderType::FragmentShader);
     shader->compile();
-    m_resources[paths] = shader;
+    m_resources[pathToVertexShader.string() + pathToFragmentShader.string()] = shader;
     return shader;
 }
 
-std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view path)
+std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
 {
-    std::shared_ptr<Texture> texture = GetResource<Texture>(path.data());
+    std::shared_ptr<Texture> texture = GetResource<Texture>(path.string());
     if (texture)
     {
         return texture;
@@ -37,10 +35,10 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view path)
     stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
 
-    unsigned char* data = stbi_load(path.data(), &width, &height, &channels, 0);
+    unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
     if (data == nullptr)
     {
-        Logger::Critical("ERROR::Failed to load the texture: {0}", path);
+        Logger::Critical("ERROR::Failed to load the texture: {0}", path.string().c_str());
         return nullptr;
     }
     TextureType type = TextureType::RGB8;
@@ -62,36 +60,33 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::string_view path)
     texture = Texture::Create(data, { width,height }, type);
     stbi_image_free(data);
 
-    m_resources[path.data()] = texture;
+    m_resources[path.string()] = texture;
     return texture;
 }
 
-std::shared_ptr<Mesh> AssetManager::LoadMesh(std::string_view path)
+std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
 {
-    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path.data());
+    std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path);
     if (mesh)
     {
         return mesh;
     }
     mesh = Component::Create<Mesh>();
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path.data(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+    const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
         return nullptr;
     }
-    std::string directory = path.data();
-    directory = directory.substr(0, directory.find_last_of("/"));
-    ProcessNode(mesh, scene->mRootNode, scene, directory);
-
-    m_resources[path.data()] = mesh;
+    ProcessNode(mesh, scene->mRootNode, scene, path.parent_path());
+    m_resources[path.string()] = mesh;
     return std::shared_ptr<Mesh>(mesh);
 }
 
-std::string AssetManager::ReadFile(std::string_view path)
+std::string AssetManager::ReadFile(std::filesystem::path path)
 {
-    std::ifstream file(path.data());
+    std::ifstream file(path);
     if (file.is_open())
     {
         std::stringstream buffer;
@@ -101,11 +96,11 @@ std::string AssetManager::ReadFile(std::string_view path)
 
         return buffer.str();
     }
-    Logger::Critical("ERROR::Failed to open file::{0}", path.data());
+    Logger::Critical("ERROR::Failed to open file::{0}", path.string().c_str());
     return "";
 }
 
-std::shared_ptr<SubMesh> AssetManager::ProcessSubMesh(aiMesh* mesh, const aiScene* scene, const std::string& directory)
+std::shared_ptr<SubMesh> AssetManager::ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory)
 {
     std::vector<Vertex> vertices;
     for (size_t i = 0; i < mesh->mNumVertices; i++)
@@ -174,7 +169,7 @@ std::shared_ptr<SubMesh> AssetManager::ProcessSubMesh(aiMesh* mesh, const aiScen
     return submesh;
 }
 
-void AssetManager::ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, const std::string& directory)
+void AssetManager::ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::filesystem::path directory)
 {
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
@@ -188,13 +183,13 @@ void AssetManager::ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const a
     }
 }
 
-std::shared_ptr<Texture> AssetManager::LoadMaterialTexture(aiMaterial* material, aiTextureType type, const std::string& directory)
+std::shared_ptr<Texture> AssetManager::LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory)
 {
     if (material->GetTextureCount(type) > 0)
     {
         aiString pathToTexture;
         material->GetTexture(type, 0, &pathToTexture);
-        return LoadTexture(directory + "/" + pathToTexture.C_Str());
+        return LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
     }
     return nullptr;
 }
