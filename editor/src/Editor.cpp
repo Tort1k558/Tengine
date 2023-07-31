@@ -85,7 +85,7 @@ void Editor::create()
             std::shared_ptr<Camera> camera = object->getComponent<Camera>();
             transform->setPosition(transform->getPosition() + Vec3(0.0f, static_cast<float>(speed * Timer::GetDeltaTime()), 0.0f));
         });
-    controller->setMouseCallback([cameraSensitivity](std::shared_ptr<Object> object)
+    controller->setMouseMoveCallback([cameraSensitivity](std::shared_ptr<Object> object)
         {
             std::shared_ptr<Transform> transform = object->getComponent<Transform>();
             if (Input::IsMouseButtonPressed(MouseButton::BUTTON_2))

@@ -22,7 +22,7 @@ void ControllerSystem::update()
 				callback.second(parent);
 			}
 		}
-		auto mouseCallback = controller->getMouseCallback();
+		auto mouseCallback = controller->getMouseMoveCallback();
 		if (mouseCallback)
 		{
 			mouseCallback(parent);
