@@ -5,7 +5,7 @@ Scene::Scene()
 	static size_t counter = 0;
 	m_name = "Scene" + std::to_string(counter);
 }
-std::string Scene::getName()
+std::string Scene::getName() const
 {
 	return m_name;
 }
@@ -42,16 +42,16 @@ void Scene::setName(std::string_view name)
 	m_name = name;
 }
 
-std::shared_ptr<Object> Scene::getObjectByUUID(UUID id)
+std::shared_ptr<Object> Scene::getObjectByUUID(UUID id) const
 {
-	if (m_objects.at(id))
+	if (m_objects.find(id) != m_objects.end())
 	{
 		return m_objects.at(id);
 	}
 	return nullptr;
 }
 
-std::shared_ptr<Object> Scene::getObjectByName(std::string_view name)
+std::shared_ptr<Object> Scene::getObjectByName(std::string_view name) const
 {
 	for (const auto& object : m_objects)
 	{
@@ -63,7 +63,7 @@ std::shared_ptr<Object> Scene::getObjectByName(std::string_view name)
 	return nullptr;
 }
 
-std::vector<std::shared_ptr<Object>> Scene::getAllObjects()
+std::vector<std::shared_ptr<Object>> Scene::getAllObjects() const
 {
 	std::vector<std::shared_ptr<Object>> objects;
 	for (const auto& object : m_objects)

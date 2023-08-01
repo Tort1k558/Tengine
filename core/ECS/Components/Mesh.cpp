@@ -20,7 +20,11 @@ SubMesh::SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices
 		m_vertexArray->setIndexBuffer(m_indexBuffer);
 	}
 }
-std::shared_ptr<Material> SubMesh::getMaterial()
+std::shared_ptr<VertexArray> SubMesh::getVertexArray() const
+{
+	return m_vertexArray;
+}
+std::shared_ptr<Material> SubMesh::getMaterial() const
 {
 	return m_material;
 }
@@ -30,7 +34,7 @@ void SubMesh::setMaterial(std::shared_ptr<Material> material)
 	m_material = material;
 }
 
-bool SubMesh::hasMaterial()
+bool SubMesh::hasMaterial() const
 {
 	if (m_material)
 	{
@@ -54,12 +58,12 @@ void Mesh::addSubmesh(std::shared_ptr<SubMesh> submesh)
 	m_submeshes.push_back(submesh);
 }
 
-bool Mesh::hasSubmeshes()
+bool Mesh::hasSubmeshes() const
 {
 	return !m_submeshes.empty();
 }
 
-std::vector<std::shared_ptr<SubMesh>> Mesh::getSubmeshes()
+std::vector<std::shared_ptr<SubMesh>> Mesh::getSubmeshes() const
 {
 	return m_submeshes;
 }

@@ -27,8 +27,8 @@ public:
 	void setMaxFps(size_t fps);
 	void close();
 
-	size_t getMaxFps();
-	std::shared_ptr<Window> getWindow();
+	size_t getMaxFps() const;
+	std::shared_ptr<Window> getWindow() const;
 private:
 	std::shared_ptr<Window> m_window;
 	EventDispatcher m_eventDispatcher;

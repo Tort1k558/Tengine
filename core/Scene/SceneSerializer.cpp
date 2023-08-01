@@ -6,6 +6,7 @@
 #include"Core/Logger.h"
 #include"Scene/SceneManager.h"
 #include"ECS/Components/Camera.h"
+
 void SceneSerializer::Serialize(std::shared_ptr<Scene> scene)
 {
 	//Prepare data

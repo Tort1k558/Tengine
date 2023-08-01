@@ -15,7 +15,7 @@ public:
 		return m_id == other.m_id;
 	}
 private:
-	std::string genId();
+	std::string genId() const;
 	std::string m_id;
 	static std::unordered_set<std::string> m_ids;
 	static std::random_device m_randomDevice;

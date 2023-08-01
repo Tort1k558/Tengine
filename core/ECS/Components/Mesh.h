@@ -20,10 +20,10 @@ class SubMesh
 {
 public:
 	SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
-	std::shared_ptr<VertexArray> getVertexArray() { return m_vertexArray; }
-	std::shared_ptr<Material> getMaterial();
+	std::shared_ptr<VertexArray> getVertexArray() const;
+	std::shared_ptr<Material> getMaterial() const;
 	void setMaterial(std::shared_ptr<Material> material);
-	bool hasMaterial();
+	bool hasMaterial() const;
 
 private:
 	std::vector<Vertex> m_vertices;
@@ -40,8 +40,8 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 	Mesh(std::shared_ptr<SubMesh> submesh);
 	void addSubmesh(std::shared_ptr<SubMesh> submesh);
-	bool hasSubmeshes();
-	std::vector<std::shared_ptr<SubMesh>> getSubmeshes();
+	bool hasSubmeshes() const;
+	std::vector<std::shared_ptr<SubMesh>> getSubmeshes() const;
 
 	DisplayInfo getDisplayInfo() final;
 	bool hasDisplayInfo() final;

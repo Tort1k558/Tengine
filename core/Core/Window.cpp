@@ -130,12 +130,27 @@ void Window::setEventCallback(std::function<void(Event&)> callback)
 	m_eventCallback = callback;
 }
 
-std::function<void(Event&)> Window::getEventCallback()
+std::function<void(Event&)> Window::getEventCallback() const
 {
 	return m_eventCallback;
 }
 
-GLFWwindow* Window::getWindow()
+UVec2 Window::getSize() const
+{
+	return m_size;
+}
+
+unsigned int Window::getWidth() const
+{
+	return m_size.x;
+}
+
+unsigned int Window::getHeight() const
+{
+	return m_size.y;
+}
+
+GLFWwindow* Window::getWindow() const
 {
 	return m_window;
 }

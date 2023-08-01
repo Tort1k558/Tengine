@@ -22,10 +22,10 @@ public:
 	void setScaleY(float scale);
 	void setScaleZ(float scale);
 
-	Vec3 getPosition() { return m_position; }
-	Vec3 getRotation() { return m_rotation; }
-	Vec3 getScale() { return m_scale; }
-	Mat4 getMatrix();
+	Vec3 getPosition() const;
+	Vec3 getRotation() const;
+	Vec3 getScale() const;
+	Mat4 getMatrix() const;
 
 	DisplayInfo getDisplayInfo() final;
 	bool hasDisplayInfo() final;

@@ -22,11 +22,11 @@ public:
 	void setWidth(unsigned int width);
 	void setHeight(unsigned int height);
 	void setCursorPos(UVec2 pos);
-	std::function<void(Event&)> getEventCallback();
-	GLFWwindow* getWindow();
-	UVec2 getSize() { return m_size; }
-	unsigned int getWidth() { return m_size.x; }
-	unsigned int getHeight() { return m_size.y; }
+	std::function<void(Event&)> getEventCallback() const;
+	GLFWwindow* getWindow() const;
+	UVec2 getSize() const;
+	unsigned int getWidth() const;
+	unsigned int getHeight() const;
 private:
 	GLFWwindow* m_window;
 	UVec2 m_size;

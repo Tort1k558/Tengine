@@ -17,12 +17,12 @@ public:
 	void removeObjectByName(std::string_view name);
 	void setName(std::string_view name);
 
-	std::shared_ptr<Object> getObjectByUUID(UUID id);
-	std::shared_ptr<Object> getObjectByName(std::string_view name);
-	std::vector<std::shared_ptr<Object>> getAllObjects();
+	std::shared_ptr<Object> getObjectByUUID(UUID id) const;
+	std::shared_ptr<Object> getObjectByName(std::string_view name) const;
+	std::vector<std::shared_ptr<Object>> getAllObjects() const;
 	template<typename T>
-	std::vector<std::shared_ptr<T>> getComponents();
-	std::string getName();
+	std::vector<std::shared_ptr<T>> getComponents() const;
+	std::string getName() const;
 	static std::shared_ptr<Scene> Create();
 private:
 	std::unordered_map<UUID, std::shared_ptr<Object>> m_objects;
@@ -30,7 +30,7 @@ private:
 };
 
 template<typename T>
-inline std::vector<std::shared_ptr<T>> Scene::getComponents()
+inline std::vector<std::shared_ptr<T>> Scene::getComponents() const
 {
 	std::vector<std::shared_ptr<T>> components;
 	for (auto& object : m_objects)

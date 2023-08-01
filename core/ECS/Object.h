@@ -23,17 +23,17 @@ public:
 	void removeComponent();
 
 	template<typename T>
-	std::shared_ptr<T> getComponent();
+	std::shared_ptr<T> getComponent() const;
 
 	template<typename T>
-	bool hasComponent();
+	bool hasComponent() const;
 
 	std::vector<std::shared_ptr<Component>> getComponents();
 
 	void setName(const std::string& name);
-	std::string getName();
+	std::string getName() const;
 	
-	UUID getId();
+	UUID getId() const;
 	
 	static std::shared_ptr<Object> Create();
 	static std::shared_ptr<Object> Create(UUID id);
@@ -66,18 +66,18 @@ inline void Object::removeComponent()
 
 
 template<typename T>
-inline std::shared_ptr<T> Object::getComponent()
+inline std::shared_ptr<T> Object::getComponent() const
 {
 	if (m_components.find(typeid(T).hash_code()) == m_components.end())
 	{
 		return nullptr;
 	}
-	std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(m_components[typeid(T).hash_code()]);
+	std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(m_components.at(typeid(T).hash_code()));
 	return component;
 }
 
 template<typename T>
-inline bool Object::hasComponent()
+inline bool Object::hasComponent() const
 {
 	if (m_components.find(typeid(T).hash_code()) == m_components.end())
 	{

@@ -113,11 +113,11 @@ void Application::close()
 {
     m_isRunning = false;
 }
-size_t Application::getMaxFps()
+size_t Application::getMaxFps() const
 {
     return m_maxFps;
 }
-std::shared_ptr<Window> Application::getWindow()
+std::shared_ptr<Window> Application::getWindow() const
 {
     return m_window;
 }

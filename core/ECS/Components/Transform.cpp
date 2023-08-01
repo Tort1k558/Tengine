@@ -75,7 +75,22 @@ void Transform::setScaleZ(float scale)
 	
 }
 
-Mat4 Transform::getMatrix()
+Vec3 Transform::getPosition() const
+{
+	return m_position;
+}
+
+Vec3 Transform::getRotation() const
+{
+	return m_rotation;
+}
+
+Vec3 Transform::getScale() const
+{
+	return m_scale;
+}
+
+Mat4 Transform::getMatrix() const
 {
 	Mat4 translateMatrix = TranslateMatrix(Mat4(1.0f), m_position);
 	Mat4 rotateMatrix(1.0f);

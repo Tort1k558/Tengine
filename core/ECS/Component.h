@@ -13,7 +13,7 @@ public:
 	virtual ~Component() = default;
 
 	void setParent(std::shared_ptr<Object> parent);
-	std::shared_ptr<Object> getParent() { return m_parent.lock(); }
+	std::shared_ptr<Object> getParent() const;
 
 	template<typename T, typename... Args>
 	static std::shared_ptr<T> Create(Args... args);

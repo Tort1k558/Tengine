@@ -16,12 +16,12 @@ public:
 	virtual ~Projection() = default;
 	virtual void updateProjection() = 0;
 
-	Mat4 getProjectionMatrix();
+	Mat4 getProjectionMatrix() const;
 	void setZNear(float zNear);
 	void setZFar(float zFar);
 
-	float getZNear();
-	float getZFar();
+	float getZNear() const;
+	float getZFar() const;
 protected:
 	Mat4 m_projection;
 	float m_zNear = 0.01f;
@@ -38,8 +38,8 @@ public:
 	void setAspectRatio(float aspect);
 	void setFov(float fov);
 	void updateProjection() final;
-	float getFov();
-	float getAspectRatio();
+	float getFov() const;
+	float getAspectRatio() const;
 private:
 	float m_aspectRatio = 16.0f / 9.0f;
 	float m_fov = 60.0f;
@@ -92,18 +92,18 @@ public:
 	void setRotationOrder(RotationOrder order);
 
 	Mat4 getViewMatrix();
-	Vec3 getDirection();
+	Vec3 getDirection() const;
 	Vec3 getUp();
-	std::shared_ptr<PerspectiveProjection> getPerspectiveProjection();
-	std::shared_ptr<OrthographicalProjection> getOrthographicalProjection();
-	std::shared_ptr<Projection> getProjection();
-	RotationOrder getRotationOrder();
-	ProjectionType getProjectionType();
+	std::shared_ptr<PerspectiveProjection> getPerspectiveProjection() const;
+	std::shared_ptr<OrthographicalProjection> getOrthographicalProjection() const;
+	std::shared_ptr<Projection> getProjection() const;
+	RotationOrder getRotationOrder() const;
+	ProjectionType getProjectionType() const;
 
 	DisplayInfo getDisplayInfo() final;
 	bool hasDisplayInfo() final;
 private:
-	Mat4 getRotationMatrix(Vec3 rotation);
+	Mat4 getRotationMatrix(Vec3 rotation) const;
 
 	ProjectionType m_projectionType;
 	std::shared_ptr<Projection> m_projection;

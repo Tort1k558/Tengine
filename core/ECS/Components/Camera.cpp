@@ -12,7 +12,7 @@ Camera::Camera(ProjectionType type)
 	setCameraType(type);
 }
 
-ProjectionType Camera::getProjectionType()
+ProjectionType Camera::getProjectionType() const
 {
 	return m_projectionType;
 }
@@ -27,7 +27,7 @@ Mat4 Camera::getViewMatrix()
 	return GetLookAtMatrix(transform->getPosition(), direction, up);
 }
 
-Vec3 Camera::getDirection()
+Vec3 Camera::getDirection() const
 {
 	std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
 	Vec3 rotation = transform->getRotation();
@@ -43,7 +43,7 @@ Vec3 Camera::getUp()
 	return rotateMatrix * Vec4(m_up,1.0f);
 }
 
-std::shared_ptr<PerspectiveProjection> Camera::getPerspectiveProjection()
+std::shared_ptr<PerspectiveProjection> Camera::getPerspectiveProjection() const
 {
 	if (m_projectionType == ProjectionType::Perspective)
 	{
@@ -52,7 +52,7 @@ std::shared_ptr<PerspectiveProjection> Camera::getPerspectiveProjection()
 	return nullptr;
 }
 
-std::shared_ptr<OrthographicalProjection> Camera::getOrthographicalProjection()
+std::shared_ptr<OrthographicalProjection> Camera::getOrthographicalProjection() const
 {
 	if (m_projectionType == ProjectionType::Orthographical)
 	{
@@ -61,12 +61,12 @@ std::shared_ptr<OrthographicalProjection> Camera::getOrthographicalProjection()
 	return nullptr;
 }
 
-std::shared_ptr<Projection> Camera::getProjection()
+std::shared_ptr<Projection> Camera::getProjection() const
 {
 	return m_projection;
 }
 
-RotationOrder Camera::getRotationOrder()
+RotationOrder Camera::getRotationOrder() const
 {
 	return m_rotationOrder;
 }
@@ -103,11 +103,13 @@ DisplayInfo Camera::getDisplayInfo()
 	projectionSettingsZFar->callback = [this]() {m_projection->updateProjection(); };
 	displayInfo.addElement(projectionSettingsZFar);
 
-	if (m_projectionType == ProjectionType::Perspective)
+	switch (m_projectionType)
 	{
-		std::shared_ptr<PerspectiveProjection> projection = std::dynamic_pointer_cast<PerspectiveProjection>(m_projection);
+	case ProjectionType::Perspective:
+	{
+		std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
 		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsAspect = std::make_shared<DisplayInfoElementSlider>();
-		projectionSettingsAspect->data = &projection->m_aspectRatio;
+		projectionSettingsAspect->data = &perspective->m_aspectRatio;
 		projectionSettingsAspect->minValue = 0.0f;
 		projectionSettingsAspect->maxValue = 3.0f;
 		projectionSettingsAspect->name = "Aspect";
@@ -115,14 +117,54 @@ DisplayInfo Camera::getDisplayInfo()
 		projectionSettingsAspect->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsAspect);
 		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsFov = std::make_shared<DisplayInfoElementSlider>();
-		projectionSettingsFov->data = &projection->m_fov;
+		projectionSettingsFov->data = &perspective->m_fov;
 		projectionSettingsFov->minValue = 0.0f;
 		projectionSettingsFov->maxValue = 360.0f;
 		projectionSettingsFov->name = "Fov";
 		projectionSettingsFov->type = DisplayTypeElement::Slider;
 		projectionSettingsFov->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsFov);
-
+		break;
+	}
+	case ProjectionType::Orthographical:
+	{
+		std::shared_ptr<OrthographicalProjection> projection = getOrthographicalProjection();
+		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsLeft = std::make_shared<DisplayInfoElementSlider>();
+		projectionSettingsLeft->data = &projection->m_left;
+		projectionSettingsLeft->minValue = -0.01f;
+		projectionSettingsLeft->maxValue = -10.0f;
+		projectionSettingsLeft->name = "Left";
+		projectionSettingsLeft->type = DisplayTypeElement::Slider;
+		projectionSettingsLeft->callback = [this]() {m_projection->updateProjection(); };
+		displayInfo.addElement(projectionSettingsLeft);
+		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsRight = std::make_shared<DisplayInfoElementSlider>();
+		projectionSettingsRight->data = &projection->m_right;
+		projectionSettingsRight->minValue = 0.01f;
+		projectionSettingsRight->maxValue = 10.0f;
+		projectionSettingsRight->name = "Right";
+		projectionSettingsRight->type = DisplayTypeElement::Slider;
+		projectionSettingsRight->callback = [this]() {m_projection->updateProjection(); };
+		displayInfo.addElement(projectionSettingsRight);
+		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsBottom = std::make_shared<DisplayInfoElementSlider>();
+		projectionSettingsBottom->data = &projection->m_bottom;
+		projectionSettingsBottom->minValue = -0.01f;
+		projectionSettingsBottom->maxValue = -10.0f;
+		projectionSettingsBottom->name = "Bottom";
+		projectionSettingsBottom->type = DisplayTypeElement::Slider;
+		projectionSettingsBottom->callback = [this]() {m_projection->updateProjection(); };
+		displayInfo.addElement(projectionSettingsBottom);
+		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsTop = std::make_shared<DisplayInfoElementSlider>();
+		projectionSettingsTop->data = &projection->m_top;
+		projectionSettingsTop->minValue = 0.01f;
+		projectionSettingsTop->maxValue = 10.0f;
+		projectionSettingsTop->name = "Top";
+		projectionSettingsTop->type = DisplayTypeElement::Slider;
+		projectionSettingsTop->callback = [this]() {m_projection->updateProjection(); };
+		displayInfo.addElement(projectionSettingsTop);
+		break;
+	}
+	default:
+		break;
 	}
 	return displayInfo;
 }
@@ -132,7 +174,7 @@ bool Camera::hasDisplayInfo()
 	return true;
 }
 
-Mat4 Camera::getRotationMatrix(Vec3 rotation)
+Mat4 Camera::getRotationMatrix(Vec3 rotation) const
 {
 	switch (m_rotationOrder)
 	{
@@ -190,17 +232,17 @@ void PerspectiveProjection::updateProjection()
 	m_projection = GetPerspectiveMatrix(m_fov, m_aspectRatio, m_zNear, m_zFar);
 }
 
-float PerspectiveProjection::getFov()
+float PerspectiveProjection::getFov() const
 {
 	return m_fov;
 }
 
-float PerspectiveProjection::getAspectRatio()
+float PerspectiveProjection::getAspectRatio() const
 {
 	return m_aspectRatio;
 }
 
-Mat4 Projection::getProjectionMatrix()
+Mat4 Projection::getProjectionMatrix() const
 {
 	return m_projection;
 }
@@ -217,12 +259,12 @@ void Projection::setZFar(float zFar)
 	updateProjection();
 }
 
-float Projection::getZNear()
+float Projection::getZNear() const 
 {
 	return m_zNear;
 }
 
-float Projection::getZFar()
+float Projection::getZFar() const
 {
 	return m_zFar;
 }

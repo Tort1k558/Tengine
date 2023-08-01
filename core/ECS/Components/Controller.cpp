@@ -10,12 +10,12 @@ void Controller::setMouseMoveCallback(std::function<void(std::shared_ptr<Object>
 	m_mouseMoveCallback = callback;
 }
 
-std::vector<std::pair<KeyCode, std::function<void(std::shared_ptr<Object>)>>> Controller::getKeyCallbacks()
+std::vector<std::pair<KeyCode, std::function<void(std::shared_ptr<Object>)>>> Controller::getKeyCallbacks() const
 {
 	return m_keyCallbacks;
 }
 
-std::function<void(std::shared_ptr<Object>)> Controller::getMouseMoveCallback()
+std::function<void(std::shared_ptr<Object>)> Controller::getMouseMoveCallback() const
 {
 	return m_mouseMoveCallback;
 }

@@ -122,8 +122,8 @@ public:
 	DisplayInfo() = default;
 	void addElement(std::shared_ptr<DisplayInfoElement> element);
 	void setComponentName(const std::string& name);
-	std::string getComponentName();
-	std::vector< std::shared_ptr<DisplayInfoElement>> getElements();
+	std::string getComponentName() const;
+	std::vector< std::shared_ptr<DisplayInfoElement>> getElements() const;
 private:
 	std::vector<std::shared_ptr<DisplayInfoElement>> m_elements;
 	std::string m_componentName;

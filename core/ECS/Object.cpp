@@ -21,12 +21,12 @@ void Object::setName(const std::string& name)
 	m_name = name;
 }
 
-std::string Object::getName()
+std::string Object::getName() const
 {
 	return m_name;
 }
 
-UUID Object::getId()
+UUID Object::getId() const
 {
 	return m_id;
 }
