@@ -1,8 +1,12 @@
 #pragma once
 
 #include<memory>
+#include<filesystem>
 
 #include"Core/Math.h"
+#include"Core/AssetManager.h"
+
+class Resource;
 
 enum class TextureType
 {
@@ -21,7 +25,7 @@ enum class TextureFilter
 	Anisotropic16
 };
 
-class Texture
+class Texture : public Resource
 {
 public:
 	virtual ~Texture() = default;

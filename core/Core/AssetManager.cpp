@@ -6,8 +6,11 @@
 #include<stb_image.h>
 
 #include"Core/Logger.h"
+#include"Renderer/Shader.h"
+#include"Renderer/Texture.h"
+#include"ECS/Components/Mesh.h"
 
-std::unordered_map<std::filesystem::path, AssetManager::Resource> AssetManager::m_resources;
+std::unordered_map<std::filesystem::path, std::shared_ptr<Resource>> AssetManager::m_resources;
 
 std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
 {
@@ -21,6 +24,7 @@ std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVer
     shader->addShader(ReadFile(pathToFragmentShader), ShaderType::FragmentShader);
     shader->compile();
     m_resources[pathToVertexShader.string() + pathToFragmentShader.string()] = shader;
+
     return shader;
 }
 
@@ -31,7 +35,6 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
     {
         return texture;
     }
-
     stbi_set_flip_vertically_on_load(true);
     int width, height, channels;
 
@@ -58,6 +61,7 @@ std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
         break;
     }
     texture = Texture::Create(data, { width,height }, type);
+    texture->setPath(path);
     stbi_image_free(data);
 
     m_resources[path] = texture;
@@ -72,6 +76,7 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
         return mesh;
     }
     mesh = Component::Create<Mesh>();
+    mesh->setPath(path);
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -80,7 +85,7 @@ std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
         return nullptr;
     }
     ProcessNode(mesh, scene->mRootNode, scene, path.parent_path());
-    m_resources[path] = std::make_shared<Mesh>(*mesh);
+    m_resources[path] = std::dynamic_pointer_cast<Resource>(std::make_shared<Mesh>(*mesh));
     return mesh;
 }
 
@@ -192,4 +197,14 @@ std::shared_ptr<Texture> AssetManager::LoadMaterialTexture(aiMaterial* material,
         return LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
     }
     return nullptr;
+}
+
+std::filesystem::path Resource::getPath() const
+{
+    return m_path;
+}
+
+void Resource::setPath(std::filesystem::path path)
+{
+    m_path = path;
 }

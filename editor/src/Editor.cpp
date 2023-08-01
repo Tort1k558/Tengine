@@ -32,7 +32,7 @@ void Editor::create()
     transform->setScale({ 10.0f,10.0f,1.0f });
     transform->setPositionY(-1.0f);
     transform->setRotationX(-90.0f);
-    object->addComponent<Mesh>(Primitives::CreateQuad());
+    object->addComponent<Mesh>(Primitives::CreateSphere(50,50));
 
     std::shared_ptr<Object> object2 = Object::Create();
     std::shared_ptr<Camera> camera = Component::Create<Camera>(ProjectionType::Perspective);

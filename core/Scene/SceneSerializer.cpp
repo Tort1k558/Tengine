@@ -6,6 +6,9 @@
 #include"Core/Logger.h"
 #include"Scene/SceneManager.h"
 #include"ECS/Components/Camera.h"
+#include"ECS/Components/Mesh.h"
+#include"ECS/Components/Transform.h"
+#include"Utils/Primitives.h"
 
 void SceneSerializer::Serialize(std::shared_ptr<Scene> scene)
 {
@@ -57,6 +60,14 @@ void SceneSerializer::Serialize(std::shared_ptr<Scene> scene)
 				break;
 			}
 
+		}
+		if (object->hasComponent<Mesh>())
+		{
+			std::shared_ptr<Mesh> mesh = object->getComponent<Mesh>();
+			if (!mesh->getPath().empty())
+			{
+				data[object->getId().string()]["mesh"]["path"] = mesh->getPath().string();
+			}
 		}
 	}
 
@@ -128,6 +139,43 @@ std::shared_ptr<Scene> SceneSerializer::Deserialize(std::filesystem::path path)
 					break;
 				}
 				object->addComponent<Camera>(camera);
+			}
+			if (item.value().contains("mesh"))
+			{
+				std::shared_ptr<Mesh> mesh;
+				if (item.value()["mesh"].contains("path"))
+				{
+					std::string path = item.value()["mesh"]["path"];
+					if (path == "Primitive::Quad")
+					{
+						mesh = Primitives::CreateQuad();
+					}
+					else if (path == "Primitive::Cube")
+					{
+						mesh = Primitives::CreateCube();
+					}
+					else if (path.find("Primitive::Sphere::") != std::string::npos)
+					{
+						size_t sectorsPos = path.find("::Sectors::");
+						size_t stacksPos = path.rfind("::Stacks::");
+
+						int sectors;
+						int stacks;
+
+						if (sectorsPos == std::string::npos || stacksPos == std::string::npos || sectorsPos == stacksPos) {
+							sectors = 1;
+							stacks = 1;
+						}
+						sectors = std::stoi(path.substr(sectorsPos + 11, stacksPos - sectorsPos - 11));
+						stacks = std::stoi(path.substr(stacksPos + 10));
+						mesh = Primitives::CreateSphere(sectors, stacks);
+					}
+					else
+					{
+						mesh = AssetManager::LoadMesh(path);
+					}
+				}
+				object->addComponent<Mesh>(mesh);
 			}
 		}
 	}

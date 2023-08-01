@@ -1,18 +1,18 @@
-#include "RendererSystem.h"
+#include"RendererSystem.h"
 
-#include "Renderer/OpenGL/RendererContextOpenGL.h"
-#include "ECS/Components/Transform.h"
-#include "ECS/Components/Camera.h"
-#include "ECS/Components/Mesh.h"
-#include "Core/Logger.h"
-#include "Core/Timer.h"
-#include "Core/AssetManager.h"
-#include "Renderer/VertexArray.h"
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/IndexBuffer.h"
-#include "Scene/Scene.h"
-#include "Scene/SceneManager.h"
-
+#include"Renderer/OpenGL/RendererContextOpenGL.h"
+#include"ECS/Components/Transform.h"
+#include"ECS/Components/Camera.h"
+#include"ECS/Components/Mesh.h"
+#include"Core/Logger.h"
+#include"Core/Timer.h"
+#include"Core/AssetManager.h"
+#include"Renderer/VertexArray.h"
+#include"Renderer/VertexBuffer.h"
+#include"Renderer/IndexBuffer.h"
+#include"Renderer/Shader.h"
+#include"Scene/Scene.h"
+#include"Scene/SceneManager.h"
 
 void RendererSystem::init()
 {

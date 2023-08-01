@@ -9,7 +9,9 @@ std::shared_ptr<Mesh> Primitives::CreateQuad()
     vertices.push_back({ Vec3(1.0f, -1.0f, 0.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 0.0f) });
     std::vector<unsigned int> indices = { 0,1,2,
                                           0,1,3 };
-    return Component::Create<Mesh>(vertices, indices);
+    std::shared_ptr<Mesh> mesh = Component::Create<Mesh>(vertices, indices);
+    mesh->setPath("Primitive::Quad");
+    return mesh;
 }
 
 std::shared_ptr<Mesh> Primitives::CreateSphere(int sectors, int stacks)
@@ -60,7 +62,9 @@ std::shared_ptr<Mesh> Primitives::CreateSphere(int sectors, int stacks)
             }
         }
     }
-    return Component::Create<Mesh>(vertices, indices);
+    std::shared_ptr<Mesh> mesh = Component::Create<Mesh>(vertices, indices);
+    mesh->setPath("Primitive::Sphere::Sectors::" + std::to_string(sectors) + "::Stacks::" + std::to_string(stacks));
+    return mesh;
 }
 
 std::shared_ptr<Mesh> Primitives::CreateCube()
@@ -108,6 +112,7 @@ std::shared_ptr<Mesh> Primitives::CreateCube()
       16,17,18, 16,17,19,
         // Bottom
       20,21,22, 20,21,23 };
-
-    return Component::Create<Mesh>(vertices, indices);
+    std::shared_ptr<Mesh> mesh = Component::Create<Mesh>(vertices, indices);
+    mesh->setPath("Primitive::Cube");
+    return mesh;
 }

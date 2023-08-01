@@ -3,13 +3,16 @@
 #include<memory>
 #include<string>
 #include"Core/Math.h"
+#include"Core/AssetManager.h"
+
+
 enum class ShaderType
 {
 	VertexShader = 0,
 	FragmentShader
 };
 
-class Shader
+class Shader : public Resource
 {
 public:
 	virtual ~Shader() = default;

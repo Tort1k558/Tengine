@@ -9,9 +9,20 @@
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
 
-#include"Renderer/Texture.h"
-#include"Renderer/Shader.h"
-#include"ECS/Components/Mesh.h"
+class Texture;
+class Shader;
+class Mesh;
+class SubMesh;
+
+class Resource
+{
+public:
+	virtual ~Resource() = default;
+	std::filesystem::path getPath() const;
+	void setPath(std::filesystem::path path);
+private:
+	std::filesystem::path m_path;
+};
 
 class AssetManager
 {
@@ -21,10 +32,6 @@ public:
 	AssetManager(AssetManager&&) = delete;
 	AssetManager& operator=(const AssetManager&) = delete;
 	AssetManager& operator=(AssetManager&&) = delete;
-
-	using Resource = std::variant<std::shared_ptr<Shader>,
-								  std::shared_ptr<Texture>,
-								  std::shared_ptr<Mesh>>;
 
 	static std::shared_ptr<Shader> LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader);
 	static std::shared_ptr<Texture> LoadTexture(std::filesystem::path path);
@@ -38,28 +45,16 @@ private:
 	static void ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::filesystem::path directory);
 	static std::shared_ptr<Texture> LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory);
 
-	static std::unordered_map<std::filesystem::path, Resource> m_resources;
+	static std::unordered_map<std::filesystem::path, std::shared_ptr<Resource>> m_resources;
 };
 
 template<typename T>
 inline std::shared_ptr<T> AssetManager::GetResource(std::filesystem::path path)
 {
-	std::shared_ptr<T>* resource = std::get_if<std::shared_ptr<T>>(&m_resources[path.string()]);
-	if (!resource)
+	if (m_resources.find(path.string()) == m_resources.end())
 	{
 		return nullptr;
 	}
-	return *resource;
-}
-
-template<>
-inline std::shared_ptr<Mesh> AssetManager::GetResource<Mesh>(std::filesystem::path path)
-{
-	std::shared_ptr<Mesh>* resource = std::get_if<std::shared_ptr<Mesh>>(&m_resources[path.string()]);
-	if (!resource)
-	{
-		return nullptr;
-	}
-	return std::make_shared<Mesh>(**resource);
+	return std::dynamic_pointer_cast<T>(m_resources.at(path.string()));
 }
 

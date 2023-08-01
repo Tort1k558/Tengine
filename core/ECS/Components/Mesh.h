@@ -3,6 +3,7 @@
 #include<vector>
 
 #include"Core/Math.h"
+#include"Core/AssetManager.h"
 #include"ECS/Component.h"
 #include"Renderer/VertexArray.h"
 #include"Renderer/VertexBuffer.h"
@@ -33,7 +34,7 @@ private:
 	std::shared_ptr<Material> m_material;
 };
 
-class Mesh : public Component
+class Mesh : public Component, public Resource
 {
 public:
 	Mesh() = default;

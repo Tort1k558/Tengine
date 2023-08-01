@@ -104,6 +104,9 @@ void UISystem::update()
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
     
+    static int currentItem = 0;
+    static std::string nameOfSelectedObject;
+
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("Scene")) {
             if (ImGui::MenuItem("Save Scene"))
@@ -116,15 +119,18 @@ void UISystem::update()
                 nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
                 if (result == NFD_OKAY) {
                     SceneSerializer::Deserialize(outPath);
+                    nameOfSelectedObject.clear();
                 }
             }
             if (ImGui::MenuItem("Create Scene")) {
                 SceneManager::SetCurrentScene(Scene::Create());
+                nameOfSelectedObject.clear();
             }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
     }
+
     ImGui::End();
     ImGui::Begin("info", nullptr);
     ImGui::Text("FPS::%d", static_cast<unsigned int>(1.0 / Timer::GetDeltaTime()));
@@ -141,8 +147,7 @@ void UISystem::update()
         objectNames.push_back(object->getName());
     }
     std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
-    static int currentItem = 0;
-    static std::string nameOfSelectedObject;
+    
     if (ImGui::ListBox("##", &currentItem, [](void* data, int idx, const char** out_text) {
         auto& items = *static_cast<std::vector<std::string>*>(data);
         if (idx < 0 || idx >= static_cast<int>(items.size())) {
@@ -173,7 +178,7 @@ void UISystem::update()
 
     //Components
     ImGui::Begin("Components", nullptr);
-    if (!nameOfSelectedObject.empty())
+    if (!nameOfSelectedObject.empty() )
     {
         std::shared_ptr<Object> object = SceneManager::GetCurrentScene()->getObjectByName(nameOfSelectedObject);
         std::vector<std::shared_ptr<Component>> components = object->getComponents();
