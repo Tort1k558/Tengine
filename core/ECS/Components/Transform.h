@@ -4,6 +4,7 @@
 #include"Core/Math.h"
 class Transform : public Component
 {
+	TRACEABLE
 public:
 	Transform();
 	Transform(Vec3 position, Vec3 rotation, Vec3 scale);

@@ -4,7 +4,6 @@
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
 #include<nfd.h>
-
 #include"Core/Timer.h"
 #include"Core/Logger.h"
 #include"ECS/Components/Mesh.h"
@@ -13,6 +12,9 @@
 #include"Scene/SceneManager.h"
 #include"Scene/SceneSerializer.h"
 #include"Core/AssetManager.h"
+
+
+
 void UISystem::init()
 {
     IMGUI_CHECKVERSION();
@@ -175,7 +177,6 @@ void UISystem::update()
     }
     ImGui::End();
 
-
     //Components
     ImGui::Begin("Components", nullptr);
     if (!nameOfSelectedObject.empty() )
@@ -187,10 +188,12 @@ void UISystem::update()
             if (component->hasDisplayInfo())
             {
                 DisplayInfo info = component->getDisplayInfo();
-                ImGui::Text(info.getComponentName().c_str());
-                for (const auto& element : info.getElements())
+                if (ImGui::CollapsingHeader(info.getComponentName().c_str()))
                 {
-                    displayElement(element);
+                    for (const auto& element : info.getElements())
+                    {
+                        displayElement(element);
+                    }
                 }
             }
         }

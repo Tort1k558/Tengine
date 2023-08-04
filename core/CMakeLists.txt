@@ -18,9 +18,21 @@ set(DIRS_SRC
 	"Utils/*.cpp"               "Utils/*.h"          
 	"Utils/EditorElements/*.cpp""Utils/EditorElements/*.h"          
 	)
+	set(DIRS_INCLUDES	
+	"Core/*.h"			
+	"ECS/*.h" 			
+	"ECS/Components/*.h" 			
+	"ECS/Systems/*.h" 			
+	"Renderer/*.h"		
+	"Renderer/OpenGL/*.h"		
+	"Scene/*.h" 		
+	"Utils/*.h"          
+	"Utils/EditorElements/*.h"          
+	)
 file(GLOB TARGET_SRC ${DIRS_SRC})
+file(GLOB TARGET_INCLUDES ${DIRS_INCLUDES})
 
-add_library(${PROJECT_NAME} STATIC ${TARGET_SRC})
+add_library(${PROJECT_NAME} STATIC ${TARGET_SRC} ${TARGET_INCLUDES} ${CMAKE_SOURCE_DIR}/core/Utils/Reflection.hpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC "../core")
 
@@ -48,3 +60,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
 
 add_subdirectory(../external/nlohmann ${CMAKE_CURRENT_BINARY_DIR}/bin/nlohmann)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json)
+
+add_subdirectory(../external/reflang ${CMAKE_CURRENT_BINARY_DIR}/bin/reflang)
+target_include_directories(${PROJECT_NAME} PUBLIC ../external/reflang/lib)
+set(OUT_REFLECTION ${CMAKE_SOURCE_DIR}/core/Utils/Reflection.hpp)
+add_custom_target(ReflectionTarget  
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/bin/reflang/Debug/reflang --out-hpp ${OUT_REFLECTION} ${TARGET_INCLUDES} -- -x c++
+)
+add_dependencies(${PROJECT_NAME} ReflectionTarget)
+add_dependencies(ReflectionTarget reflang)

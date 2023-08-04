@@ -1,7 +1,12 @@
 #pragma once
 
+#define TRACEABLE \
+	template<typename T> \
+	friend class reflang::Class;
+
 #include<memory>
 
+#include"reflang.hpp"
 #include"ECS/Object.h"
 #include"Utils/EditorElements/DisplayInfo.h"
 
