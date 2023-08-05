@@ -185,9 +185,9 @@ void UISystem::update()
         std::vector<std::shared_ptr<Component>> components = object->getComponents();
         for (const auto& component : components)
         {
-            if (component->hasDisplayInfo())
+            DisplayInfo info = component->getDisplayInfo();
+            if (!info.getComponentName().empty())
             {
-                DisplayInfo info = component->getDisplayInfo();
                 if (ImGui::CollapsingHeader(info.getComponentName().c_str()))
                 {
                     for (const auto& element : info.getElements())

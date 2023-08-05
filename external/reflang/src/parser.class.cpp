@@ -40,6 +40,10 @@ namespace
 	{
 		NamedObject field;
 		field.Name = parser::Convert(clang_getCursorSpelling(cursor));
+		if (field.Name == "TRACEABLE")
+		{
+			return {};
+		}
 		//field.Type = parser::GetName(clang_getCursorType(cursor));
 		switch (clang_getCXXAccessSpecifier(cursor))
 		{
@@ -73,7 +77,6 @@ namespace
 			type.erase(type.begin() + type.find("="), type.end());
 		}
 		field.Type = type;
-		std::cout << field.Type<< std::endl;
 		return field;
 	}
 
@@ -94,11 +97,26 @@ namespace
 		//	}
 		//	break;
 		case CXCursor_FieldDecl:
-			c->Fields.push_back(GetFieldFromCursor(cursor));
+		{
+
+			NamedObject object = GetFieldFromCursor(cursor);
+			if (object.Name.empty())
+			{
+				break;
+			}
+			c->Fields.push_back(object);
 			break;
+		}
 		case CXCursor_VarDecl:
-			c->StaticFields.push_back(GetFieldFromCursor(cursor));
+		{
+			NamedObject object = GetFieldFromCursor(cursor);
+			if (object.Name.empty())
+			{
+				break;
+			}
+			c->StaticFields.push_back(object);
 			break;
+		}
 		default:
 			break;
 		}

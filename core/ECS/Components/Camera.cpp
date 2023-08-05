@@ -169,11 +169,6 @@ DisplayInfo Camera::getDisplayInfo()
 	return displayInfo;
 }
 
-bool Camera::hasDisplayInfo()
-{
-	return true;
-}
-
 Mat4 Camera::getRotationMatrix(Vec3 rotation) const
 {
 	switch (m_rotationOrder)

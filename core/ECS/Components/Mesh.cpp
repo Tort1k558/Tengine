@@ -114,8 +114,3 @@ DisplayInfo Mesh::getDisplayInfo()
 	displayInfo.addElement(submeshesHeader);
 	return displayInfo;
 }
-
-bool Mesh::hasDisplayInfo()
-{
-	return true;
-}

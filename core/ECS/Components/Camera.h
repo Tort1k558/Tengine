@@ -101,7 +101,6 @@ public:
 	ProjectionType getProjectionType() const;
 
 	DisplayInfo getDisplayInfo() final;
-	bool hasDisplayInfo() final;
 private:
 	Mat4 getRotationMatrix(Vec3 rotation) const;
 

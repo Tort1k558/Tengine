@@ -128,8 +128,3 @@ DisplayInfo Transform::getDisplayInfo()
 	displayInfo.addElement(scaleSlider);
 	return displayInfo;
 }
-
-bool Transform::hasDisplayInfo()
-{
-	return true;
-}

@@ -4,7 +4,6 @@
 #include"Core/Math.h"
 class Transform : public Component
 {
-	TRACEABLE
 public:
 	Transform();
 	Transform(Vec3 position, Vec3 rotation, Vec3 scale);
@@ -29,7 +28,6 @@ public:
 	Mat4 getMatrix() const;
 
 	DisplayInfo getDisplayInfo() final;
-	bool hasDisplayInfo() final;
 private:
 	Vec3 m_position = Vec3(0.0f);
 	Vec3 m_rotation = Vec3(0.0f);

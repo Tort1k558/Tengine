@@ -1,8 +1,8 @@
 #pragma once
 
-#define TRACEABLE \
-	template<typename T> \
-	friend class reflang::Class;
+//#define TRACEABLE \
+//	template<typename T> \
+//	friend class reflang::Class;
 
 #include<memory>
 
@@ -24,7 +24,6 @@ public:
 	static std::shared_ptr<T> Create(Args... args);
 
 	virtual DisplayInfo getDisplayInfo() { return DisplayInfo(); }
-	virtual bool hasDisplayInfo() { return false; }
 private:
 	std::weak_ptr<Object> m_parent;
 };

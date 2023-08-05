@@ -45,7 +45,6 @@ public:
 	std::vector<std::shared_ptr<SubMesh>> getSubmeshes() const;
 
 	DisplayInfo getDisplayInfo() final;
-	bool hasDisplayInfo() final;
 private:
 	std::vector<std::shared_ptr<SubMesh>> m_submeshes;
 };
