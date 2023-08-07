@@ -5,6 +5,7 @@
 //	friend class reflang::Class;
 
 #include<memory>
+#include<nlohmann/json.hpp>
 
 #include"reflang.hpp"
 #include"ECS/Object.h"
@@ -24,6 +25,7 @@ public:
 	static std::shared_ptr<T> Create(Args... args);
 
 	virtual DisplayInfo getDisplayInfo() { return DisplayInfo(); }
+	virtual void serialize(nlohmann::json& data) {}
 private:
 	std::weak_ptr<Object> m_parent;
 };

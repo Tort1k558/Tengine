@@ -16,6 +16,5 @@ public:
 
 	static void Serialize(std::shared_ptr<Scene> scene);
 	static std::shared_ptr<Scene> Deserialize(std::filesystem::path path);
-private:
-
+	
 };

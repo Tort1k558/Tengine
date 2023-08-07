@@ -28,6 +28,7 @@ public:
 	Mat4 getMatrix() const;
 
 	DisplayInfo getDisplayInfo() final;
+	void serialize(nlohmann::json& data) final;
 private:
 	Vec3 m_position = Vec3(0.0f);
 	Vec3 m_rotation = Vec3(0.0f);

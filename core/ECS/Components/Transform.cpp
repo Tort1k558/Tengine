@@ -1,5 +1,7 @@
 #include"Transform.h"
 
+#include"Scene/SceneSerializer.h"
+
 Transform::Transform()
 {
 }
@@ -127,4 +129,15 @@ DisplayInfo Transform::getDisplayInfo()
 	scaleSlider->data = &m_scale;
 	displayInfo.addElement(scaleSlider);
 	return displayInfo;
+}
+
+void Transform::serialize(nlohmann::json& data)
+{
+	// Serialize
+	Vec3 position = getPosition();
+	data["transform"]["position"] = { position.x,position.y,position.z };
+	Vec3 rotation = getRotation();
+	data["transform"]["rotation"] = { rotation.x,rotation.y,rotation.z };
+	Vec3 scale = getScale();
+	data["transform"]["scale"] = { scale.x,scale.y,scale.z };
 }

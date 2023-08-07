@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include"ECS/Components/Transform.h"
+#include"Scene/SceneSerializer.h"
 
 Camera::Camera()
 {
@@ -167,6 +168,38 @@ DisplayInfo Camera::getDisplayInfo()
 		break;
 	}
 	return displayInfo;
+}
+
+void Camera::serialize(nlohmann::json& data)
+{
+	// Serialize
+	data["camera"]["rotationOrder"] = getRotationOrder();
+	data["camera"]["projectionType"] = getProjectionType();
+	switch(getProjectionType())
+	{
+	case ProjectionType::Perspective:
+	{
+		std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
+		data["camera"]["perspective"]["zNear"] = perspective->getZNear();
+		data["camera"]["perspective"]["zFar"] = perspective->getZFar();
+		data["camera"]["perspective"]["fov"] = perspective->getFov();
+		data["camera"]["perspective"]["aspectRatio"] = perspective->getAspectRatio();
+		break;
+	}
+	case ProjectionType::Orthographical:
+	{
+		std::shared_ptr<OrthographicalProjection> orthographical = getOrthographicalProjection();
+		data["camera"]["orthographical"]["zNear"] = orthographical->getZNear();
+		data["camera"]["orthographical"]["zFar"] = orthographical->getZFar();
+		data["camera"]["orthographical"]["left"] = orthographical->getLeft();
+		data["camera"]["orthographical"]["right"] = orthographical->getRight();
+		data["camera"]["orthographical"]["bottom"] = orthographical->getBottom();
+		data["camera"]["orthographical"]["top"] = orthographical->getTop();
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 Mat4 Camera::getRotationMatrix(Vec3 rotation) const

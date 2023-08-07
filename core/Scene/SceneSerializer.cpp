@@ -10,6 +10,7 @@
 #include"ECS/Components/Transform.h"
 #include"Utils/Primitives.h"
 
+
 void SceneSerializer::Serialize(std::shared_ptr<Scene> scene)
 {
 	//Prepare data
@@ -18,56 +19,9 @@ void SceneSerializer::Serialize(std::shared_ptr<Scene> scene)
 	for (const auto& object : scene->getAllObjects())
 	{
 		data[object->getId().string()]["name"] = object->getName();
-		if (object->hasComponent<Transform>())
+		for (const auto& component : object->getComponents())
 		{
-			std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-			Vec3 position = transform->getPosition();
-			data[object->getId().string()]["transform"]["position"] = { position.x,position.y,position.z };
-			Vec3 rotation = transform->getRotation();
-			data[object->getId().string()]["transform"]["rotation"] = { rotation.x,rotation.y,rotation.z };
-			Vec3 scale = transform->getScale();
-			data[object->getId().string()]["transform"]["scale"] = { scale.x,scale.y,scale.z };
-		}
-		if (object->hasComponent<Camera>())
-		{
-			std::shared_ptr<Camera> camera = object->getComponent<Camera>();
-
-			data[object->getId().string()]["camera"]["rotationOrder"] = camera->getRotationOrder();
-			data[object->getId().string()]["camera"]["projectionType"] = camera->getProjectionType();
-			switch (camera->getProjectionType())
-			{
-			case ProjectionType::Perspective:
-			{
-				std::shared_ptr<PerspectiveProjection> perspective = camera->getPerspectiveProjection();
-				data[object->getId().string()]["camera"]["perspective"]["zNear"] = perspective->getZNear();
-				data[object->getId().string()]["camera"]["perspective"]["zFar"] = perspective->getZFar();
-				data[object->getId().string()]["camera"]["perspective"]["fov"] = perspective->getFov();
-				data[object->getId().string()]["camera"]["perspective"]["aspectRatio"] = perspective->getAspectRatio();
-				break;
-			}
-			case ProjectionType::Orthographical:
-			{
-				std::shared_ptr<OrthographicalProjection> orthographical = camera->getOrthographicalProjection();
-				data[object->getId().string()]["camera"]["orthographical"]["zNear"] = orthographical->getZNear();
-				data[object->getId().string()]["camera"]["orthographical"]["zFar"] = orthographical->getZFar();
-				data[object->getId().string()]["camera"]["orthographical"]["left"] = orthographical->getLeft();
-				data[object->getId().string()]["camera"]["orthographical"]["right"] = orthographical->getRight();
-				data[object->getId().string()]["camera"]["orthographical"]["bottom"] = orthographical->getBottom();
-				data[object->getId().string()]["camera"]["orthographical"]["top"] = orthographical->getTop();
-				break;
-			}
-			default:
-				break;
-			}
-
-		}
-		if (object->hasComponent<Mesh>())
-		{
-			std::shared_ptr<Mesh> mesh = object->getComponent<Mesh>();
-			if (!mesh->getPath().empty())
-			{
-				data[object->getId().string()]["mesh"]["path"] = mesh->getPath().string();
-			}
+			component->serialize(data[object->getId().string()]);
 		}
 	}
 
@@ -95,44 +49,49 @@ std::shared_ptr<Scene> SceneSerializer::Deserialize(std::filesystem::path path)
 		{
 			std::string objectId = item.key();
 			std::shared_ptr<Object> object = Object::Create(UUID(objectId));
-			std::string objectName = item.value()["name"];
-			object->setName(objectName);
-			if (item.value().contains("transform"))
+			nlohmann::json dataObject = item.value();
+			if (dataObject.contains("name"))
+			{
+				object->setName(dataObject["name"]);
+			}
+
+			if (dataObject.contains("transform"))
 			{
 				std::shared_ptr<Transform> transform = Component::Create<Transform>();
-				transform->setPosition(Vec3(item.value()["transform"]["position"][0], item.value()["transform"]["position"][1], item.value()["transform"]["position"][2]));
-				transform->setRotation(Vec3(item.value()["transform"]["rotation"][0], item.value()["transform"]["rotation"][1], item.value()["transform"]["rotation"][2]));
-				transform->setScale(Vec3(item.value()["transform"]["scale"][0], item.value()["transform"]["scale"][1], item.value()["transform"]["scale"][2]));
+				transform->setPosition(Vec3(dataObject["transform"]["position"][0], dataObject["transform"]["position"][1], dataObject["transform"]["position"][2]));
+				transform->setRotation(Vec3(dataObject["transform"]["rotation"][0], dataObject["transform"]["rotation"][1], dataObject["transform"]["rotation"][2]));
+				transform->setScale(Vec3(dataObject["transform"]["scale"][0], dataObject["transform"]["scale"][1], dataObject["transform"]["scale"][2]));
 
 				object->addComponent<Transform>(transform);
 			}
-			if (item.value().contains("camera"))
+
+			if (dataObject.contains("camera"))
 			{
 				std::shared_ptr<Camera> camera;
-				switch (static_cast<ProjectionType>(item.value()["camera"]["projectionType"]))
+				switch (static_cast<ProjectionType>(dataObject["camera"]["projectionType"]))
 				{
 				case ProjectionType::Perspective:
 				{
 					camera = Component::Create<Camera>(ProjectionType::Perspective);
-					camera->setRotationOrder(static_cast<RotationOrder>(item.value()["camera"]["rotationOrder"]));
+					camera->setRotationOrder(static_cast<RotationOrder>(dataObject["camera"]["rotationOrder"]));
 					std::shared_ptr<PerspectiveProjection> perspective = camera->getPerspectiveProjection();
-					perspective->setZNear(item.value()["camera"]["perspective"]["zNear"]);
-					perspective->setZFar(item.value()["camera"]["perspective"]["zFar"]);
-					perspective->setFov(item.value()["camera"]["perspective"]["fov"]);
-					perspective->setAspectRatio(item.value()["camera"]["perspective"]["aspectRatio"]);
+					perspective->setZNear(dataObject["camera"]["perspective"]["zNear"]);
+					perspective->setZFar(dataObject["camera"]["perspective"]["zFar"]);
+					perspective->setFov(dataObject["camera"]["perspective"]["fov"]);
+					perspective->setAspectRatio(dataObject["camera"]["perspective"]["aspectRatio"]);
 					break;
 				}
 				case ProjectionType::Orthographical:
 				{
 					camera = Component::Create<Camera>(ProjectionType::Orthographical);
-					camera->setRotationOrder(static_cast<RotationOrder>(item.value()["camera"]["rotationOrder"]));
+					camera->setRotationOrder(static_cast<RotationOrder>(dataObject["camera"]["rotationOrder"]));
 					std::shared_ptr<OrthographicalProjection> orthographical = camera->getOrthographicalProjection();
-					orthographical->setZNear(item.value()["camera"]["orthographical"]["zNear"]);
-					orthographical->setZFar(item.value()["camera"]["orthographical"]["zFar"]);
-					orthographical->setLeft(item.value()["camera"]["orthographical"]["left"]);
-					orthographical->setRight(item.value()["camera"]["orthographical"]["right"]);
-					orthographical->setBottom(item.value()["camera"]["orthographical"]["bottom"]);
-					orthographical->setTop(item.value()["camera"]["orthographical"]["top"]);
+					orthographical->setZNear(dataObject["camera"]["orthographical"]["zNear"]);
+					orthographical->setZFar(dataObject["camera"]["orthographical"]["zFar"]);
+					orthographical->setLeft(dataObject["camera"]["orthographical"]["left"]);
+					orthographical->setRight(dataObject["camera"]["orthographical"]["right"]);
+					orthographical->setBottom(dataObject["camera"]["orthographical"]["bottom"]);
+					orthographical->setTop(dataObject["camera"]["orthographical"]["top"]);
 					break;
 				}
 				default:
@@ -140,12 +99,13 @@ std::shared_ptr<Scene> SceneSerializer::Deserialize(std::filesystem::path path)
 				}
 				object->addComponent<Camera>(camera);
 			}
-			if (item.value().contains("mesh"))
+
+			if (dataObject.contains("mesh"))
 			{
 				std::shared_ptr<Mesh> mesh;
-				if (item.value()["mesh"].contains("path"))
+				if (dataObject["mesh"].contains("path"))
 				{
-					std::string path = item.value()["mesh"]["path"];
+					std::string path = dataObject["mesh"]["path"];
 					if (path == "Primitive::Quad")
 					{
 						mesh = Primitives::CreateQuad();

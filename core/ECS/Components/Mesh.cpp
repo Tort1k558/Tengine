@@ -1,6 +1,9 @@
 #include "Mesh.h"
 
 #include"Core/AssetManager.h"
+#include"Scene/SceneSerializer.h"
+#include"Utils/Primitives.h"
+
 
 SubMesh::SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices) :
 	m_vertices(vertices), m_indices(indices)
@@ -114,3 +117,13 @@ DisplayInfo Mesh::getDisplayInfo()
 	displayInfo.addElement(submeshesHeader);
 	return displayInfo;
 }
+
+void Mesh::serialize(nlohmann::json& data)
+{
+	//Serialize
+	if (!getPath().empty())
+	{
+		data["mesh"]["path"] = getPath().string();
+	}
+}
+
