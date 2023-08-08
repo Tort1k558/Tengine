@@ -142,7 +142,7 @@ void Transform::serialize(nlohmann::json& data)
 	data["transform"]["scale"] = { scale.x,scale.y,scale.z };
 }
 
-void Transform::Deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
+void Transform::deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
 {
 	if (data.contains("transform"))
 	{

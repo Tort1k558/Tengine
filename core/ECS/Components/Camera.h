@@ -102,7 +102,7 @@ public:
 
 	DisplayInfo getDisplayInfo() final;
 	void serialize(nlohmann::json& data) final;
-	static void Deserialize(nlohmann::json& data, std::shared_ptr<Object> object);
+	void deserialize(nlohmann::json& data, std::shared_ptr<Object> object) final;
 private:
 	Mat4 getRotationMatrix(Vec3 rotation) const;
 

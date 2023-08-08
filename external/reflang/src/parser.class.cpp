@@ -141,7 +141,7 @@ Class parser::GetClass(CXCursor cursor)
 	{
 		c.Traceable = true;
 	}
-	if (str.find("static void Deserialize") != str.npos)
+	if (str.find("void deserialize ( nlohmann :: json") != str.npos)
 	{
 		c.Serializeable = true;
 	}

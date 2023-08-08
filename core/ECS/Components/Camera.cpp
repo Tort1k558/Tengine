@@ -202,7 +202,7 @@ void Camera::serialize(nlohmann::json& data)
 	}
 }
 
-void Camera::Deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
+void Camera::deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
 {
 	if (data.contains("camera"))
 	{

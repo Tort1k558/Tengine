@@ -26,6 +26,7 @@ public:
 
 	virtual DisplayInfo getDisplayInfo() { return DisplayInfo(); }
 	virtual void serialize(nlohmann::json& data) {}
+	virtual void deserialize(nlohmann::json& data,std::shared_ptr<Object> object) {}
 private:
 	std::weak_ptr<Object> m_parent;
 };

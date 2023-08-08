@@ -110,7 +110,6 @@ int main(int argc, char** argv)
 			}
 			if (!hasType)
 			{
-				std::cout << types[i]->GetFullName() << std::endl;
 				uniqueTypes.push_back(std::move(types[i]));
 			}
 		}

@@ -110,7 +110,9 @@ namespace reflang
 		o << "	{\n";
 		for (size_t i = 0; i < serializeables.size(); i++)
 		{
-			o << "		" + serializeables[i]->GetFullName() + "::" + "Deserialize(data,object);\n";
+			std::string nameComponent = "component" + std::to_string(i);
+			o << "		" + serializeables[i]->GetFullName() +" " + nameComponent + "; \n";
+			o << "		" + nameComponent + ".deserialize(data, object); \n";
 		}
 		o << "	}\n";
 	}

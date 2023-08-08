@@ -127,7 +127,7 @@ void Mesh::serialize(nlohmann::json& data)
 	}
 }
 
-void Mesh::Deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
+void Mesh::deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
 {
 	if (data.contains("mesh"))
 	{
