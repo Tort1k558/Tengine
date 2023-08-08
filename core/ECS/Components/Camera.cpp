@@ -202,6 +202,44 @@ void Camera::serialize(nlohmann::json& data)
 	}
 }
 
+void Camera::Deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
+{
+	if (data.contains("camera"))
+	{
+		std::shared_ptr<Camera> camera;
+		switch (static_cast<ProjectionType>(data["camera"]["projectionType"]))
+		{
+		case ProjectionType::Perspective:
+		{
+			camera = Component::Create<Camera>(ProjectionType::Perspective);
+			camera->setRotationOrder(static_cast<RotationOrder>(data["camera"]["rotationOrder"]));
+			std::shared_ptr<PerspectiveProjection> perspective = camera->getPerspectiveProjection();
+			perspective->setZNear(data["camera"]["perspective"]["zNear"]);
+			perspective->setZFar(data["camera"]["perspective"]["zFar"]);
+			perspective->setFov(data["camera"]["perspective"]["fov"]);
+			perspective->setAspectRatio(data["camera"]["perspective"]["aspectRatio"]);
+			break;
+		}
+		case ProjectionType::Orthographical:
+		{
+			camera = Component::Create<Camera>(ProjectionType::Orthographical);
+			camera->setRotationOrder(static_cast<RotationOrder>(data["camera"]["rotationOrder"]));
+			std::shared_ptr<OrthographicalProjection> orthographical = camera->getOrthographicalProjection();
+			orthographical->setZNear(data["camera"]["orthographical"]["zNear"]);
+			orthographical->setZFar(data["camera"]["orthographical"]["zFar"]);
+			orthographical->setLeft(data["camera"]["orthographical"]["left"]);
+			orthographical->setRight(data["camera"]["orthographical"]["right"]);
+			orthographical->setBottom(data["camera"]["orthographical"]["bottom"]);
+			orthographical->setTop(data["camera"]["orthographical"]["top"]);
+			break;
+		}
+		default:
+			break;
+		}
+		object->addComponent<Camera>(camera);
+	}
+}
+
 Mat4 Camera::getRotationMatrix(Vec3 rotation) const
 {
 	switch (m_rotationOrder)

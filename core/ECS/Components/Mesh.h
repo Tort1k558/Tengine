@@ -46,6 +46,7 @@ public:
 
 	DisplayInfo getDisplayInfo() final;
 	void serialize(nlohmann::json& data) final;
+	static void Deserialize(nlohmann::json& data, std::shared_ptr<Object> object);
 private:
 	std::vector<std::shared_ptr<SubMesh>> m_submeshes;
 };

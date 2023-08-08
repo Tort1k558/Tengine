@@ -12,7 +12,7 @@
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
 #include"Core/AssetManager.h"
-
+#include"Scene/SceneSerializer.h"
 Editor::Editor(unsigned int width, unsigned int height, const std::string& title) :
 Application(width, height, title)
 {

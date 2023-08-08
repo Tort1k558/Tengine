@@ -141,3 +141,16 @@ void Transform::serialize(nlohmann::json& data)
 	Vec3 scale = getScale();
 	data["transform"]["scale"] = { scale.x,scale.y,scale.z };
 }
+
+void Transform::Deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
+{
+	if (data.contains("transform"))
+	{
+		std::shared_ptr<Transform> transform = Component::Create<Transform>();
+		transform->setPosition(Vec3(data["transform"]["position"][0], data["transform"]["position"][1], data["transform"]["position"][2]));
+		transform->setRotation(Vec3(data["transform"]["rotation"][0], data["transform"]["rotation"][1], data["transform"]["rotation"][2]));
+		transform->setScale(Vec3(data["transform"]["scale"][0], data["transform"]["scale"][1], data["transform"]["scale"][2]));
+
+		object->addComponent<Transform>(transform);
+	}
+}

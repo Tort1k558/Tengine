@@ -67,5 +67,5 @@ set(OUT_REFLECTION ${CMAKE_SOURCE_DIR}/core/Utils/Reflection.hpp)
 add_custom_target(ReflectionTarget  
     COMMAND ${CMAKE_CURRENT_BINARY_DIR}/bin/reflang/Debug/reflang --out-hpp ${OUT_REFLECTION} ${TARGET_INCLUDES} -- -x c++
 )
-#add_dependencies(${PROJECT_NAME} ReflectionTarget)
+add_dependencies(${PROJECT_NAME} ReflectionTarget)
 add_dependencies(ReflectionTarget reflang)

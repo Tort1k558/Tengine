@@ -70,7 +70,7 @@ namespace
 			case CXCursor_StructDecl:
 			{
 				Class c = parser::GetClass(cursor);
-				if (c.Traceable)
+				if (c.Serializeable)
 				{
 					type = std::make_unique<Class>(c);
 				}

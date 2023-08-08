@@ -40,11 +40,14 @@ namespace
 		string include_guard = CalcIncludeGuard(options);
 		if (!include_guard.empty())
 		{
-			o << "#ifndef REFLANG_METADATA_" << include_guard << "\n";
-			o << "#define REFLANG_METADATA_" << include_guard << "\n\n";
+			o << "#pragma once\n";
 		}
 
 		o << R"(#include <string>
+#include<memory>
+#include<nlohmann/json.hpp>
+class Object;
+
 )";
 		o << options.include_path << "\n";
 
@@ -101,7 +104,16 @@ namespace reflang
 	{
 		o << "}  // namespace reflang\n";
 	}
-
+	void Deserialize(ostream& o,std::vector<Class*>& serializeables)
+	{
+		o << "	void Deserialize(nlohmann::json data, std::shared_ptr<::Object> object)\n";
+		o << "	{\n";
+		for (size_t i = 0; i < serializeables.size(); i++)
+		{
+			o << "		" + serializeables[i]->GetFullName() + "::" + "Deserialize(data,object);\n";
+		}
+		o << "	}\n";
+	}
 void serializer::Serialize(
 		const std::vector<std::unique_ptr<TypeBase>>& types,
 		const Options& options)
@@ -124,40 +136,43 @@ void serializer::Serialize(
 		out_cpp = fout_cpp.get();
 	}
 	BeginHeader(*out_hpp, options, types);
+	std::vector<Class*> serializeables;
 	for (const auto& type : types)
 	{
 		switch (type->GetType())
 		{
-		case TypeBase::Type::Enum:
-			SerializeEnumHeader(*out_hpp, static_cast<const Enum&>(*type));
-			break;
-		case TypeBase::Type::Function:
-			SerializeFunctionHeader(*out_hpp, static_cast<const Function&>(*type));
-			break;
+		//case TypeBase::Type::Enum:
+		//	SerializeEnumHeader(*out_hpp, static_cast<const Enum&>(*type));
+		//	break;
+		//case TypeBase::Type::Function:
+		//	SerializeFunctionHeader(*out_hpp, static_cast<const Function&>(*type));
+		//	break;
 		case TypeBase::Type::Class:
-			SerializeClassHeader(*out_hpp, static_cast<const Class&>(*type));
+			serializeables.push_back(static_cast<Class*>(&(*type)));
+			//SerializeClassHeader(*out_hpp, static_cast<const Class&>(*type));
 			break;
 		}
 		*out_hpp << "\n\n";
 	}
-	EndHeader(*out_hpp, options);
-
-	BeginSources(*out_cpp, options);
-	for (const auto& type : types)
-	{
-		switch (type->GetType())
-		{
-		case TypeBase::Type::Enum:
-			SerializeEnumSources(*out_cpp, static_cast<const Enum&>(*type));
-			break;
-		case TypeBase::Type::Function:
-			SerializeFunctionSources(*out_cpp, static_cast<const Function&>(*type));
-			break;
-		case TypeBase::Type::Class:
-			SerializeClassSources(*out_cpp, static_cast<const Class&>(*type));
-			break;
-		}
-		*out_cpp << "\n\n";
-	}
+	Deserialize(*out_hpp, serializeables);
+	//EndHeader(*out_hpp, options);
+	//
+	//BeginSources(*out_cpp, options);
+	//for (const auto& type : types)
+	//{
+	//	switch (type->GetType())
+	//	{
+	//	case TypeBase::Type::Enum:
+	//		SerializeEnumSources(*out_cpp, static_cast<const Enum&>(*type));
+	//		break;
+	//	case TypeBase::Type::Function:
+	//		SerializeFunctionSources(*out_cpp, static_cast<const Function&>(*type));
+	//		break;
+	//	case TypeBase::Type::Class:
+	//		SerializeClassSources(*out_cpp, static_cast<const Class&>(*type));
+	//		break;
+	//	}
+	//	*out_cpp << "\n\n";
+	//}
 	EndSources(*out_cpp);
 }

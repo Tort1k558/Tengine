@@ -135,12 +135,16 @@ Class parser::GetClass(CXCursor cursor)
 	for (unsigned int i = 0; i < numTokens; ++i) {
 		CXString tokenString = clang_getTokenSpelling(clang_Cursor_getTranslationUnit(cursor), tokens[i]);
 		str += clang_getCString(tokenString);
+		str += " ";
 	}
 	if (str.find("TRACEABLE") != str.npos)
 	{
 		c.Traceable = true;
 	}
-
-	clang_visitChildren(cursor, VisitClass, &c);
+	if (str.find("static void Deserialize") != str.npos)
+	{
+		c.Serializeable = true;
+	}
+	//clang_visitChildren(cursor, VisitClass, &c);
 	return c;
 }

@@ -84,6 +84,7 @@ namespace reflang
 		FieldList StaticFields;
 
 		bool Traceable = false;
+		bool Serializeable = false;
 	};
 }
 

@@ -127,3 +127,43 @@ void Mesh::serialize(nlohmann::json& data)
 	}
 }
 
+void Mesh::Deserialize(nlohmann::json& data, std::shared_ptr<Object> object)
+{
+	if (data.contains("mesh"))
+	{
+		std::shared_ptr<Mesh> mesh;
+		if (data["mesh"].contains("path"))
+		{
+			std::string path = data["mesh"]["path"];
+			if (path == "Primitive::Quad")
+			{
+				mesh = Primitives::CreateQuad();
+			}
+			else if (path == "Primitive::Cube")
+			{
+				mesh = Primitives::CreateCube();
+			}
+			else if (path.find("Primitive::Sphere::") != std::string::npos)
+			{
+				size_t sectorsPos = path.find("::Sectors::");
+				size_t stacksPos = path.rfind("::Stacks::");
+
+				int sectors;
+				int stacks;
+
+				if (sectorsPos == std::string::npos || stacksPos == std::string::npos || sectorsPos == stacksPos) {
+					sectors = 1;
+					stacks = 1;
+				}
+				sectors = std::stoi(path.substr(sectorsPos + 11, stacksPos - sectorsPos - 11));
+				stacks = std::stoi(path.substr(stacksPos + 10));
+				mesh = Primitives::CreateSphere(sectors, stacks);
+			}
+			else
+			{
+				mesh = AssetManager::LoadMesh(path);
+			}
+		}
+		object->addComponent<Mesh>(mesh);
+	}
+}
