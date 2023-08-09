@@ -7,6 +7,7 @@ set(PROJECT_NAME_EDITOR TengineEditor)
 
 set(DIRS_SRC_EDITOR 
 	"src/*.h" "src/*.cpp" 
+	"src/Scripts/*.h" "src/Scripts/*.cpp" 
 	)
 file(GLOB TARGET_SRC_EDITOR ${DIRS_SRC_EDITOR})
 

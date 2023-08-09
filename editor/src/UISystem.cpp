@@ -12,7 +12,7 @@
 #include"Scene/SceneManager.h"
 #include"Scene/SceneSerializer.h"
 #include"Core/AssetManager.h"
-
+#include"Scripts/CodeGenerator.h"
 using namespace Tengine;
 
 void UISystem::init()
@@ -127,6 +127,14 @@ void UISystem::update()
             if (ImGui::MenuItem("Create Scene")) {
                 SceneManager::SetCurrentScene(Scene::Create());
                 nameOfSelectedObject.clear();
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Script"))
+        {
+            if (ImGui::MenuItem("Update scripts"))
+            {
+                CodeGenerator::UpdateScripts();
             }
             ImGui::EndMenu();
         }

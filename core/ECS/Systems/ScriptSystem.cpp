@@ -23,26 +23,36 @@ namespace Tengine
 
 	void ScriptSystem::destroy()
 	{
-		m_startScripts = nullptr;
-		m_updateScripts = nullptr;
-
-		if (!FreeLibrary(m_dllHandle))
-		{
-			DWORD errorCode = GetLastError();
-			Logger::Critical("ERROR::ScriptSystem::Could not free script dll: {0}", errorCode);
-			return;
-		}
+		freeModule();
 	}
-
+	
 	void ScriptSystem::reload()
 	{
-		m_dllHandle = LoadLibrary("scriptSystem.dll");
+		m_dllHandle = LoadLibrary("scriptModule.dll");
 		if (m_dllHandle == nullptr) {
-			Logger::Critical("ERROR::ScriptSystem::Could not load script dll: scriptSystem.dll");
+			Logger::Critical("ERROR::ScriptSystem::Could not load script dll: scriptModule.dll");
 			return;
 		}
-		m_startScripts = (StartScriptsFn)tryLoadFunction(m_dllHandle, "startScripts");
-		m_updateScripts = (UpdateScriptsFn)tryLoadFunction(m_dllHandle, "updateScripts");
+		m_startScripts = (StartScriptsFn)tryLoadFunction(m_dllHandle, "StartScripts");
+		m_updateScripts = (UpdateScriptsFn)tryLoadFunction(m_dllHandle, "UpdateScripts");
+		m_isLoaded = true;
+	}
+
+	void ScriptSystem::freeModule()
+	{
+		if (m_isLoaded)
+		{
+			m_startScripts = nullptr;
+			m_updateScripts = nullptr;
+
+			if (!FreeLibrary(m_dllHandle))
+			{
+				DWORD errorCode = GetLastError();
+				Logger::Critical("ERROR::ScriptSystem::Could not free script dll: {0}", errorCode);
+				return;
+			}
+			m_isLoaded = false;
+		}
 	}
 
 	FARPROC __stdcall ScriptSystem::tryLoadFunction(HMODULE module, std::string_view functionName)

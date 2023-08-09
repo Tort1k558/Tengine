@@ -16,10 +16,12 @@ namespace Tengine
 		void update() final;
 		void destroy() final;
 		void reload();
+		void freeModule();
 	private:
 		FARPROC __stdcall tryLoadFunction(HMODULE module, std::string_view functionName);
 		StartScriptsFn m_startScripts = nullptr;
 		UpdateScriptsFn m_updateScripts = nullptr;
 		HMODULE m_dllHandle = nullptr;
+		bool m_isLoaded = false;
 	};
 }
