@@ -4,20 +4,23 @@
 #include"OpenGL/VertexBufferOpenGL.h"
 #include"Core/Logger.h"
 
-void VertexBuffer::setLayout(BufferLayout layout)
+namespace Tengine
 {
-	m_layout = layout;
-}
-
-std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int size, BufferUsage usage)
-{
-	switch (System::GetInstance<RendererSystem>()->getRendererType())
+	void VertexBuffer::setLayout(BufferLayout layout)
 	{
-	case RendererType::None:
-		Logger::Critical("ERROR::Renderer not initialized!");
-		return nullptr;
-	case RendererType::OpenGL:
-		return std::make_shared<VertexBufferOpenGL>(vertices, size, usage);
+		m_layout = layout;
 	}
-	return nullptr;
+
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int size, BufferUsage usage)
+	{
+		switch (System::GetInstance<RendererSystem>()->getRendererType())
+		{
+		case RendererType::None:
+			Logger::Critical("ERROR::Renderer not initialized!");
+			return nullptr;
+		case RendererType::OpenGL:
+			return std::make_shared<VertexBufferOpenGL>(vertices, size, usage);
+		}
+		return nullptr;
+	}
 }

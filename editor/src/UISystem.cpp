@@ -13,7 +13,7 @@
 #include"Scene/SceneSerializer.h"
 #include"Core/AssetManager.h"
 
-
+using namespace Tengine;
 
 void UISystem::init()
 {
@@ -39,7 +39,7 @@ void UISystem::init()
     style.GrabMinSize = 5.0f;
     style.GrabRounding = 3.0f;
     style.WindowMenuButtonPosition = ImGuiDir_None;
-    
+
     colors[ImGuiCol_Text] = { 0.80f, 0.80f, 0.83f, 1.00f };
     colors[ImGuiCol_TextDisabled] = { 0.24f, 0.23f, 0.29f, 1.00f };
     colors[ImGuiCol_WindowBg] = { 0.06f, 0.05f, 0.07f, 1.00f };
@@ -105,7 +105,7 @@ void UISystem::update()
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
-    
+
     static int currentItem = 0;
     static std::string nameOfSelectedObject;
 
@@ -115,7 +115,7 @@ void UISystem::update()
             {
                 SceneSerializer::Serialize(SceneManager::GetCurrentScene());
             }
-            if (ImGui::MenuItem("Load Scene")) 
+            if (ImGui::MenuItem("Load Scene"))
             {
                 nfdchar_t* outPath = nullptr;
                 nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
@@ -149,7 +149,7 @@ void UISystem::update()
         objectNames.push_back(object->getName());
     }
     std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
-    
+
     if (ImGui::ListBox("##", &currentItem, [](void* data, int idx, const char** out_text) {
         auto& items = *static_cast<std::vector<std::string>*>(data);
         if (idx < 0 || idx >= static_cast<int>(items.size())) {
@@ -179,7 +179,7 @@ void UISystem::update()
 
     //Components
     ImGui::Begin("Components", nullptr);
-    if (!nameOfSelectedObject.empty() )
+    if (!nameOfSelectedObject.empty())
     {
         std::shared_ptr<Object> object = SceneManager::GetCurrentScene()->getObjectByName(nameOfSelectedObject);
         std::vector<std::shared_ptr<Component>> components = object->getComponents();
@@ -329,7 +329,7 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
         ImGui::Text(image->name.c_str());
         if (image->texture)
         {
-            ImGui::Image(reinterpret_cast<void*>(image->texture->getId()),{image->size.x,image->size.y});
+            ImGui::Image(reinterpret_cast<void*>(image->texture->getId()), { image->size.x,image->size.y });
         }
         else
         {
@@ -361,7 +361,7 @@ void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
     case DisplayTypeElement::FileDialog:
     {
         std::shared_ptr<DisplayInfoElementFileDialog> fileDialog = std::dynamic_pointer_cast<DisplayInfoElementFileDialog>(element);
-        
+
         if (ImGui::Button(fileDialog->name.c_str()))
         {
             nfdchar_t* outPath = nullptr;

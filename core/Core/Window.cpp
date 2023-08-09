@@ -4,169 +4,172 @@
 #include"Core/Logger.h"
 #include"Input.h"
 
-Window::Window(unsigned int width, unsigned int height, std::string title) :
-	m_size(width,height), m_title(title), m_window(nullptr)
+namespace Tengine
 {
-
-}
-
-Window::~Window()
-{
-	glfwDestroyWindow(m_window);
-	glfwTerminate();
-}
-
-void Window::init()
-{
-	Logger::Info("Creating a window named {0} size {1}x{2}", m_title, m_size.x, m_size.y);
-
-	if (!glfwInit())
+	Window::Window(unsigned int width, unsigned int height, std::string title) :
+		m_size(width, height), m_title(title), m_window(nullptr)
 	{
-		Logger::Critical("ERROR::GLFW::Failed to load glfw!");
-		return;
+
 	}
 
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-	m_window = glfwCreateWindow(m_size.x, m_size.y, m_title.c_str(), nullptr, nullptr);
-	if (!m_window)
+	Window::~Window()
 	{
-		Logger::Critical("ERROR::GLFW::Failed to create a window!");
-		return;
+		glfwDestroyWindow(m_window);
+		glfwTerminate();
 	}
 
-	glfwMakeContextCurrent(m_window);
+	void Window::init()
+	{
+		Logger::Info("Creating a window named {0} size {1}x{2}", m_title, m_size.x, m_size.y);
 
-	glfwSetErrorCallback([](int error_code, const char* description) 
+		if (!glfwInit())
 		{
-			Logger::Critical("ERROR::GLFW::{0}",description);
-		});
-	glfwSetWindowUserPointer(m_window, this);
-	glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double x, double y)
-		{
-			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			EventMouseMoved event(x, y);
-			window.getEventCallback()(event);
-		});
-	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods)
-		{
-			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+			Logger::Critical("ERROR::GLFW::Failed to load glfw!");
+			return;
+		}
 
-			double x, y;
-			glfwGetCursorPos(glfwWindow, &x, &y);
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+		m_window = glfwCreateWindow(m_size.x, m_size.y, m_title.c_str(), nullptr, nullptr);
+		if (!m_window)
+		{
+			Logger::Critical("ERROR::GLFW::Failed to create a window!");
+			return;
+		}
 
-			switch (action)
+		glfwMakeContextCurrent(m_window);
+
+		glfwSetErrorCallback([](int error_code, const char* description)
 			{
-			case GLFW_PRESS:
+				Logger::Critical("ERROR::GLFW::{0}", description);
+			});
+		glfwSetWindowUserPointer(m_window, this);
+		glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double x, double y)
 			{
-				EventMouseButtonPressed event(static_cast<MouseButton>(button), x, y);
+				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+				EventMouseMoved event(x, y);
 				window.getEventCallback()(event);
-				break;
-			}
-			case GLFW_RELEASE:
+			});
+		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods)
 			{
-				EventMouseButtonReleased event(static_cast<MouseButton>(button), x, y);
+				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+
+				double x, y;
+				glfwGetCursorPos(glfwWindow, &x, &y);
+
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					EventMouseButtonPressed event(static_cast<MouseButton>(button), x, y);
+					window.getEventCallback()(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					EventMouseButtonReleased event(static_cast<MouseButton>(button), x, y);
+					window.getEventCallback()(event);
+					break;
+				}
+				}
+			});
+		glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+			{
+				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					EventKeyPressed event(static_cast<KeyCode>(key));
+					window.getEventCallback()(event);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					EventKeyPressed event(static_cast<KeyCode>(key), true);
+					window.getEventCallback()(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					EventKeyReleased event(static_cast<KeyCode>(key));
+					window.getEventCallback()(event);
+					break;
+				}
+				}
+			});
+		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* glfwWindow)
+			{
+				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+				EventWindowClose event;
 				window.getEventCallback()(event);
-				break;
-			}
-			}
-		});
-	glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
-		{
-			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			switch (action)
+			});
+		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 			{
-			case GLFW_PRESS:
-			{
-				EventKeyPressed event(static_cast<KeyCode>(key));
+				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+
+				EventWindowResize event(width, height);
 				window.getEventCallback()(event);
-				break;
-			}
-			case GLFW_REPEAT:
+			});
+		glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 			{
-				EventKeyPressed event(static_cast<KeyCode>(key),true);
-				window.getEventCallback()(event);
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				EventKeyReleased event(static_cast<KeyCode>(key));
-				window.getEventCallback()(event);
-				break;
-			}
-			}
-		});
-	glfwSetWindowCloseCallback(m_window, [](GLFWwindow* glfwWindow)
-		{
-			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			EventWindowClose event;
-			window.getEventCallback()(event);
-		});
-	glfwSetWindowSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
-		{
-			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			
-			EventWindowResize event(width, height);
-			window.getEventCallback()(event);
-		});
-	glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
-		{
-			Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-			System::GetInstance<RendererSystem>()->updateViewport({ width, height });
-			window.setWidth(width);
-			window.setHeight(height);
-		});
+				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
+				System::GetInstance<RendererSystem>()->updateViewport({ width, height });
+				window.setWidth(width);
+				window.setHeight(height);
+			});
 
-	//glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-}
+		//glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
 
-void Window::update()
-{
-	glfwPollEvents();
-	glfwSwapBuffers(m_window);
-}
+	void Window::update()
+	{
+		glfwPollEvents();
+		glfwSwapBuffers(m_window);
+	}
 
-void Window::setEventCallback(std::function<void(Event&)> callback)
-{
-	m_eventCallback = callback;
-}
+	void Window::setEventCallback(std::function<void(Event&)> callback)
+	{
+		m_eventCallback = callback;
+	}
 
-std::function<void(Event&)> Window::getEventCallback() const
-{
-	return m_eventCallback;
-}
+	std::function<void(Event&)> Window::getEventCallback() const
+	{
+		return m_eventCallback;
+	}
 
-UVec2 Window::getSize() const
-{
-	return m_size;
-}
+	UVec2 Window::getSize() const
+	{
+		return m_size;
+	}
 
-unsigned int Window::getWidth() const
-{
-	return m_size.x;
-}
+	unsigned int Window::getWidth() const
+	{
+		return m_size.x;
+	}
 
-unsigned int Window::getHeight() const
-{
-	return m_size.y;
-}
+	unsigned int Window::getHeight() const
+	{
+		return m_size.y;
+	}
 
-GLFWwindow* Window::getWindow() const
-{
-	return m_window;
-}
+	GLFWwindow* Window::getWindow() const
+	{
+		return m_window;
+	}
 
-void Window::setCursorPos(UVec2 pos)
-{
-	glfwSetCursorPos(m_window, pos.x, pos.y);
-	Input::SetMousePosition(pos);
-}
+	void Window::setCursorPos(UVec2 pos)
+	{
+		glfwSetCursorPos(m_window, pos.x, pos.y);
+		Input::SetMousePosition(pos);
+	}
 
-void Window::setWidth(unsigned int width)
-{
-	m_size.x = width;
-}
+	void Window::setWidth(unsigned int width)
+	{
+		m_size.x = width;
+	}
 
-void Window::setHeight(unsigned int height)
-{
-	m_size.y = height;
+	void Window::setHeight(unsigned int height)
+	{
+		m_size.y = height;
+	}
 }

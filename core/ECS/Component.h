@@ -11,28 +11,30 @@
 #include"ECS/Object.h"
 #include"Utils/EditorElements/DisplayInfo.h"
 
-class Object;
-
-class Component
+namespace Tengine
 {
-public:
-	virtual ~Component() = default;
+	class Object;
 
-	void setParent(std::shared_ptr<Object> parent);
-	std::shared_ptr<Object> getParent() const;
+	class Component
+	{
+	public:
+		virtual ~Component() = default;
 
-	template<typename T, typename... Args>
-	static std::shared_ptr<T> Create(Args... args);
+		void setParent(std::shared_ptr<Object> parent);
+		std::shared_ptr<Object> getParent() const;
 
-	virtual DisplayInfo getDisplayInfo() { return DisplayInfo(); }
-	virtual void serialize(nlohmann::json& data) {}
-	virtual void deserialize(nlohmann::json& data,std::shared_ptr<Object> object) {}
-private:
-	std::weak_ptr<Object> m_parent;
-};
+		template<typename T, typename... Args>
+		static std::shared_ptr<T> Create(Args... args);
 
-template<typename T, typename ...Args>
-inline std::shared_ptr<T> Component::Create(Args ...args)
-{
-	return std::make_shared<T>(args...);
+		virtual DisplayInfo getDisplayInfo() { return DisplayInfo(); }
+		virtual void serialize(nlohmann::json& data) {}
+	private:
+		std::weak_ptr<Object> m_parent;
+	};
+
+	template<typename T, typename ...Args>
+	inline std::shared_ptr<T> Component::Create(Args ...args)
+	{
+		return std::make_shared<T>(args...);
+	}
 }

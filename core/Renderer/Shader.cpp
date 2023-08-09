@@ -4,16 +4,19 @@
 #include"OpenGL/ShaderOpenGL.h"
 #include"Core/Logger.h"
 
-
-std::shared_ptr<Shader> Shader::Create()
+namespace Tengine
 {
-	switch (System::GetInstance<RendererSystem>()->getRendererType())
+
+	std::shared_ptr<Shader> Shader::Create()
 	{
-	case RendererType::None:
-		Logger::Critical("ERROR::Renderer not initialized!");
+		switch (System::GetInstance<RendererSystem>()->getRendererType())
+		{
+		case RendererType::None:
+			Logger::Critical("ERROR::Renderer not initialized!");
+			return nullptr;
+		case RendererType::OpenGL:
+			return std::make_shared<ShaderOpenGL>();
+		}
 		return nullptr;
-	case RendererType::OpenGL:
-		return std::make_shared<ShaderOpenGL>();
 	}
-	return nullptr;
 }

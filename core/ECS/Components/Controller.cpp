@@ -1,21 +1,24 @@
 #include "Controller.h"
-
-void Controller::addKeyCallback(KeyCode code, std::function<void(std::shared_ptr<Object>)> callback)
+namespace Tengine
 {
-	m_keyCallbacks.push_back({ code,callback });
-}
 
-void Controller::setMouseMoveCallback(std::function<void(std::shared_ptr<Object>)> callback)
-{
-	m_mouseMoveCallback = callback;
-}
+	void Controller::addKeyCallback(KeyCode code, std::function<void(std::shared_ptr<Object>)> callback)
+	{
+		m_keyCallbacks.push_back({ code,callback });
+	}
 
-std::vector<std::pair<KeyCode, std::function<void(std::shared_ptr<Object>)>>> Controller::getKeyCallbacks() const
-{
-	return m_keyCallbacks;
-}
+	void Controller::setMouseMoveCallback(std::function<void(std::shared_ptr<Object>)> callback)
+	{
+		m_mouseMoveCallback = callback;
+	}
 
-std::function<void(std::shared_ptr<Object>)> Controller::getMouseMoveCallback() const
-{
-	return m_mouseMoveCallback;
+	std::vector<std::pair<KeyCode, std::function<void(std::shared_ptr<Object>)>>> Controller::getKeyCallbacks() const
+	{
+		return m_keyCallbacks;
+	}
+
+	std::function<void(std::shared_ptr<Object>)> Controller::getMouseMoveCallback() const
+	{
+		return m_mouseMoveCallback;
+	}
 }

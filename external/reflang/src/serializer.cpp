@@ -46,7 +46,8 @@ namespace
 		o << R"(#include <string>
 #include<memory>
 #include<nlohmann/json.hpp>
-class Object;
+
+class Tengine::Object;
 
 )";
 		o << options.include_path << "\n";
@@ -106,7 +107,7 @@ namespace reflang
 	}
 	void Deserialize(ostream& o,std::vector<Class*>& serializeables)
 	{
-		o << "	void Deserialize(nlohmann::json data, std::shared_ptr<::Object> object)\n";
+		o << "	void Deserialize(nlohmann::json data, std::shared_ptr<Tengine::Object> object)\n";
 		o << "	{\n";
 		for (size_t i = 0; i < serializeables.size(); i++)
 		{

@@ -4,15 +4,19 @@
 #include"Renderer/OpenGL/VertexArrayOpenGL.h"
 #include"Core/Logger.h"
 
-std::shared_ptr<VertexArray> VertexArray::Create()
+namespace Tengine
 {
-	switch (System::GetInstance<RendererSystem>()->getRendererType())
+
+	std::shared_ptr<VertexArray> VertexArray::Create()
 	{
-	case RendererType::None:
-		Logger::Critical("ERROR::Renderer not initialized!");
+		switch (System::GetInstance<RendererSystem>()->getRendererType())
+		{
+		case RendererType::None:
+			Logger::Critical("ERROR::Renderer not initialized!");
+			return nullptr;
+		case RendererType::OpenGL:
+			return std::make_shared<VertexArrayOpenGL>();
+		}
 		return nullptr;
-	case RendererType::OpenGL:
-		return std::make_shared<VertexArrayOpenGL>();
 	}
-	return nullptr;
 }

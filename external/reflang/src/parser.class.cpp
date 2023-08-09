@@ -145,6 +145,7 @@ Class parser::GetClass(CXCursor cursor)
 	{
 		c.Serializeable = true;
 	}
+	std::cout << str << std::endl;
 	//clang_visitChildren(cursor, VisitClass, &c);
 	return c;
 }

@@ -4,32 +4,35 @@
 #include"Scene/SceneManager.h"
 #include"Core/Input.h"
 
-void ControllerSystem::init()
+namespace Tengine
 {
-}
-
-void ControllerSystem::update()
-{
-	std::vector<std::shared_ptr<Controller>> controllers = SceneManager::GetCurrentScene()->getComponents<Controller>();
-	for (auto& controller : controllers)
+	void ControllerSystem::init()
 	{
-		auto callbacks = controller->getKeyCallbacks();
-		std::shared_ptr<Object> parent = controller->getParent();
-		for (auto& callback : callbacks)
+	}
+
+	void ControllerSystem::update()
+	{
+		std::vector<std::shared_ptr<Controller>> controllers = SceneManager::GetCurrentScene()->getComponents<Controller>();
+		for (auto& controller : controllers)
 		{
-			if (Input::IsKeyPressed(callback.first))
+			auto callbacks = controller->getKeyCallbacks();
+			std::shared_ptr<Object> parent = controller->getParent();
+			for (auto& callback : callbacks)
 			{
-				callback.second(parent);
+				if (Input::IsKeyPressed(callback.first))
+				{
+					callback.second(parent);
+				}
+			}
+			auto mouseCallback = controller->getMouseMoveCallback();
+			if (mouseCallback)
+			{
+				mouseCallback(parent);
 			}
 		}
-		auto mouseCallback = controller->getMouseMoveCallback();
-		if (mouseCallback)
-		{
-			mouseCallback(parent);
-		}
 	}
-}
 
-void ControllerSystem::destroy()
-{
+	void ControllerSystem::destroy()
+	{
+	}
 }

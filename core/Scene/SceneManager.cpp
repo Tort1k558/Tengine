@@ -1,8 +1,12 @@
 #include "SceneManager.h"
 
-std::shared_ptr<Scene> SceneManager::m_currentScene;
-
-void SceneManager::SetCurrentScene(std::shared_ptr<Scene> scene)
+namespace Tengine
 {
-	m_currentScene = scene;
+
+	std::shared_ptr<Scene> SceneManager::m_currentScene;
+
+	void SceneManager::SetCurrentScene(std::shared_ptr<Scene> scene)
+	{
+		m_currentScene = scene;
+	}
 }

@@ -2,23 +2,26 @@
 
 #include<chrono>
 
-class Timer
+namespace Tengine
 {
-public:
-	Timer() = delete;
-	Timer(const Timer&) = delete;
-	Timer(Timer&&) = delete;
-	Timer& operator=(const Timer&) = delete;
-	Timer& operator=(Timer&&) = delete;
+	class Timer
+	{
+	public:
+		Timer() = delete;
+		Timer(const Timer&) = delete;
+		Timer(Timer&&) = delete;
+		Timer& operator=(const Timer&) = delete;
+		Timer& operator=(Timer&&) = delete;
 
-	static void Start();
-	static void End();
-	static std::chrono::high_resolution_clock::time_point GetStartPoint() { return m_startTime; };
-	static std::chrono::high_resolution_clock::time_point GetNowPoint();
-	static double GetDeltaTime();
-	static double GetDifferenceBetweenPoints(std::chrono::high_resolution_clock::time_point point1, std::chrono::high_resolution_clock::time_point point2);
-	static void SetDeltaTime(double delta);
-private:
-	static std::chrono::high_resolution_clock::time_point m_startTime;
-	static double m_delta;
-};
+		static void Start();
+		static void End();
+		static std::chrono::high_resolution_clock::time_point GetStartPoint() { return m_startTime; };
+		static std::chrono::high_resolution_clock::time_point GetNowPoint();
+		static double GetDeltaTime();
+		static double GetDifferenceBetweenPoints(std::chrono::high_resolution_clock::time_point point1, std::chrono::high_resolution_clock::time_point point2);
+		static void SetDeltaTime(double delta);
+	private:
+		static std::chrono::high_resolution_clock::time_point m_startTime;
+		static double m_delta;
+	};
+}

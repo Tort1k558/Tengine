@@ -1,74 +1,78 @@
 #include "Scene.h"
 
-Scene::Scene()
+namespace Tengine
 {
-	static size_t counter = 0;
-	m_name = "Scene" + std::to_string(counter);
-}
-std::string Scene::getName() const
-{
-	return m_name;
-}
 
-std::shared_ptr<Scene> Scene::Create()
-{
-	return std::make_shared<Scene>();
-}
-
-void Scene::addObject(std::shared_ptr<Object> object)
-{
-	m_objects[object->getId()] = object;
-}
-
-void Scene::removeObjectByUUID(UUID id)
-{
-	m_objects.erase(id);
-}
-
-void Scene::removeObjectByName(std::string_view name)
-{
-	for (const auto& object : m_objects)
+	Scene::Scene()
 	{
-		if (object.second->getName() == name)
+		static size_t counter = 0;
+		m_name = "Scene" + std::to_string(counter);
+	}
+	std::string Scene::getName() const
+	{
+		return m_name;
+	}
+
+	std::shared_ptr<Scene> Scene::Create()
+	{
+		return std::make_shared<Scene>();
+	}
+
+	void Scene::addObject(std::shared_ptr<Object> object)
+	{
+		m_objects[object->getId()] = object;
+	}
+
+	void Scene::removeObjectByUUID(UUID id)
+	{
+		m_objects.erase(id);
+	}
+
+	void Scene::removeObjectByName(std::string_view name)
+	{
+		for (const auto& object : m_objects)
 		{
-			removeObjectByUUID(object.second->getId());
-			return;
+			if (object.second->getName() == name)
+			{
+				removeObjectByUUID(object.second->getId());
+				return;
+			}
 		}
 	}
-}
 
-void Scene::setName(std::string_view name)
-{
-	m_name = name;
-}
-
-std::shared_ptr<Object> Scene::getObjectByUUID(UUID id) const
-{
-	if (m_objects.find(id) != m_objects.end())
+	void Scene::setName(std::string_view name)
 	{
-		return m_objects.at(id);
+		m_name = name;
 	}
-	return nullptr;
-}
 
-std::shared_ptr<Object> Scene::getObjectByName(std::string_view name) const
-{
-	for (const auto& object : m_objects)
+	std::shared_ptr<Object> Scene::getObjectByUUID(UUID id) const
 	{
-		if (object.second->getName() == name)
+		if (m_objects.find(id) != m_objects.end())
 		{
-			return object.second;
+			return m_objects.at(id);
 		}
+		return nullptr;
 	}
-	return nullptr;
-}
 
-std::vector<std::shared_ptr<Object>> Scene::getAllObjects() const
-{
-	std::vector<std::shared_ptr<Object>> objects;
-	for (const auto& object : m_objects)
+	std::shared_ptr<Object> Scene::getObjectByName(std::string_view name) const
 	{
-		objects.push_back(object.second);
+		for (const auto& object : m_objects)
+		{
+			if (object.second->getName() == name)
+			{
+				return object.second;
+			}
+		}
+		return nullptr;
 	}
-	return objects;
+
+	std::vector<std::shared_ptr<Object>> Scene::getAllObjects() const
+	{
+		std::vector<std::shared_ptr<Object>> objects;
+		for (const auto& object : m_objects)
+		{
+			objects.push_back(object.second);
+		}
+		return objects;
+	}
 }

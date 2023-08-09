@@ -6,38 +6,41 @@
 #include"Core/Math.h"
 #include"Core/AssetManager.h"
 
-class Resource;
-
-enum class TextureType
+namespace Tengine
 {
-	R8,
-	RG8,
-	RGB8,
-	RGBA8,
-};
+	class Resource;
 
-enum class TextureFilter
-{
-	Bilinear,
-	Trilinear,
-	Anisotropic4,
-	Anisotropic8,
-	Anisotropic16
-};
+	enum class TextureType
+	{
+		R8,
+		RG8,
+		RGB8,
+		RGBA8,
+	};
 
-class Texture : public Resource
-{
-public:
-	virtual ~Texture() = default;
+	enum class TextureFilter
+	{
+		Bilinear,
+		Trilinear,
+		Anisotropic4,
+		Anisotropic8,
+		Anisotropic16
+	};
 
-	virtual void bind(unsigned int slot) = 0;
+	class Texture : public Resource
+	{
+	public:
+		virtual ~Texture() = default;
 
-	UVec2 getSize();
-	void* getData();
-	virtual unsigned int getId() = 0;
-	static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type);
+		virtual void bind(unsigned int slot) = 0;
 
-protected:
-	UVec2 m_size;
-	void* m_data;
-};
+		UVec2 getSize();
+		void* getData();
+		virtual unsigned int getId() = 0;
+		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type);
+
+	protected:
+		UVec2 m_size;
+		void* m_data;
+	};
+}
