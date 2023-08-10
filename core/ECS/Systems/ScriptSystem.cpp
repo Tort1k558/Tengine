@@ -28,7 +28,7 @@ namespace Tengine
 	
 	void ScriptSystem::reload()
 	{
-		m_dllHandle = LoadLibrary("scriptModule.dll");
+		m_dllHandle = LoadLibrary("Scripts/scriptModule.dll");
 		if (m_dllHandle == nullptr) {
 			Logger::Critical("ERROR::ScriptSystem::Could not load script dll: scriptModule.dll");
 			return;

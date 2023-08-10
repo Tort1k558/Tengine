@@ -10,14 +10,16 @@ namespace Tengine
 {
     void CodeGenerator::UpdateScripts()
     {
+        std::filesystem::create_directory("Scripts");
         GenerateInitFiles();
         GeneratePremake();
+        System::GetInstance<ScriptSystem>()->freeModule();
+        BuildDll();
         System::GetInstance<ScriptSystem>()->reload();
-        BuildPremake();
     }
-    void CodeGenerator::BuildPremake()
+    void CodeGenerator::BuildDll()
     {
-
+        std::system("cmake --build Scripts --config Release");
     }
     void CodeGenerator::GenerateInitFiles()
     {
@@ -57,7 +59,7 @@ void StartScripts()
 
 void UpdateScripts()
 {
-    
+    Tengine::Logger::Info("Hello from ScriptModule: Start Function");
 }
 )";
             initSourceFile.close();
@@ -69,28 +71,41 @@ void UpdateScripts()
     }
     void CodeGenerator::GeneratePremake()
 	{
-		std::ofstream premakeFile("premakeScriptModule.lua");
-        if (premakeFile.is_open()) {
-            premakeFile <<
-R"(workspace "Script"
-    configurations { "Debug", "Release" }
-    platforms { "x64" }
+		std::ofstream cmakeFile("Scripts/CMakeLists.txt");
+        if (cmakeFile.is_open()) {
+            cmakeFile <<
+R"(cmake_minimum_required(VERSION 3.2)
 
-project "ScriptModule"
-    kind "SharedLib"
-    language "C++"
-    targetdir ""
-    files { "scripts/**.cpp" , "scripts/**.h" }
-    includedirs { 
-        "../../Core",
-        "../../external/spdlog/include" 
-}
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(PROJECT_NAME ScriptModule)
+
+project(${PROJECT_NAME})
+
+set(DIRS_SRC_MODULE 
+	"*.h" "*.cpp" 
+	)
+file(GLOB TARGET_SRC_MODULE ${DIRS_SRC_MODULE})
+
+include_directories(../../../core)
+include_directories(../../../external/spdlog/include)
+
+
+add_library(${PROJECT_NAME} SHARED ${TARGET_SRC_MODULE})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_BINARY_DIR}/Release/ScriptModule.dll
+        ${CMAKE_SOURCE_DIR}/scriptModule.dll
+)
+
 )";
-            premakeFile.close();
+            cmakeFile.close();
         }
         else {
             Logger::Critical("ERROR::CodeGenerator::Error creating Premake file");
         }
-        std::system("premake5 --file=premakeScriptModule.lua vs2022");
+        std::system("cmake -S Scripts -B Scripts");
 	}
 }
