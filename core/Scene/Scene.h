@@ -10,7 +10,7 @@ namespace Tengine
 
 	class Object;
 
-	class Scene
+	class TENGINE Scene
 	{
 	public:
 		Scene();

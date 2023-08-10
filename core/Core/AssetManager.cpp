@@ -5,10 +5,15 @@
 
 #include<stb_image.h>
 
+#include<assimp/Importer.hpp>
+#include<assimp/scene.h>
+#include<assimp/postprocess.h>
+
 #include"Core/Logger.h"
 #include"Renderer/Shader.h"
 #include"Renderer/Texture.h"
 #include"ECS/Components/Mesh.h"
+
 namespace Tengine
 {
     std::unordered_map<std::filesystem::path, std::shared_ptr<Resource>> AssetManager::m_resources;

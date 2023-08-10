@@ -2,13 +2,23 @@
 
 namespace Tengine
 {
-	std::unordered_map<size_t, std::shared_ptr<System>> SystemManager::m_systems;
+	std::vector<std::shared_ptr<System>> SystemManager::m_systems;
+
+	void SystemManager::AddSystem(std::shared_ptr<System> system)
+	{
+		m_systems.push_back(system);
+	}
+
+	void SystemManager::RemoveSystem(std::shared_ptr<System> system)
+	{
+		//TODO
+	}
 
 	void SystemManager::InitSystems()
 	{
 		for (auto& system : m_systems)
 		{
-			system.second->init();
+			system->init();
 		}
 	}
 
@@ -16,7 +26,7 @@ namespace Tengine
 	{
 		for (auto& system : m_systems)
 		{
-			system.second->update();
+			system->update();
 		}
 	}
 
@@ -24,7 +34,7 @@ namespace Tengine
 	{
 		for (auto& system : m_systems)
 		{
-			system.second->destroy();
+			system->destroy();
 		}
 	}
 }

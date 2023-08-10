@@ -8,6 +8,8 @@
 
 namespace Tengine
 {
+    std::unordered_set<std::filesystem::path> CodeGenerator::m_pathsToScripts;
+
     void CodeGenerator::UpdateScripts()
     {
         std::filesystem::create_directory("Scripts");
@@ -16,6 +18,10 @@ namespace Tengine
         System::GetInstance<ScriptSystem>()->freeModule();
         BuildDll();
         System::GetInstance<ScriptSystem>()->reload();
+    }
+    void CodeGenerator::AddScript(std::filesystem::path pathToScript)
+    {
+        m_pathsToScripts.insert(pathToScript);
     }
     void CodeGenerator::BuildDll()
     {
@@ -51,15 +57,36 @@ extern "C" EXTERN void UpdateScripts();
                 R"(#include"SystemModule.h"
 
 #include"Core/Logger.h"
+#include"Scene/SceneManager.h"
+#include"ECS/Components/Script.h"
+
+using namespace Tengine;
 
 void StartScripts()
 {
     Tengine::Logger::Info("Hello from ScriptModule: Start Function");
+    std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
+    if(scene)
+    {
+        std::vector<std::shared_ptr<Script>> scripts = scene->getComponents<Script>();
+        for (const auto& script : scripts)
+        {
+            script->start();
+        }
+    }
 }
 
 void UpdateScripts()
 {
-    Tengine::Logger::Info("Hello from ScriptModule: Start Function");
+    std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
+    if(scene)
+    {
+        std::vector<std::shared_ptr<Script>> scripts = scene->getComponents<Script>();
+        for (const auto& script : scripts)
+        {
+            script->update();
+        }
+    }
 }
 )";
             initSourceFile.close();
@@ -90,9 +117,13 @@ file(GLOB TARGET_SRC_MODULE ${DIRS_SRC_MODULE})
 
 include_directories(../../../core)
 include_directories(../../../external/spdlog/include)
+include_directories(../../../external/nlohmann/include)
+include_directories(../../../external/glm)
 
 
 add_library(${PROJECT_NAME} SHARED ${TARGET_SRC_MODULE})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy

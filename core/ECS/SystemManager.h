@@ -6,7 +6,7 @@
 
 namespace Tengine
 {
-	class SystemManager
+	class TENGINE SystemManager
 	{
 	public:
 		SystemManager() = delete;
@@ -15,20 +15,13 @@ namespace Tengine
 		SystemManager& operator=(const SystemManager&) = delete;
 		SystemManager& operator=(SystemManager&&) = delete;
 
-		template<typename T>
-		static void AddSystem()
-		{
-			m_systems[typeid(T).hash_code()] = System::GetInstance<T>();
-		}
-		template<typename T>
-		static void RemoveSystem()
-		{
-			m_systems.erase(typeid(T));
-		}
+		static void AddSystem(std::shared_ptr<System> system);
+		static void RemoveSystem(std::shared_ptr<System> system);
+
 		static void InitSystems();
 		static void UpdateSystems();
 		static void DestroySystems();
 	private:
-		static std::unordered_map<size_t, std::shared_ptr<System>> m_systems;
+		static std::vector<std::shared_ptr<System>> m_systems;
 	};
 }

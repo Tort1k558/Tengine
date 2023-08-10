@@ -16,4 +16,4 @@ add_subdirectory(../external/nfd ${CMAKE_CURRENT_BINARY_DIR}/bin/nfd)
 
 add_executable(${PROJECT_NAME_EDITOR} ${TARGET_SRC_EDITOR} main.cpp)
 
-target_link_libraries(${PROJECT_NAME_EDITOR} TengineCore glm imgui spdlog assimp glfw nfd nlohmann_json)
+target_link_libraries(${PROJECT_NAME_EDITOR} TengineCore glm stbi imgui spdlog assimp glfw nfd nlohmann_json)

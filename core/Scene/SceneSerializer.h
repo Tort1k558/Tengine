@@ -4,11 +4,12 @@
 #include<filesystem>
 
 #include"Scene/Scene.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
 
-	class SceneSerializer
+	class TENGINE SceneSerializer
 	{
 	public:
 		SceneSerializer() = delete;

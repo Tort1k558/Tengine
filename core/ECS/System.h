@@ -2,9 +2,11 @@
 
 #include<memory>
 
+#include"Core/Core.h"
+
 namespace Tengine
 {
-    class System {
+    class TENGINE System {
     public:
         virtual void init() = 0;
         virtual void update() = 0;

@@ -15,6 +15,11 @@ namespace Tengine
 		m_delta = GetDifferenceBetweenPoints(GetNowPoint(), m_startTime);
 	}
 
+	std::chrono::high_resolution_clock::time_point Timer::GetStartPoint()
+	{
+		return m_startTime;
+	}
+
 	std::chrono::high_resolution_clock::time_point Timer::GetNowPoint()
 	{
 		return std::chrono::high_resolution_clock::now();

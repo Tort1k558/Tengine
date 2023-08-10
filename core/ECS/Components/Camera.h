@@ -2,6 +2,7 @@
 
 #include"ECS/Component.h"
 #include"Core/Math.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
@@ -84,7 +85,7 @@ namespace Tengine
 		ZXY,
 		ZYX
 	};
-	class Camera : public Component
+	class TENGINE Camera : public Component
 	{
 	public:
 		Camera();

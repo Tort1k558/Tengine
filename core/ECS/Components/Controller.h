@@ -9,7 +9,7 @@
 namespace Tengine
 {
 
-	class Controller : public Component
+	class TENGINE Controller : public Component
 	{
 	public:
 		Controller() = default;

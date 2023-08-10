@@ -2,11 +2,12 @@
 
 #include<string>
 #include<spdlog/spdlog.h>
+#include"Core/Core.h"
 
 namespace Tengine
 {
 
-	enum class LogLevel
+	enum class TENGINE LogLevel
 	{
 		Off,
 		Debug,
@@ -14,7 +15,7 @@ namespace Tengine
 		Critical
 	};
 
-	class Logger
+	class TENGINE Logger
 	{
 	public:
 		Logger() = delete;

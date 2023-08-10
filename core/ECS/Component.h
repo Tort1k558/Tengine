@@ -14,7 +14,7 @@ namespace Tengine
 {
 	class Object;
 
-	class Component
+	class TENGINE Component
 	{
 	public:
 		virtual ~Component() = default;

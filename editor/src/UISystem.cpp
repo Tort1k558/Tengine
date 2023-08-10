@@ -8,6 +8,7 @@
 #include"Core/Logger.h"
 #include"ECS/Components/Mesh.h"
 #include"ECS/Components/Camera.h"
+#include"ECS/Components/Script.h"
 #include"ECS/Object.h"
 #include"Scene/SceneManager.h"
 #include"Scene/SceneSerializer.h"
@@ -75,6 +76,7 @@ void UISystem::init()
     colors[ImGuiCol_PlotHistogram] = { 0.40f, 0.39f, 0.38f, 0.63f };
     colors[ImGuiCol_PlotHistogramHovered] = { 0.25f, 1.00f, 0.00f, 1.00f };
 
+    glfwInit();
 
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
@@ -212,7 +214,7 @@ void UISystem::update()
 
         if (ImGui::BeginPopup("Select Component"))
         {
-            std::vector<std::string> items = { "Mesh","Camera" };
+            std::vector<std::string> items = { "Mesh", "Camera", "Script"};
             static int selectedItem = 0;
             if (ImGui::BeginCombo("Components", items[selectedItem].c_str()))
             {
@@ -241,6 +243,10 @@ void UISystem::update()
                 {
                     object->addComponent<Camera>(Component::Create<Camera>());
                 }
+                if (selectedItem == 2)
+                {
+                    object->addComponent<Script>(Component::Create<Script>());
+                }
                 ImGui::CloseCurrentPopup();
             }
             ImGui::EndPopup();
@@ -265,6 +271,8 @@ void UISystem::destroy()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    
+    glfwTerminate();
 }
 
 void UISystem::setWindow(std::shared_ptr<Window> window)

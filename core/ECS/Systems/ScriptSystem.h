@@ -4,10 +4,12 @@
 #include<string>
 
 #include"ECS/System.h"
+#include"Scene/SceneManager.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
-	class ScriptSystem : public System
+	class TENGINE ScriptSystem : public System
 	{
 		using UpdateScriptsFn = void(*)();
 		using StartScriptsFn = void(*)();

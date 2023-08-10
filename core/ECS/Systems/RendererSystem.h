@@ -1,14 +1,15 @@
 #pragma once
 
+#include<memory>
+
 #include"Renderer/RendererContext.h"
 #include"Renderer/Texture.h"
 #include"ECS/System.h"
-#include<memory>
 
 namespace Tengine
 {
 
-	class RendererSystem : public System
+	class TENGINE RendererSystem : public System
 	{
 	public:
 		void init() final;

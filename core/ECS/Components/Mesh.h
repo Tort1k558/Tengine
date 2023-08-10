@@ -13,14 +13,14 @@
 namespace Tengine
 {
 
-	struct Vertex
+	struct TENGINE Vertex
 	{
 		Vec3 position;
 		Vec3 normal;
 		Vec2 texCoords;
 	};
 
-	class SubMesh
+	class TENGINE SubMesh
 	{
 	public:
 		SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
@@ -37,7 +37,7 @@ namespace Tengine
 		std::shared_ptr<Material> m_material;
 	};
 
-	class Mesh : public Component, public Resource
+	class TENGINE Mesh : public Component, public Resource
 	{
 	public:
 		Mesh() = default;

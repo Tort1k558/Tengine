@@ -4,10 +4,12 @@
 #include<string>
 #include<unordered_set>
 
+#include"Core/Core.h"
+
 namespace Tengine
 {
 
-	class UUID
+	class TENGINE UUID
 	{
 	public:
 		UUID();

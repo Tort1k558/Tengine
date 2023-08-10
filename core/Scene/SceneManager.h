@@ -1,12 +1,14 @@
 #pragma once
 
 #include"Scene/Scene.h"
+#include"Core/Logger.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
 
 	class Scene;
-	class SceneManager
+	class TENGINE SceneManager
 	{
 	public:
 		SceneManager() = delete;
@@ -15,9 +17,9 @@ namespace Tengine
 		SceneManager& operator=(const SceneManager&) = delete;
 		SceneManager& operator=(SceneManager&&) = delete;
 
+		static std::shared_ptr<Scene> GetCurrentScene();
 		static void SetCurrentScene(std::shared_ptr<Scene> scene);
-		static std::shared_ptr<Scene> GetCurrentScene() { return m_currentScene; }
-	private:
 		static std::shared_ptr<Scene> m_currentScene;
+	private:
 	};
 }

@@ -54,4 +54,19 @@ namespace Tengine
         //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.x, event.y);
         m_mousePosition = position;
     }
+
+    Vec2 Input::GetMousePosition()
+    {
+        return m_mousePosition;
+    }
+
+    Vec2 Input::GetPrevMousePosition()
+    {
+        return m_prevMousePosition;
+    }
+
+    Vec2 Input::GetDeltaMousePosition()
+    {
+        return m_prevMousePosition - m_mousePosition;;
+    }
 }

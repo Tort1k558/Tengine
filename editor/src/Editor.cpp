@@ -21,9 +21,9 @@ Application(width, height, title)
 
 void Editor::create()
 {
-    UISystem::GetInstance<UISystem>()->setWindow(getWindow());
-    SystemManager::AddSystem<UISystem>();
-    UISystem::GetInstance<UISystem>()->init();
+    System::GetInstance<UISystem>()->setWindow(getWindow());
+    SystemManager::AddSystem(System::GetInstance<UISystem>());
+    System::GetInstance<UISystem>()->init();
     std::shared_ptr<Scene> scene = Scene::Create();
     SceneManager::SetCurrentScene(scene);
     

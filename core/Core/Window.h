@@ -5,10 +5,11 @@
 #include<GLFW/glfw3.h>
 #include"Event.h"
 #include"Core/Math.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
-	class Window
+	class TENGINE Window
 	{
 	public:
 		Window(unsigned int width, unsigned int height, std::string title);

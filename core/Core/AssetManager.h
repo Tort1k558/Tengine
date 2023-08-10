@@ -5,9 +5,14 @@
 #include<variant>
 #include<filesystem>
 
-#include<assimp/Importer.hpp>
-#include<assimp/scene.h>
-#include<assimp/postprocess.h>
+#include"Core/Core.h"
+
+struct aiMesh;
+struct aiScene;
+struct aiNode;
+struct aiMaterial;
+enum aiTextureType;
+
 namespace Tengine
 {
 	class Texture;
@@ -15,7 +20,7 @@ namespace Tengine
 	class Mesh;
 	class SubMesh;
 
-	class Resource
+	class TENGINE Resource
 	{
 	public:
 		virtual ~Resource() = default;
@@ -25,7 +30,7 @@ namespace Tengine
 		std::filesystem::path m_path;
 	};
 
-	class AssetManager
+	class TENGINE AssetManager
 	{
 	public:
 		AssetManager() = delete;

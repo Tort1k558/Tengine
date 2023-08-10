@@ -4,11 +4,13 @@
 #include<memory>
 #include"Event.h"
 #include"Core/Window.h"
+#include"Core/Core.h"
+
 namespace Tengine
 {
 	class Window;
 
-	class Application
+	class TENGINE Application
 	{
 	public:
 		Application(unsigned int width, unsigned int height, std::string title);
@@ -21,14 +23,14 @@ namespace Tengine
 
 		virtual void update() = 0;
 		virtual void create() = 0;
-
+		
 		void init();
 		void run();
 		void lockFps();
 		void unlockFps();
 		void setMaxFps(size_t fps);
 		void close();
-
+		
 		size_t getMaxFps() const;
 		std::shared_ptr<Window> getWindow() const;
 	private:

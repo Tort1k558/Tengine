@@ -118,7 +118,7 @@ namespace Tengine
 		std::function<void(const std::string& path)> callback;
 	};
 
-	class DisplayInfo
+	class TENGINE DisplayInfo
 	{
 	public:
 		DisplayInfo() = default;

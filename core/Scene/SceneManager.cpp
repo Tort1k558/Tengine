@@ -9,4 +9,8 @@ namespace Tengine
 	{
 		m_currentScene = scene;
 	}
+	std::shared_ptr<Scene> SceneManager::GetCurrentScene()
+	{
+		return m_currentScene;
+	}
 }

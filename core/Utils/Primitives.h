@@ -9,8 +9,8 @@ namespace Tengine
 
     namespace Primitives
     {
-        std::shared_ptr<Mesh> CreateQuad();
-        std::shared_ptr<Mesh> CreateSphere(int sectors, int stacks);
-        std::shared_ptr<Mesh> CreateCube();
+        TENGINE std::shared_ptr<Mesh> CreateQuad();
+        TENGINE std::shared_ptr<Mesh> CreateSphere(int sectors, int stacks);
+        TENGINE std::shared_ptr<Mesh> CreateCube();
     }
 }

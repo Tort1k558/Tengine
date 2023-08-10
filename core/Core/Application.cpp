@@ -26,9 +26,9 @@ namespace Tengine
 
         System::GetInstance<RendererSystem>()->setRendererType(RendererType::OpenGL);
         System::GetInstance<RendererSystem>()->setTextureFilter(TextureFilter::Anisotropic16);
-        SystemManager::AddSystem<RendererSystem>();
-        SystemManager::AddSystem<ControllerSystem>();
-        SystemManager::AddSystem<ScriptSystem>();
+        SystemManager::AddSystem(System::GetInstance<RendererSystem>());
+        SystemManager::AddSystem(System::GetInstance<ControllerSystem>());
+        SystemManager::AddSystem(System::GetInstance<ScriptSystem>());
         SystemManager::InitSystems();
         System::GetInstance<RendererSystem>()->updateViewport(m_window->getSize());
 

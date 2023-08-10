@@ -7,6 +7,7 @@
 
 #include"Core/UUID.h"
 #include"ECS/Component.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
@@ -14,7 +15,7 @@ namespace Tengine
 	class Scene;
 	class Component;
 
-	class Object : public std::enable_shared_from_this<Object>
+	class TENGINE Object : public std::enable_shared_from_this<Object>
 	{
 	public:
 		Object();

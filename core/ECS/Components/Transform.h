@@ -4,7 +4,7 @@
 #include"Core/Math.h"
 namespace Tengine
 {
-	class Transform : public Component
+	class TENGINE Transform : public Component
 	{
 	public:
 		Transform();
