@@ -8,7 +8,7 @@ namespace Tengine
 {
 	std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType type)
 	{
-		switch (System::GetInstance<RendererSystem>()->getRendererType())
+		switch (RendererSystem::GetInstance()->getRendererType())
 		{
 		case RendererType::None:
 			Logger::Critical("ERROR::Renderer not initialized!");

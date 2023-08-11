@@ -48,7 +48,7 @@ namespace Tengine
 		glTextureStorage2D(m_id, mipLevels, TextureTypeToOpenGLInternalType(type), size.x, size.y);
 		glTextureSubImage2D(m_id, 0, 0, 0, size.x, size.y, TextureTypeToOpenGLDataType(type), GL_UNSIGNED_BYTE, data);
 
-		switch (System::GetInstance<RendererSystem>()->getTextureFilter())
+		switch (RendererSystem::GetInstance()->getTextureFilter())
 		{
 		case TextureFilter::Bilinear:
 			glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

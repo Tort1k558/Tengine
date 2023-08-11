@@ -11,5 +11,9 @@ namespace Tengine
 		void init() final;
 		void update() final;
 		void destroy() final;
+
+		static std::shared_ptr<ControllerSystem> GetInstance();
+	private:
+		static std::shared_ptr<ControllerSystem> m_instance;
 	};
 }

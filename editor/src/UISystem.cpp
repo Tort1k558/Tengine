@@ -14,7 +14,11 @@
 #include"Scene/SceneSerializer.h"
 #include"Core/AssetManager.h"
 #include"Scripts/CodeGenerator.h"
+#include"ECS/Systems/ScriptSystem.h"
+
 using namespace Tengine;
+
+std::shared_ptr<UISystem> UISystem::m_instance;
 
 void UISystem::init()
 {
@@ -180,7 +184,7 @@ void UISystem::update()
         Object::Create();
     }
     ImGui::SameLine();
-    if (ImGui::Button("Delete object"))
+    if (ImGui::Button("Delete object") && !nameOfSelectedObject.empty())
     {
         SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(nameOfSelectedObject)->getName());
         nameOfSelectedObject.clear();
@@ -215,6 +219,10 @@ void UISystem::update()
         if (ImGui::BeginPopup("Select Component"))
         {
             std::vector<std::string> items = { "Mesh", "Camera", "Script"};
+            for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
+            {
+                items.push_back(scriptName);
+            }
             static int selectedItem = 0;
             if (ImGui::BeginCombo("Components", items[selectedItem].c_str()))
             {
@@ -278,6 +286,15 @@ void UISystem::destroy()
 void UISystem::setWindow(std::shared_ptr<Window> window)
 {
     m_window = window;
+}
+
+std::shared_ptr<UISystem> Tengine::UISystem::GetInstance()
+{
+    if (!m_instance)
+    {
+        m_instance = std::make_shared<UISystem>();
+    }
+    return m_instance;
 }
 
 void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)

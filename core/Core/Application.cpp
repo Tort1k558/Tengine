@@ -24,13 +24,13 @@ namespace Tengine
     {
         m_window->init();
 
-        System::GetInstance<RendererSystem>()->setRendererType(RendererType::OpenGL);
-        System::GetInstance<RendererSystem>()->setTextureFilter(TextureFilter::Anisotropic16);
-        SystemManager::AddSystem(System::GetInstance<RendererSystem>());
-        SystemManager::AddSystem(System::GetInstance<ControllerSystem>());
-        SystemManager::AddSystem(System::GetInstance<ScriptSystem>());
+        RendererSystem::GetInstance()->setRendererType(RendererType::OpenGL);
+        RendererSystem::GetInstance()->setTextureFilter(TextureFilter::Anisotropic16);
+        SystemManager::AddSystem(RendererSystem::GetInstance());
+        SystemManager::AddSystem(ControllerSystem::GetInstance());
+        SystemManager::AddSystem(ScriptSystem::GetInstance());
         SystemManager::InitSystems();
-        System::GetInstance<RendererSystem>()->updateViewport(m_window->getSize());
+        RendererSystem::GetInstance()->updateViewport(m_window->getSize());
 
         m_eventDispatcher = EventDispatcher();
         m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)

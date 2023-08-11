@@ -6,6 +6,8 @@
 
 namespace Tengine
 {
+	std::shared_ptr<ControllerSystem> ControllerSystem::m_instance;
+
 	void ControllerSystem::init()
 	{
 	}
@@ -34,5 +36,15 @@ namespace Tengine
 
 	void ControllerSystem::destroy()
 	{
+
+	}
+
+	std::shared_ptr<ControllerSystem> ControllerSystem::GetInstance()
+	{
+		if (!m_instance)
+		{
+			m_instance = std::make_shared<ControllerSystem>();
+		}
+		return m_instance;
 	}
 }

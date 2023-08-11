@@ -113,7 +113,7 @@ namespace Tengine
 		glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
 			{
 				Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(glfwWindow));
-				System::GetInstance<RendererSystem>()->updateViewport({ width, height });
+				RendererSystem::GetInstance()->updateViewport({ width, height });
 				window.setWidth(width);
 				window.setHeight(height);
 			});

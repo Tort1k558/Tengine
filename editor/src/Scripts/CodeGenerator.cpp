@@ -12,12 +12,13 @@ namespace Tengine
 
     void CodeGenerator::UpdateScripts()
     {
+        ScriptSystem::GetInstance()->freeModule();
         std::filesystem::create_directory("Scripts");
+        std::filesystem::create_directory("Scripts/build");
         GenerateInitFiles();
         GeneratePremake();
-        System::GetInstance<ScriptSystem>()->freeModule();
         BuildDll();
-        System::GetInstance<ScriptSystem>()->reload();
+        ScriptSystem::GetInstance()->reload();
     }
     void CodeGenerator::AddScript(std::filesystem::path pathToScript)
     {
@@ -25,22 +26,33 @@ namespace Tengine
     }
     void CodeGenerator::BuildDll()
     {
-        std::system("cmake --build Scripts --config Release");
+        std::system("cmake --build Scripts/build --config Debug");
     }
     void CodeGenerator::GenerateInitFiles()
     {
         //Header file
-        std::ofstream initHeaderFile("Scripts/SystemModule.h");
+        std::ofstream initHeaderFile("Scripts/build/SystemModule.h");
         if (initHeaderFile.is_open())
         {
             initHeaderFile << \
 R"(#pragma once
+
+#include<string>
+#include<vector>
+
+#include"ECS/Object.h"
+
+using namespace Tengine;
 
 #define EXTERN __declspec(dllexport)
 
 extern "C" EXTERN void StartScripts();
 
 extern "C" EXTERN void UpdateScripts();
+
+extern "C" EXTERN void AddScript(std::shared_ptr<Object> object, std::string_view nameScript);
+
+extern "C" EXTERN std::vector<std::string> GetScriptNames();
 )";
             initHeaderFile.close();
         }
@@ -50,7 +62,7 @@ extern "C" EXTERN void UpdateScripts();
         }
 
         //Source file
-        std::ofstream initSourceFile("Scripts/SystemModule.cpp");
+        std::ofstream initSourceFile("Scripts/build/SystemModule.cpp");
         if (initSourceFile.is_open())
         {
             initSourceFile << \
@@ -86,8 +98,21 @@ void UpdateScripts()
         {
             script->update();
         }
+
+        Logger::Info("Objects");
     }
 }
+
+void AddScript(std::shared_ptr<Object> object, std::string_view nameScript)
+{
+    
+}
+
+std::vector<std::string> GetScriptNames()
+{
+    return {"CameraController"};
+}
+
 )";
             initSourceFile.close();
         }
@@ -98,7 +123,7 @@ void UpdateScripts()
     }
     void CodeGenerator::GeneratePremake()
 	{
-		std::ofstream cmakeFile("Scripts/CMakeLists.txt");
+		std::ofstream cmakeFile("Scripts/build/CMakeLists.txt");
         if (cmakeFile.is_open()) {
             cmakeFile <<
 R"(cmake_minimum_required(VERSION 3.2)
@@ -111,23 +136,28 @@ set(PROJECT_NAME ScriptModule)
 project(${PROJECT_NAME})
 
 set(DIRS_SRC_MODULE 
-	"*.h" "*.cpp" 
+	"*.h" "*.cpp"
+    "../*.h" "../*.cpp" 
 	)
 file(GLOB TARGET_SRC_MODULE ${DIRS_SRC_MODULE})
 
-include_directories(../../../core)
-include_directories(../../../external/spdlog/include)
-include_directories(../../../external/nlohmann/include)
-include_directories(../../../external/glm)
+include_directories(../../../../core)
+include_directories(../../../../external/spdlog/include)
+include_directories(../../../../external/nlohmann/include)
+include_directories(../../../../external/glm)
 
 
 add_library(${PROJECT_NAME} SHARED ${TARGET_SRC_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)
+target_link_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/../..
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE TengineCored)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_BINARY_DIR}/Release/ScriptModule.dll
+        ${CMAKE_CURRENT_BINARY_DIR}/Debug/ScriptModule.dll
         ${CMAKE_SOURCE_DIR}/scriptModule.dll
 )
 
@@ -137,6 +167,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         else {
             Logger::Critical("ERROR::CodeGenerator::Error creating Premake file");
         }
-        std::system("cmake -S Scripts -B Scripts");
+        std::system("cmake -S Scripts/build -B Scripts/build");
 	}
 }

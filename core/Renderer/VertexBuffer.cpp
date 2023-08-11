@@ -13,7 +13,7 @@ namespace Tengine
 
 	std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int size, BufferUsage usage)
 	{
-		switch (System::GetInstance<RendererSystem>()->getRendererType())
+		switch (RendererSystem::GetInstance()->getRendererType())
 		{
 		case RendererType::None:
 			Logger::Critical("ERROR::Renderer not initialized!");

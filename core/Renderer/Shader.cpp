@@ -9,7 +9,7 @@ namespace Tengine
 
 	std::shared_ptr<Shader> Shader::Create()
 	{
-		switch (System::GetInstance<RendererSystem>()->getRendererType())
+		switch (RendererSystem::GetInstance()->getRendererType())
 		{
 		case RendererType::None:
 			Logger::Critical("ERROR::Renderer not initialized!");

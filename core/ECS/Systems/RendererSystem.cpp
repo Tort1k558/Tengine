@@ -16,6 +16,7 @@
 
 namespace Tengine
 {
+	std::shared_ptr<RendererSystem> RendererSystem::m_instance;
 
 	void RendererSystem::init()
 	{
@@ -84,6 +85,15 @@ namespace Tengine
 	void RendererSystem::setTextureFilter(TextureFilter filter)
 	{
 		m_textureFilter = filter;
+	}
+
+	std::shared_ptr<RendererSystem> RendererSystem::GetInstance()
+	{
+		if (!m_instance)
+		{
+			m_instance = std::make_shared<RendererSystem>();
+		}
+		return m_instance;
 	}
 
 	void RendererSystem::destroy()
