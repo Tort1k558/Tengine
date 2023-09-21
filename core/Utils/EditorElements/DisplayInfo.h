@@ -42,7 +42,7 @@ namespace Tengine
 	{
 		DisplayInfoElementSlider()
 		{
-			type = DisplayTypeElement::Slider2;
+			type = DisplayTypeElement::Slider;
 		}
 	};
 

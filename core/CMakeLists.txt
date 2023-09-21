@@ -40,26 +40,13 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 target_include_directories(${PROJECT_NAME} PUBLIC "../core")
 
 add_subdirectory(../external/glfw ${CMAKE_CURRENT_BINARY_DIR}/bin/glfw)
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
-
 add_subdirectory(../external/glad ${CMAKE_CURRENT_BINARY_DIR}/bin/glad)
-target_link_libraries(${PROJECT_NAME} PRIVATE glad)
-
 add_subdirectory(../external/spdlog ${CMAKE_CURRENT_BINARY_DIR}/bin/spdlog)
-target_link_libraries(${PROJECT_NAME} PRIVATE spdlog)
-
-add_subdirectory(../external/imgui ${CMAKE_CURRENT_BINARY_DIR}/bin/imgui)
-target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
-
 add_subdirectory(../external/glm ${CMAKE_CURRENT_BINARY_DIR}/bin/glm)
-target_link_libraries(${PROJECT_NAME} PRIVATE glm)
-
 add_subdirectory(../external/stbi ${CMAKE_CURRENT_BINARY_DIR}/bin/stbi)
-target_link_libraries(${PROJECT_NAME} PRIVATE stbi)
-
 add_subdirectory(../external/Assimp ${CMAKE_CURRENT_BINARY_DIR}/bin/Assimp)
 target_include_directories(${PROJECT_NAME} PUBLIC ../external/Assimp/include)
-target_link_libraries(${PROJECT_NAME} PRIVATE assimp)
 
 add_subdirectory(../external/nlohmann ${CMAKE_CURRENT_BINARY_DIR}/bin/nlohmann)
-target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw spdlog glm stbi assimp nlohmann_json)

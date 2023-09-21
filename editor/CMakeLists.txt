@@ -14,6 +14,8 @@ file(GLOB TARGET_SRC_EDITOR ${DIRS_SRC_EDITOR})
 include_directories(src)
 add_subdirectory(../external/nfd ${CMAKE_CURRENT_BINARY_DIR}/bin/nfd)
 
+add_subdirectory(../external/imgui ${CMAKE_CURRENT_BINARY_DIR}/bin/imgui)
+
 add_executable(${PROJECT_NAME} ${TARGET_SRC_EDITOR} main.cpp)
 
 target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)

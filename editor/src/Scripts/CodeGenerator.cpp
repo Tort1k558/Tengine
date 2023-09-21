@@ -77,7 +77,6 @@ using namespace Tengine;
 
 void StartScripts()
 {
-    Tengine::Logger::Info("Hello from ScriptModule: Start Function");
     std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
     if(scene)
     {
@@ -131,7 +130,7 @@ std::vector<std::string> GetScriptNames()
                     initSourceFile << R"(    if (nameScript == ")" + m_scriptInfo[i].name + R"(")
     {
 )";
-                    initSourceFile << R"(        object->addComponent<)" + m_scriptInfo[i].name + ">(Component::Create<" + m_scriptInfo[i].name + R"(>());
+                    initSourceFile << R"(        object->addComponent(Component::Create<)" + m_scriptInfo[i].name + R"(>());
     }
 )";
                 }
@@ -140,7 +139,7 @@ std::vector<std::string> GetScriptNames()
                     initSourceFile << R"(    else if (nameScript == )" + m_scriptInfo[i].name + R"()
     {
 )";
-                    initSourceFile << R"(    object->addComponent<)" + m_scriptInfo[i].name + ">(Component::Create<" + m_scriptInfo[i].name + R"(>());
+                    initSourceFile << R"(    object->addComponent(Component::Create<" + m_scriptInfo[i].name + R"(>());
     }
 )";
                 }

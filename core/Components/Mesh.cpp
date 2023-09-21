@@ -86,7 +86,7 @@ namespace Tengine
 			{
 				newMesh->setParent(this->getParent());
 			}
-			this->getParent()->addComponent<Mesh>(newMesh);
+			this->getParent()->addComponent(newMesh);
 		};
 		displayInfo.addElement(loadMeshButton);
 		std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshesHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();

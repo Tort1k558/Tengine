@@ -38,7 +38,7 @@ namespace Tengine
 	std::shared_ptr<Object> Object::Create()
 	{
 		std::shared_ptr<Object> object = std::make_shared<Object>();
-		object->addComponent<Transform>(Component::Create<Transform>());
+		object->addComponent(Component::Create<Transform>());
 		SceneManager::GetCurrentScene()->addObject(object);
 		return object;
 	}
@@ -46,9 +46,18 @@ namespace Tengine
 	std::shared_ptr<Object> Object::Create(UUID id)
 	{
 		std::shared_ptr<Object> object = std::make_shared<Object>(id);
-		object->addComponent<Transform>(Component::Create<Transform>());
+		object->addComponent(Component::Create<Transform>());
 		SceneManager::GetCurrentScene()->addObject(object);
 		return object;
+	}
+
+	void Object::addComponent(std::shared_ptr<Component> component)
+	{
+		if (component)
+		{
+			component->setParent(shared_from_this());
+			m_components.push_back(component);
+		}
 	}
 
 	std::vector<std::shared_ptr<Component>> Object::getComponents()

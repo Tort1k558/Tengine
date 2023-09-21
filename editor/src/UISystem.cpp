@@ -26,8 +26,9 @@ void UISystem::init()
     ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_::ImGuiConfigFlags_ViewportsEnable;
+    
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
@@ -81,7 +82,6 @@ void UISystem::init()
     colors[ImGuiCol_PlotHistogramHovered] = { 0.25f, 1.00f, 0.00f, 1.00f };
 
     glfwInit();
-
     ImGui_ImplOpenGL3_Init();
     ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
 }
@@ -92,7 +92,7 @@ void UISystem::update()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGuiWindowFlags windowsFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+    ImGuiWindowFlags windowsFlags = ImGuiWindowFlags_MenuBar;
     windowsFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
     windowsFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
     windowsFlags |= ImGuiWindowFlags_NoBackground;
@@ -100,7 +100,7 @@ void UISystem::update()
     const ImGuiViewport* viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
-    ImGui::SetNextWindowViewport(viewport->ID);
+    //ImGui::SetNextWindowViewport(viewport->ID);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -130,7 +130,8 @@ void UISystem::update()
                     nameOfSelectedObject.clear();
                 }
             }
-            if (ImGui::MenuItem("Create Scene")) {
+            if (ImGui::MenuItem("Create Scene")) 
+            {
                 SceneManager::SetCurrentScene(Scene::Create());
                 nameOfSelectedObject.clear();
             }
@@ -215,16 +216,15 @@ void UISystem::update()
         {
             ImGui::OpenPopup("Select Component");
         }
-
         if (ImGui::BeginPopup("Select Component"))
         {
-            std::vector<std::string> items = { "Mesh", "Camera", "Script"};
+            static int selectedItem = 0;
+            std::vector<std::string> items = { "Mesh", "Camera"};
             for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
             {
                 items.push_back(scriptName);
             }
-            static int selectedItem = 0;
-            if (ImGui::BeginCombo("Components", items[selectedItem].c_str()))
+            if (ImGui::BeginCombo("##Components", items[selectedItem].c_str()))
             {
                 for (int i = 0; i < items.size(); ++i)
                 {
@@ -241,21 +241,18 @@ void UISystem::update()
                 }
                 ImGui::EndCombo();
             }
+
             if (ImGui::Button("Add"))
             {
                 if (selectedItem == 0)
                 {
-                    object->addComponent<Mesh>(Component::Create<Mesh>());
+                    object->addComponent(Component::Create<Mesh>());
                 }
                 if (selectedItem == 1)
                 {
-                    object->addComponent<Camera>(Component::Create<Camera>());
+                    object->addComponent(Component::Create<Camera>());
                 }
-                if (selectedItem == 2)
-                {
-                    object->addComponent<Script>(Component::Create<Script>());
-                }
-                if (selectedItem > 2)
+                if (selectedItem >= 2)
                 {
                     ScriptSystem::GetInstance()->addScript(object,items[selectedItem]);
                 }
@@ -269,13 +266,6 @@ void UISystem::update()
     //Render
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_::ImGuiConfigFlags_ViewportsEnable)
-    {
-        GLFWwindow* window = glfwGetCurrentContext();
-        ImGui::UpdatePlatformWindows();
-        ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(window);
-    }
 }
 
 void UISystem::destroy()
@@ -283,7 +273,7 @@ void UISystem::destroy()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-    
+
     glfwTerminate();
 }
 

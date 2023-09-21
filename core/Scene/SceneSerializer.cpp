@@ -64,7 +64,7 @@ namespace Tengine
 					transform->setRotation(Vec3(dataObject["transform"]["rotation"][0], dataObject["transform"]["rotation"][1], dataObject["transform"]["rotation"][2]));
 					transform->setScale(Vec3(dataObject["transform"]["scale"][0], dataObject["transform"]["scale"][1], dataObject["transform"]["scale"][2]));
 
-					object->addComponent<Transform>(transform);
+					object->addComponent(transform);
 				}
 
 				if (dataObject.contains("camera"))
@@ -99,7 +99,7 @@ namespace Tengine
 					default:
 						break;
 					}
-					object->addComponent<Camera>(camera);
+					object->addComponent(camera);
 				}
 
 				if (dataObject.contains("mesh"))
@@ -137,7 +137,7 @@ namespace Tengine
 							mesh = AssetManager::LoadMesh(path);
 						}
 					}
-					object->addComponent<Mesh>(mesh);
+					object->addComponent(mesh);
 				}
 			}
 		}

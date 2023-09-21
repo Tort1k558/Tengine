@@ -11,4 +11,4 @@ set(STBI_SRC
 
 add_library(stbi STATIC ${STBI_INCLUDES} ${STBI_SRC})
 
-target_include_directories(imgui PUBLIC /)
+target_include_directories(stbi PUBLIC /)

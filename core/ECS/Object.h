@@ -22,7 +22,6 @@ namespace Tengine
 		Object(UUID uuid);
 		virtual ~Object() = default;
 
-		template<typename T>
 		void addComponent(std::shared_ptr<Component> component);
 		template<typename T>
 		void removeComponent();
@@ -48,16 +47,6 @@ namespace Tengine
 		std::string m_name;
 		std::vector<std::shared_ptr<Component>> m_components;
 	};
-
-	template<typename T>
-	inline void Object::addComponent(std::shared_ptr<Component> component)
-	{
-		if (component)
-		{
-			component->setParent(shared_from_this());
-			m_components.push_back(component);
-		}
-	}
 
 	template<typename T>
 	inline void Object::removeComponent()
