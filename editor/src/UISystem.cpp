@@ -6,15 +6,15 @@
 #include<nfd.h>
 #include"Core/Timer.h"
 #include"Core/Logger.h"
-#include"ECS/Components/Mesh.h"
-#include"ECS/Components/Camera.h"
-#include"ECS/Components/Script.h"
+#include"Components/Mesh.h"
+#include"Components/Camera.h"
+#include"Components/Script.h"
 #include"ECS/Object.h"
 #include"Scene/SceneManager.h"
 #include"Scene/SceneSerializer.h"
 #include"Core/AssetManager.h"
 #include"Scripts/CodeGenerator.h"
-#include"ECS/Systems/ScriptSystem.h"
+#include"Systems/ScriptSystem.h"
 
 using namespace Tengine;
 
@@ -138,9 +138,9 @@ void UISystem::update()
         }
         if (ImGui::BeginMenu("Script"))
         {
-            if (ImGui::MenuItem("Update scripts"))
+            if (ImGui::MenuItem("Compile scripts"))
             {
-                CodeGenerator::UpdateScripts();
+                CodeGenerator::CompileScripts();
             }
             ImGui::EndMenu();
         }
@@ -254,6 +254,10 @@ void UISystem::update()
                 if (selectedItem == 2)
                 {
                     object->addComponent<Script>(Component::Create<Script>());
+                }
+                if (selectedItem > 2)
+                {
+                    ScriptSystem::GetInstance()->addScript(object,items[selectedItem]);
                 }
                 ImGui::CloseCurrentPopup();
             }

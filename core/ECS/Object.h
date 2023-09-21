@@ -46,7 +46,7 @@ namespace Tengine
 	private:
 		UUID m_id;
 		std::string m_name;
-		std::unordered_map<size_t, std::shared_ptr<Component>> m_components;
+		std::vector<std::shared_ptr<Component>> m_components;
 	};
 
 	template<typename T>
@@ -55,17 +55,20 @@ namespace Tengine
 		if (component)
 		{
 			component->setParent(shared_from_this());
-			m_components[typeid(T).hash_code()] = std::dynamic_pointer_cast<T>(component);
+			m_components.push_back(component);
 		}
 	}
 
 	template<typename T>
 	inline void Object::removeComponent()
 	{
-		if (m_components.find(typeid(T).hash_code()) != m_components.end())
+		for (size_t i = 0; i < m_components.size(); i++)
 		{
-			m_components[typeid(T).hash_code()]->setParent(nullptr);
-			m_components.erase(typeid(T).hash_code());
+			if (std::dynamic_pointer_cast<T>(m_components[i]))
+			{
+				m_components[i]->setParent(nullptr);
+				m_components.erase(i);
+			}
 		}
 	}
 
@@ -73,21 +76,26 @@ namespace Tengine
 	template<typename T>
 	inline std::shared_ptr<T> Object::getComponent() const
 	{
-		if (m_components.find(typeid(T).hash_code()) == m_components.end())
+		for (size_t i = 0; i < m_components.size(); i++)
 		{
-			return nullptr;
+			if (std::dynamic_pointer_cast<T>(m_components[i]))
+			{
+				return std::dynamic_pointer_cast<T>(m_components[i]);
+			}
 		}
-		std::shared_ptr<T> component = std::dynamic_pointer_cast<T>(m_components.at(typeid(T).hash_code()));
-		return component;
+		return nullptr;
 	}
 
 	template<typename T>
 	inline bool Object::hasComponent() const
 	{
-		if (m_components.find(typeid(T).hash_code()) == m_components.end())
+		for (size_t i = 0; i < m_components.size(); i++)
 		{
-			return false;
+			if (std::dynamic_pointer_cast<T>(m_components[i]))
+			{
+				return true;
+			}
 		}
-		return true;
+		return false;
 	}
 }

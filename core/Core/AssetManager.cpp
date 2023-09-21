@@ -12,7 +12,7 @@
 #include"Core/Logger.h"
 #include"Renderer/Shader.h"
 #include"Renderer/Texture.h"
-#include"ECS/Components/Mesh.h"
+#include"Components/Mesh.h"
 
 namespace Tengine
 {

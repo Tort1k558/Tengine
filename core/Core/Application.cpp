@@ -2,16 +2,16 @@
 
 #include<thread>
 
-#include"ECS/Components/Transform.h"
-#include"ECS/Components/Camera.h"
-#include"ECS/Components/Controller.h"
+#include"Components/Transform.h"
+#include"Components/Camera.h"
+#include"Components/Controller.h"
 #include"Core/Timer.h"
 #include"Core/Logger.h"
 #include"Core/Input.h"
 #include"ECS/SystemManager.h"
-#include"ECS/Systems/RendererSystem.h"
-#include"ECS/Systems/ControllerSystem.h"
-#include"ECS/Systems/ScriptSystem.h"
+#include"Systems/RendererSystem.h"
+#include"Systems/ControllerSystem.h"
+#include"Systems/ScriptSystem.h"
 #include"Scene/SceneManager.h"
 namespace Tengine
 {

@@ -2,7 +2,7 @@
 
 
 #include"Core/Math.h"
-#include"ECS/Components/Mesh.h"
+#include"Components/Mesh.h"
 
 namespace Tengine
 {

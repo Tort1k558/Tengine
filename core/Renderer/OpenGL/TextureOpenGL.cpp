@@ -1,7 +1,7 @@
 #include "TextureOpenGL.h"
 
 #include"Core/Logger.h"
-#include"ECS/Systems/RendererSystem.h"
+#include"Systems/RendererSystem.h"
 
 namespace Tengine
 {

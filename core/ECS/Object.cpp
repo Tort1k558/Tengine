@@ -7,14 +7,15 @@ namespace Tengine
 {
 
 	Object::Object() :
-		m_id()
+		m_id(), m_components()
 	{
 		static size_t counterObject = 0;
 		m_name = "Object" + std::to_string(counterObject);
 		counterObject++;
 	}
 
-	Object::Object(UUID id)
+	Object::Object(UUID id) :
+		m_components()
 	{
 		m_id = id;
 	}
@@ -52,11 +53,6 @@ namespace Tengine
 
 	std::vector<std::shared_ptr<Component>> Object::getComponents()
 	{
-		std::vector<std::shared_ptr<Component>> components;
-		for (const auto& component : m_components)
-		{
-			components.push_back(component.second);
-		}
-		return components;
+		return m_components;
 	}
 }

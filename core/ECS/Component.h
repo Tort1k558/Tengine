@@ -13,7 +13,7 @@
 namespace Tengine
 {
 	class Object;
-
+	
 	class TENGINE Component
 	{
 	public:

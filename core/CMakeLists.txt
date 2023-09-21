@@ -9,21 +9,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project(${PROJECT_NAME})
 
 set(DIRS_SRC 	
-	"Core/*.cpp"                "Core/*.h"			
-	"ECS/*.cpp"                 "ECS/*.h" 			
-	"ECS/Components/*.cpp"      "ECS/Components/*.h" 			
-	"ECS/Systems/*.cpp"     	"ECS/Systems/*.h" 			
-	"Renderer/*.cpp"            "Renderer/*.h"		
-	"Renderer/OpenGL/*.cpp"     "Renderer/OpenGL/*.h"		
-	"Scene/*.cpp"               "Scene/*.h" 		
-	"Utils/*.cpp"               "Utils/*.h"          
-	"Utils/EditorElements/*.cpp""Utils/EditorElements/*.h"          
+	"Core/*.cpp"                
+	"ECS/*.cpp"                 
+	"Components/*.cpp"      	
+	"Systems/*.cpp"     		
+	"Renderer/*.cpp"            
+	"Renderer/OpenGL/*.cpp"     
+	"Scene/*.cpp"               
+	"Utils/*.cpp"               
+	"Utils/EditorElements/*.cpp"       
 	)
 	set(DIRS_INCLUDES	
 	"Core/*.h"			
 	"ECS/*.h" 			
-	"ECS/Components/*.h" 			
-	"ECS/Systems/*.h" 			
+	"Components/*.h" 			
+	"Systems/*.h" 			
 	"Renderer/*.h"		
 	"Renderer/OpenGL/*.h"		
 	"Scene/*.h" 		
@@ -34,6 +34,8 @@ file(GLOB TARGET_SRC ${DIRS_SRC})
 file(GLOB TARGET_INCLUDES ${DIRS_INCLUDES})
 
 add_library(${PROJECT_NAME} SHARED ${TARGET_SRC} ${TARGET_INCLUDES})
+
+target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 
 target_include_directories(${PROJECT_NAME} PUBLIC "../core")
 

@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include"ECS/Components/Transform.h"
+#include"Components/Transform.h"
 #include"Scene/SceneSerializer.h"
 
 namespace Tengine

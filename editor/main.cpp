@@ -1,7 +1,6 @@
 #include"Editor.h"
 #include"Core/Logger.h"
 
-//Избавиться от статичного дисплей инфо в компоненте
 using namespace Tengine;
 int main(int argc, char** argv)
 {

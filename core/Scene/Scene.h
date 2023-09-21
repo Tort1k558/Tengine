@@ -3,7 +3,7 @@
 #include"ECS/Component.h"
 #include"Core/UUID.h"
 #include"ECS/Object.h"
-#include"ECS/Components/Transform.h"
+#include"Components/Transform.h"
 
 namespace Tengine
 {

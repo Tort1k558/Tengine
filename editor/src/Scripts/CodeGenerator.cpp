@@ -4,25 +4,22 @@
 #include<filesystem>
 
 #include"Core/Logger.h"
-#include"ECS/Systems/ScriptSystem.h"
+#include"Systems/ScriptSystem.h"
 
 namespace Tengine
 {
-    std::unordered_set<std::filesystem::path> CodeGenerator::m_pathsToScripts;
+    std::vector<ScriptInfo> CodeGenerator::m_scriptInfo;
 
-    void CodeGenerator::UpdateScripts()
+    void CodeGenerator::CompileScripts()
     {
         ScriptSystem::GetInstance()->freeModule();
         std::filesystem::create_directory("Scripts");
         std::filesystem::create_directory("Scripts/build");
+        FindAllScripts();
         GenerateInitFiles();
-        GeneratePremake();
+        GenerateCmake();
         BuildDll();
         ScriptSystem::GetInstance()->reload();
-    }
-    void CodeGenerator::AddScript(std::filesystem::path pathToScript)
-    {
-        m_pathsToScripts.insert(pathToScript);
     }
     void CodeGenerator::BuildDll()
     {
@@ -43,7 +40,6 @@ R"(#pragma once
 #include"ECS/Object.h"
 
 using namespace Tengine;
-
 #define EXTERN __declspec(dllexport)
 
 extern "C" EXTERN void StartScripts();
@@ -70,8 +66,13 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
 
 #include"Core/Logger.h"
 #include"Scene/SceneManager.h"
-#include"ECS/Components/Script.h"
-
+#include"Components/Script.h"
+)";
+            for (const auto& info : m_scriptInfo)
+            {
+                initSourceFile << "#include\"" + info.name + ".h\"\n";
+            }
+            initSourceFile << R"(
 using namespace Tengine;
 
 void StartScripts()
@@ -94,26 +95,57 @@ void UpdateScripts()
     if(scene)
     {
         std::vector<std::shared_ptr<Script>> scripts = scene->getComponents<Script>();
+        Tengine::Logger::Info("{0}",scripts.size());
         for (const auto& script : scripts)
         {
             script->update();
         }
-
-        Logger::Info("Objects");
     }
 }
-
-void AddScript(std::shared_ptr<Object> object, std::string_view nameScript)
-{
-    
-}
-
 std::vector<std::string> GetScriptNames()
 {
-    return {"CameraController"};
-}
-
 )";
+            std::string nameAllScripts;
+            for (size_t i = 0; i < m_scriptInfo.size(); i++)
+            {
+                if (i == m_scriptInfo.size() - 1)
+                {
+                    nameAllScripts += "\"" + m_scriptInfo[i].name + "\"";
+
+                }
+                else
+                {
+                    nameAllScripts += "\"" +m_scriptInfo[i].name + "\", ";
+                }
+            }
+            initSourceFile << "    return {" + nameAllScripts + R"(};
+}
+)";
+            initSourceFile << R"(void AddScript(std::shared_ptr<Object> object, std::string_view nameScript)
+{
+)";
+            for (size_t i = 0; i < m_scriptInfo.size(); i++)
+            {
+                if (i == 0)
+                {
+                    initSourceFile << R"(    if (nameScript == ")" + m_scriptInfo[i].name + R"(")
+    {
+)";
+                    initSourceFile << R"(        object->addComponent<)" + m_scriptInfo[i].name + ">(Component::Create<" + m_scriptInfo[i].name + R"(>());
+    }
+)";
+                }
+                else
+                {
+                    initSourceFile << R"(    else if (nameScript == )" + m_scriptInfo[i].name + R"()
+    {
+)";
+                    initSourceFile << R"(    object->addComponent<)" + m_scriptInfo[i].name + ">(Component::Create<" + m_scriptInfo[i].name + R"(>());
+    }
+)";
+                }
+            }
+            initSourceFile << "\n}";
             initSourceFile.close();
         }
         else
@@ -121,7 +153,20 @@ std::vector<std::string> GetScriptNames()
             Logger::Critical("ERROR::CodeGenerator::Error creating init source file");
         }
     }
-    void CodeGenerator::GeneratePremake()
+    void CodeGenerator::FindAllScripts()
+    {
+        m_scriptInfo.clear();
+        for (const auto& entry : std::filesystem::directory_iterator("Scripts")) {
+            if (entry.is_regular_file() && entry.path().extension() == ".h")
+            {
+                ScriptInfo info;
+                info.path = entry.path();
+                info.name = entry.path().stem().filename().string();
+                m_scriptInfo.push_back(info);
+            }
+        }
+    }
+    void CodeGenerator::GenerateCmake()
 	{
 		std::ofstream cmakeFile("Scripts/build/CMakeLists.txt");
         if (cmakeFile.is_open()) {
@@ -145,6 +190,8 @@ include_directories(../../../../core)
 include_directories(../../../../external/spdlog/include)
 include_directories(../../../../external/nlohmann/include)
 include_directories(../../../../external/glm)
+include_directories(..)
+
 
 
 add_library(${PROJECT_NAME} SHARED ${TARGET_SRC_MODULE})
@@ -155,6 +202,8 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE TengineCored)
 
+
+target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/Debug/ScriptModule.dll

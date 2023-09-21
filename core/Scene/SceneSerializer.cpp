@@ -5,9 +5,9 @@
 
 #include"Core/Logger.h"
 #include"Scene/SceneManager.h"
-#include"ECS/Components/Camera.h"
-#include"ECS/Components/Mesh.h"
-#include"ECS/Components/Transform.h"
+#include"Components/Camera.h"
+#include"Components/Mesh.h"
+#include"Components/Transform.h"
 #include"Utils/Primitives.h"
 
 namespace Tengine

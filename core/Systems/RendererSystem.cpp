@@ -1,9 +1,9 @@
 #include"RendererSystem.h"
 
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
-#include"ECS/Components/Transform.h"
-#include"ECS/Components/Camera.h"
-#include"ECS/Components/Mesh.h"
+#include"Components/Transform.h"
+#include"Components/Camera.h"
+#include"Components/Mesh.h"
 #include"Core/Logger.h"
 #include"Core/Timer.h"
 #include"Core/AssetManager.h"

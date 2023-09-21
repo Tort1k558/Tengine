@@ -5,20 +5,20 @@
 
 namespace Tengine
 {
-	struct ClassInfo
+	struct ScriptInfo
 	{
-		std::string className;
+		std::string name;
+		std::filesystem::path path;
 	};
 	class CodeGenerator
 	{
 	public:
-		static void UpdateScripts();
-		static void AddScript(std::filesystem::path pathToScript);
+		static void CompileScripts();
 	private:
-		static void GeneratePremake();
+		static void FindAllScripts();
+		static void GenerateCmake();
 		static void BuildDll();
 		static void GenerateInitFiles();
-		static std::unordered_set<std::filesystem::path> m_pathsToScripts;
-
+		static std::vector<ScriptInfo> m_scriptInfo;
 	};
 }
