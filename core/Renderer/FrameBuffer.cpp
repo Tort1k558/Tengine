@@ -1,12 +1,11 @@
-#include "Texture.h"
+#include "FrameBuffer.h"
 
 #include"Systems/RendererSystem.h"
-#include"OpenGL/TextureOpenGL.h"
 #include"Core/Logger.h"
-
+#include"OpenGL/FrameBufferOpenGL.h"
 namespace Tengine
 {
-	std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType type,TextureFilter filter)
+	std::shared_ptr<FrameBuffer> Tengine::FrameBuffer::Create(UVec2 size)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
 		{
@@ -14,13 +13,8 @@ namespace Tengine
 			Logger::Critical("ERROR::Renderer not initialized!");
 			return nullptr;
 		case RendererType::OpenGL:
-			return std::make_shared<TextureOpenGL>(data, size, type, filter);
+			return std::make_shared<FrameBufferOpenGL>(size);
 		}
 		return nullptr;
-	}
-
-	UVec2 Texture::getSize()
-	{
-		return m_size;
 	}
 }

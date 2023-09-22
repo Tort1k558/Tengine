@@ -17,8 +17,8 @@ namespace Tengine
 		VertexBufferOpenGL(VertexBufferOpenGL&& buffer) noexcept;
 		VertexBufferOpenGL& operator=(VertexBufferOpenGL&& buffer) noexcept;
 
-		void bind() override;
-		void unbind() override;
+		void bind() final;
+		void unbind() final;
 	private:
 		GLuint m_id;
 	};

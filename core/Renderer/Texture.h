@@ -16,10 +16,12 @@ namespace Tengine
 		RG8,
 		RGB8,
 		RGBA8,
+		DEPTH32
 	};
 
 	enum class TextureFilter
 	{
+		None,
 		Bilinear,
 		Trilinear,
 		Anisotropic4,
@@ -27,7 +29,7 @@ namespace Tengine
 		Anisotropic16
 	};
 
-	class Texture : public Resource
+	class TENGINE Texture : public Resource
 	{
 	public:
 		virtual ~Texture() = default;
@@ -35,12 +37,15 @@ namespace Tengine
 		virtual void bind(unsigned int slot) = 0;
 
 		UVec2 getSize();
-		void* getData();
+		virtual void* getData() = 0;
 		virtual unsigned int getId() = 0;
-		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type);
+
+		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type,TextureFilter filter = TextureFilter::None);
 
 	protected:
 		UVec2 m_size;
 		void* m_data;
+		TextureType m_type;
+		TextureFilter m_filter;
 	};
 }

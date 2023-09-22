@@ -17,9 +17,11 @@ namespace Tengine
 		glDeleteBuffers(1, &m_id);
 	}
 
-	IndexBufferOpenGL::IndexBufferOpenGL(IndexBufferOpenGL&& buffer) noexcept :
-		m_id(buffer.m_id), m_count(buffer.m_count)
+	IndexBufferOpenGL::IndexBufferOpenGL(IndexBufferOpenGL&& buffer) noexcept
 	{
+		m_id = buffer.m_id;
+		m_count = buffer.m_count;
+
 		buffer.m_id = 0;
 		buffer.m_count = 0;
 	}

@@ -35,20 +35,31 @@ namespace Tengine
 			return GL_RGB8;
 		case TextureType::RGBA8:
 			return GL_RGBA8;
+		case TextureType::DEPTH32:
+			return GL_DEPTH_COMPONENT32;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return 0;
 		}
 	}
 
-	TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type)
+	TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type, TextureFilter filter)
 	{
+		m_type = type;
+		m_filter = filter;
+		m_size = size;
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_id);
-		GLsizei mipLevels = static_cast<GLsizei>(log2(std::max(size.x, size.y))) + 1;
-		glTextureStorage2D(m_id, mipLevels, TextureTypeToOpenGLInternalType(type), size.x, size.y);
-		glTextureSubImage2D(m_id, 0, 0, 0, size.x, size.y, TextureTypeToOpenGLDataType(type), GL_UNSIGNED_BYTE, data);
-
-		switch (RendererSystem::GetInstance()->getTextureFilter())
+		GLsizei mipLevels = static_cast<GLsizei>(log2(std::max(m_size.x, m_size.y))) + 1;
+		glTextureStorage2D(m_id, mipLevels, TextureTypeToOpenGLInternalType(m_type), m_size.x, m_size.y);
+		if (data)
+		{
+			glTextureSubImage2D(m_id, 0, 0, 0, m_size.x, m_size.y, TextureTypeToOpenGLDataType(m_type), GL_UNSIGNED_BYTE, data);
+		}
+		if (m_filter == TextureFilter::None)
+		{
+			m_filter = RendererSystem::GetInstance()->getTextureFilter();
+		}
+		switch (m_filter)
 		{
 		case TextureFilter::Bilinear:
 			glTextureParameteri(m_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -135,6 +146,14 @@ namespace Tengine
 	void TextureOpenGL::bind(unsigned int slot)
 	{
 		glBindTextureUnit(slot, m_id);
+	}
+
+	void* TextureOpenGL::getData()
+	{
+		bind(0);
+		void* pixels;
+		glGetTexImage(m_id, 0, TextureTypeToOpenGLDataType(m_type), GL_UNSIGNED_BYTE, pixels);
+		return pixels;
 	}
 
 	unsigned int TextureOpenGL::getId()

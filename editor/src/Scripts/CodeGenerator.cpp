@@ -94,7 +94,6 @@ void UpdateScripts()
     if(scene)
     {
         std::vector<std::shared_ptr<Script>> scripts = scene->getComponents<Script>();
-        Tengine::Logger::Info("{0}",scripts.size());
         for (const auto& script : scripts)
         {
             script->update();

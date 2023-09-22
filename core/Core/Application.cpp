@@ -4,13 +4,11 @@
 
 #include"Components/Transform.h"
 #include"Components/Camera.h"
-#include"Components/Controller.h"
 #include"Core/Timer.h"
 #include"Core/Logger.h"
 #include"Core/Input.h"
 #include"ECS/SystemManager.h"
 #include"Systems/RendererSystem.h"
-#include"Systems/ControllerSystem.h"
 #include"Systems/ScriptSystem.h"
 #include"Scene/SceneManager.h"
 namespace Tengine
@@ -26,11 +24,10 @@ namespace Tengine
 
         RendererSystem::GetInstance()->setRendererType(RendererType::OpenGL);
         RendererSystem::GetInstance()->setTextureFilter(TextureFilter::Anisotropic16);
+        RendererSystem::GetInstance()->updateViewport(m_window->getSize());
         SystemManager::AddSystem(RendererSystem::GetInstance());
-        SystemManager::AddSystem(ControllerSystem::GetInstance());
         SystemManager::AddSystem(ScriptSystem::GetInstance());
         SystemManager::InitSystems();
-        RendererSystem::GetInstance()->updateViewport(m_window->getSize());
 
         m_eventDispatcher = EventDispatcher();
         m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)

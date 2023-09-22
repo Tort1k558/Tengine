@@ -15,6 +15,7 @@
 #include"Core/AssetManager.h"
 #include"Scripts/CodeGenerator.h"
 #include"Systems/ScriptSystem.h"
+#include"Systems/RendererSystem.h"
 
 using namespace Tengine;
 
@@ -93,7 +94,7 @@ void UISystem::update()
     ImGui::NewFrame();
 
     ImGuiWindowFlags windowsFlags = ImGuiWindowFlags_MenuBar;
-    windowsFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    windowsFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
     windowsFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
     windowsFlags |= ImGuiWindowFlags_NoBackground;
 
@@ -262,7 +263,12 @@ void UISystem::update()
         }
     }
     ImGui::End();
-
+    ImGui::Begin("Scene", nullptr);
+    ImVec2 availableArea = ImGui::GetContentRegionAvail();
+    std::shared_ptr<Texture> texture = RendererSystem::GetInstance()->getFramebuffer()->getColorTexture();
+    ImGui::Image((void*)texture->getId(), availableArea, {0, 1}, {1, 0});
+    RendererSystem::GetInstance()->updateViewport({ availableArea.x, availableArea.y });
+    ImGui::End();
     //Render
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
