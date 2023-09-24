@@ -6,11 +6,61 @@ namespace Tengine
 {
 	Transform::Transform()
 	{
+		DisplayInfo displayInfo;
+		displayInfo.setComponentName("Transform");
+
+		std::shared_ptr<DisplayInfoElementSlider3> positionSlider = std::make_shared<DisplayInfoElementSlider3>();
+		positionSlider->minValue = -10.0f;
+		positionSlider->maxValue = 10.0f;
+		positionSlider->name = "Position";
+		positionSlider->data = &m_position;
+		displayInfo.addElement(positionSlider);
+
+		std::shared_ptr<DisplayInfoElementSlider3> rotationSlider = std::make_shared<DisplayInfoElementSlider3>();
+		rotationSlider->minValue = -360.0f;
+		rotationSlider->maxValue = 360.0f;
+		rotationSlider->name = "Rotation";
+		rotationSlider->data = &m_rotation;
+		displayInfo.addElement(rotationSlider);
+
+		std::shared_ptr<DisplayInfoElementSlider3> scaleSlider = std::make_shared<DisplayInfoElementSlider3>();
+		scaleSlider->minValue = 0.0f;
+		scaleSlider->maxValue = 10.0f;
+		scaleSlider->name = "Scale";
+		scaleSlider->data = &m_scale;
+		displayInfo.addElement(scaleSlider);
+
+		m_displayInfo = displayInfo;
 	}
 
 	Transform::Transform(Vec3 position, Vec3 rotation, Vec3 scale) :
 		m_position(position), m_rotation(rotation), m_scale(scale)
 	{
+		DisplayInfo displayInfo;
+		displayInfo.setComponentName("Transform");
+
+		std::shared_ptr<DisplayInfoElementSlider3> positionSlider = std::make_shared<DisplayInfoElementSlider3>();
+		positionSlider->minValue = -10.0f;
+		positionSlider->maxValue = 10.0f;
+		positionSlider->name = "Position";
+		positionSlider->data = &m_position;
+		displayInfo.addElement(positionSlider);
+
+		std::shared_ptr<DisplayInfoElementSlider3> rotationSlider = std::make_shared<DisplayInfoElementSlider3>();
+		rotationSlider->minValue = -360.0f;
+		rotationSlider->maxValue = 360.0f;
+		rotationSlider->name = "Rotation";
+		rotationSlider->data = &m_rotation;
+		displayInfo.addElement(rotationSlider);
+
+		std::shared_ptr<DisplayInfoElementSlider3> scaleSlider = std::make_shared<DisplayInfoElementSlider3>();
+		scaleSlider->minValue = 0.0f;
+		scaleSlider->maxValue = 10.0f;
+		scaleSlider->name = "Scale";
+		scaleSlider->data = &m_scale;
+		displayInfo.addElement(scaleSlider);
+
+		m_displayInfo = displayInfo;
 	}
 
 	void Transform::setPosition(Vec3 position)
@@ -103,34 +153,6 @@ namespace Tengine
 		rotateMatrix = RotateMatrix(rotateMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
 		Mat4 scaleMatrix = GetScaleMatrix(m_scale);
 		return translateMatrix * rotateMatrix * scaleMatrix;
-	}
-
-	DisplayInfo Transform::getDisplayInfo()
-	{
-		DisplayInfo displayInfo;
-		displayInfo.setComponentName("Transform");
-
-		std::shared_ptr<DisplayInfoElementSlider3> positionSlider = std::make_shared<DisplayInfoElementSlider3>();
-		positionSlider->minValue = -10.0f;
-		positionSlider->maxValue = 10.0f;
-		positionSlider->name = "Position";
-		positionSlider->data = &m_position;
-		displayInfo.addElement(positionSlider);
-
-		std::shared_ptr<DisplayInfoElementSlider3> rotationSlider = std::make_shared<DisplayInfoElementSlider3>();
-		rotationSlider->minValue = -360.0f;
-		rotationSlider->maxValue = 360.0f;
-		rotationSlider->name = "Rotation";
-		rotationSlider->data = &m_rotation;
-		displayInfo.addElement(rotationSlider);
-
-		std::shared_ptr<DisplayInfoElementSlider3> scaleSlider = std::make_shared<DisplayInfoElementSlider3>();
-		scaleSlider->minValue = 0.0f;
-		scaleSlider->maxValue = 10.0f;
-		scaleSlider->name = "Scale";
-		scaleSlider->data = &m_scale;
-		displayInfo.addElement(scaleSlider);
-		return displayInfo;
 	}
 
 	void Transform::serialize(nlohmann::json& data)

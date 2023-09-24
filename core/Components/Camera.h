@@ -103,7 +103,6 @@ namespace Tengine
 		RotationOrder getRotationOrder() const;
 		ProjectionType getProjectionType() const;
 
-		DisplayInfo getDisplayInfo() final;
 		void serialize(nlohmann::json& data) final;
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;

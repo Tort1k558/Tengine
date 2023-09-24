@@ -13,6 +13,7 @@ namespace Tengine
 
 	Camera::Camera(ProjectionType type)
 	{
+
 		setCameraType(type);
 	}
 
@@ -75,7 +76,59 @@ namespace Tengine
 		return m_rotationOrder;
 	}
 
-	DisplayInfo Camera::getDisplayInfo()
+	void Camera::serialize(nlohmann::json& data)
+	{
+		// Serialize
+		data["camera"]["rotationOrder"] = getRotationOrder();
+		data["camera"]["projectionType"] = getProjectionType();
+		switch (getProjectionType())
+		{
+		case ProjectionType::Perspective:
+		{
+			std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
+			data["camera"]["perspective"]["zNear"] = perspective->getZNear();
+			data["camera"]["perspective"]["zFar"] = perspective->getZFar();
+			data["camera"]["perspective"]["fov"] = perspective->getFov();
+			data["camera"]["perspective"]["aspectRatio"] = perspective->getAspectRatio();
+			break;
+		}
+		case ProjectionType::Orthographical:
+		{
+			std::shared_ptr<OrthographicalProjection> orthographical = getOrthographicalProjection();
+			data["camera"]["orthographical"]["zNear"] = orthographical->getZNear();
+			data["camera"]["orthographical"]["zFar"] = orthographical->getZFar();
+			data["camera"]["orthographical"]["left"] = orthographical->getLeft();
+			data["camera"]["orthographical"]["right"] = orthographical->getRight();
+			data["camera"]["orthographical"]["bottom"] = orthographical->getBottom();
+			data["camera"]["orthographical"]["top"] = orthographical->getTop();
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	Mat4 Camera::getRotationMatrix(Vec3 rotation) const
+	{
+		switch (m_rotationOrder)
+		{
+		case RotationOrder::XYZ:
+			return GetEulerMatrixXYZ(rotation);
+		case RotationOrder::XZY:
+			return GetEulerMatrixXZY(rotation);
+		case RotationOrder::YXZ:
+			return GetEulerMatrixYXZ(rotation);
+		case RotationOrder::YZX:
+			return GetEulerMatrixYZX(rotation);
+		case RotationOrder::ZXY:
+			return GetEulerMatrixZXY(rotation);
+		case RotationOrder::ZYX:
+			return GetEulerMatrixZYX(rotation);
+		}
+		return Mat4(1.0f);
+	}
+
+	void Camera::setCameraType(ProjectionType type)
 	{
 		DisplayInfo displayInfo;
 		displayInfo.setComponentName("Camera");
@@ -170,63 +223,8 @@ namespace Tengine
 		default:
 			break;
 		}
-		return displayInfo;
-	}
+		m_displayInfo = displayInfo;
 
-	void Camera::serialize(nlohmann::json& data)
-	{
-		// Serialize
-		data["camera"]["rotationOrder"] = getRotationOrder();
-		data["camera"]["projectionType"] = getProjectionType();
-		switch (getProjectionType())
-		{
-		case ProjectionType::Perspective:
-		{
-			std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
-			data["camera"]["perspective"]["zNear"] = perspective->getZNear();
-			data["camera"]["perspective"]["zFar"] = perspective->getZFar();
-			data["camera"]["perspective"]["fov"] = perspective->getFov();
-			data["camera"]["perspective"]["aspectRatio"] = perspective->getAspectRatio();
-			break;
-		}
-		case ProjectionType::Orthographical:
-		{
-			std::shared_ptr<OrthographicalProjection> orthographical = getOrthographicalProjection();
-			data["camera"]["orthographical"]["zNear"] = orthographical->getZNear();
-			data["camera"]["orthographical"]["zFar"] = orthographical->getZFar();
-			data["camera"]["orthographical"]["left"] = orthographical->getLeft();
-			data["camera"]["orthographical"]["right"] = orthographical->getRight();
-			data["camera"]["orthographical"]["bottom"] = orthographical->getBottom();
-			data["camera"]["orthographical"]["top"] = orthographical->getTop();
-			break;
-		}
-		default:
-			break;
-		}
-	}
-
-	Mat4 Camera::getRotationMatrix(Vec3 rotation) const
-	{
-		switch (m_rotationOrder)
-		{
-		case RotationOrder::XYZ:
-			return GetEulerMatrixXYZ(rotation);
-		case RotationOrder::XZY:
-			return GetEulerMatrixXZY(rotation);
-		case RotationOrder::YXZ:
-			return GetEulerMatrixYXZ(rotation);
-		case RotationOrder::YZX:
-			return GetEulerMatrixYZX(rotation);
-		case RotationOrder::ZXY:
-			return GetEulerMatrixZXY(rotation);
-		case RotationOrder::ZYX:
-			return GetEulerMatrixZYX(rotation);
-		}
-		return Mat4(1.0f);
-	}
-
-	void Camera::setCameraType(ProjectionType type)
-	{
 		m_projectionType = type;
 		switch (type)
 		{

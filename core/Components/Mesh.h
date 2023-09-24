@@ -47,7 +47,6 @@ namespace Tengine
 		bool hasSubmeshes() const;
 		std::vector<std::shared_ptr<SubMesh>> getSubmeshes() const;
 
-		DisplayInfo getDisplayInfo() final;
 		void serialize(nlohmann::json& data) final;
 	private:
 		std::vector<std::shared_ptr<SubMesh>> m_submeshes;

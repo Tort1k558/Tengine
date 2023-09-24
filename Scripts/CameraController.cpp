@@ -63,24 +63,4 @@ namespace Tengine
 		Tengine::Logger::Info(getParent()->getName());
 		Tengine::Logger::Info("Position X-{0}, Y-{1}, Z-{2}",transform->getPosition().x, transform->getPosition().y, transform->getPosition().z);
 	}
-	DisplayInfo CameraController::getDisplayInfo()
-	{
-		DisplayInfo displayInfo;
-		displayInfo.setComponentName("CameraController");
-
-		std::shared_ptr<DisplayInfoElementSlider> speedSlider = std::make_shared<DisplayInfoElementSlider>();
-		speedSlider->minValue = 0.0f;
-		speedSlider->maxValue = 20.0f;
-		speedSlider->name = "speed";
-		speedSlider->data = &speed;
-		displayInfo.addElement(speedSlider);
-
-		std::shared_ptr<DisplayInfoElementSlider> sensitivitySlider = std::make_shared<DisplayInfoElementSlider>();
-		sensitivitySlider->minValue = 0.0f;
-		sensitivitySlider->maxValue = 1.0f;
-		sensitivitySlider->name = "sensitivity";
-		sensitivitySlider->data = &cameraSensitivity;
-		displayInfo.addElement(sensitivitySlider);
-		return displayInfo;
-	}
 }

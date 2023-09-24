@@ -11,6 +11,11 @@ namespace Tengine
 		return m_parent.lock();
 	}
 
+	DisplayInfo Component::getDisplayInfo()
+	{
+		return m_displayInfo;
+	}
+
 	void DisplayInfo::addElement(std::shared_ptr<DisplayInfoElement> element)
 	{
 		m_elements.push_back(element);

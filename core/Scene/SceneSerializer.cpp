@@ -59,12 +59,10 @@ namespace Tengine
 				
 				if (dataObject.contains("transform"))
 				{
-					std::shared_ptr<Transform> transform = Component::Create<Transform>();
+					std::shared_ptr<Transform> transform = object->getComponent<Transform>();
 					transform->setPosition(Vec3(dataObject["transform"]["position"][0], dataObject["transform"]["position"][1], dataObject["transform"]["position"][2]));
 					transform->setRotation(Vec3(dataObject["transform"]["rotation"][0], dataObject["transform"]["rotation"][1], dataObject["transform"]["rotation"][2]));
 					transform->setScale(Vec3(dataObject["transform"]["scale"][0], dataObject["transform"]["scale"][1], dataObject["transform"]["scale"][2]));
-
-					object->addComponent(transform);
 				}
 
 				if (dataObject.contains("camera"))

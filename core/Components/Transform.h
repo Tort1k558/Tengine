@@ -28,8 +28,6 @@ namespace Tengine
 		Vec3 getRotation() const;
 		Vec3 getScale() const;
 		Mat4 getMatrix() const;
-
-		DisplayInfo getDisplayInfo() final;
 		void serialize(nlohmann::json& data) final;
 	private:
 		Vec3 m_position = Vec3(0.0f);
