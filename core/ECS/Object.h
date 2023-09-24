@@ -67,9 +67,10 @@ namespace Tengine
 	{
 		for (size_t i = 0; i < m_components.size(); i++)
 		{
-			if (std::dynamic_pointer_cast<T>(m_components[i]))
+			std::shared_ptr<T> ptr = std::dynamic_pointer_cast<T>(m_components[i]);
+			if (ptr)
 			{
-				return std::dynamic_pointer_cast<T>(m_components[i]);
+				return ptr;
 			}
 		}
 		return nullptr;

@@ -11,7 +11,7 @@ namespace Tengine
     std::vector<std::string> splitString(const std::string& input) {
         std::vector<std::string> tokens;
         std::string token;
-        std::string delimiter = " ;=,:()";
+        std::string delimiter = " ;=,:(){}";
 
         for (char c : input) {
             if (c == '\t' || c == '\n')
@@ -230,31 +230,45 @@ std::vector<std::string> GetScriptNames()
                     scriptCode = scriptCode.substr(0, lastPos);
                     std::vector<std::string> tokens = splitString(scriptCode);
 
+                    bool inScope = false;
                     for (size_t i = 0; i < tokens.size(); i++)
                     {
-                        if (tokens[i] == "float" || tokens[i] == "int" || tokens[i] == "double")
+                        if (tokens[i] == "{")
                         {
-                            std::string type = tokens[i];
-                            i++;
-                            if (tokens[i+1] != "(")
+                            inScope = true;
+                            continue;
+                        }
+                        else if (tokens[i] == "}")
+                        {
+                            inScope = false;
+                            continue;
+                        }
+                        if (!inScope)
+                        {
+                            if (tokens[i] == "float" || tokens[i] == "int" || tokens[i] == "double")
                             {
-                                while (tokens[i] != ";")
+                                std::string type = tokens[i];
+                                i++;
+                                if (tokens[i + 1] != "(")
                                 {
-                                    if (tokens[i] == ",")
+                                    while (tokens[i] != ";")
                                     {
-                                        i++;
-                                        continue;
-                                    }
-                                    if (tokens[i] == "=")
-                                    {
-                                        while (!(tokens[i] == ";" || tokens[i] == ","))
+                                        if (tokens[i] == ",")
                                         {
                                             i++;
+                                            continue;
                                         }
-                                        continue;
+                                        if (tokens[i] == "=")
+                                        {
+                                            while (!(tokens[i] == ";" || tokens[i] == ","))
+                                            {
+                                                i++;
+                                            }
+                                            continue;
+                                        }
+                                        info.fields.push_back({ type,tokens[i] });
+                                        i++;
                                     }
-                                    info.fields.push_back({ type,tokens[i] });
-                                    i++;
                                 }
                             }
                         }

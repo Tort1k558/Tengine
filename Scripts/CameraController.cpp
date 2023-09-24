@@ -59,8 +59,6 @@ namespace Tengine
 			}
 			deltaMouse = Input::GetPrevMousePosition() - Input::GetMousePosition();
 		}
-
-		Tengine::Logger::Info(getParent()->getName());
-		Tengine::Logger::Info("Position X-{0}, Y-{1}, Z-{2}",transform->getPosition().x, transform->getPosition().y, transform->getPosition().z);
+		Logger::Info("Position X-{0}, Y-{1}, Z-{2}",transform->getPosition().x, transform->getPosition().y, transform->getPosition().z);
 	}
 }

@@ -23,11 +23,15 @@ namespace Tengine
 		}
 	}
 
+	void FreeScriptModule()
+	{
+		ScriptSystem::GetInstance()->freeModule();
+	}
+
 	void ScriptSystem::destroy()
 	{
-		freeModule();
+		std::atexit(FreeScriptModule);
 	}
-	
 	void ScriptSystem::reload()
 	{
 		m_dllHandle = LoadLibrary("build/scriptModule.dll");

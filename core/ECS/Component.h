@@ -30,7 +30,6 @@ namespace Tengine
 	private:
 		std::weak_ptr<Object> m_parent;
 	protected:
-		DisplayInfo m_displayInfo;
 	};
 
 	template<typename T, typename ...Args>
