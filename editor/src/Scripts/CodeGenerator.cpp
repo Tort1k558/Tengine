@@ -71,18 +71,19 @@ R"(#pragma once
 
 #include<string>
 #include<vector>
+#include<memory>
 
 #include"ECS/Object.h"
 
 using namespace Tengine;
 #define EXTERN __declspec(dllexport)
-#define SHOWINEDITOR DisplayInfo getDisplayInfo() override;
+#define SHOWINEDITOR ComponentInfo getInfo() override;
 
 extern "C" EXTERN void StartScripts();
 
 extern "C" EXTERN void UpdateScripts();
 
-extern "C" EXTERN void AddScript(std::shared_ptr<Object> object, std::string_view nameScript);
+extern "C" EXTERN void* AddScript(std::shared_ptr<Object> object, std::string_view nameScript);
 
 extern "C" EXTERN std::vector<std::string> GetScriptNames();
 )";
@@ -155,7 +156,7 @@ std::vector<std::string> GetScriptNames()
             initSourceFile << "    return {" + nameAllScripts + R"(};
 }
 )";
-            initSourceFile << R"(void AddScript(std::shared_ptr<Object> object, std::string_view nameScript)
+            initSourceFile << R"(void* AddScript(std::shared_ptr<Object> object, std::string_view nameScript)
 {
 )";
             for (size_t i = 0; i < m_scriptInfo.size(); i++)
@@ -165,21 +166,21 @@ std::vector<std::string> GetScriptNames()
                     initSourceFile << R"(    if (nameScript == ")" + m_scriptInfo[i].name + R"(")
     {
 )";
-                    initSourceFile << R"(        object->addComponent(Component::Create<)" + m_scriptInfo[i].name + R"(>());
-    }
-)";
+                    initSourceFile <<"\t\tstd::shared_ptr<Script> component = Component::Create<" + m_scriptInfo[i].name + ">();\n";
+                    initSourceFile <<"\t\tobject->addComponent(component);\n";
+                    initSourceFile <<"\t\treturn &component;\n\t}\n";
                 }
                 else
                 {
                     initSourceFile << R"(    else if (nameScript == )" + m_scriptInfo[i].name + R"()
     {
 )";
-                    initSourceFile << R"(    object->addComponent(Component::Create<" + m_scriptInfo[i].name + R"(>());
-    }
-)";
+                    initSourceFile << "\t\tstd::shared_ptr<Script> component = Component::Create<" + m_scriptInfo[i].name + ">();\n";
+                    initSourceFile << "\t\tobject->addComponent(component);\n";
+                    initSourceFile << "\t\treturn &component;\n\t}\n";
                 }
             }
-            initSourceFile << "\n}";
+            initSourceFile << "}\n";
             initSourceFile << m_metaData;
             initSourceFile.close();
         }
@@ -284,9 +285,9 @@ std::vector<std::string> GetScriptNames()
     {
         for (const auto& info : m_scriptInfo)
         {
-            m_metaData += "DisplayInfo " + info.name + R"(::getDisplayInfo()
+            m_metaData += "ComponentInfo " + info.name + R"(::getInfo()
 {
-    DisplayInfo displayInfo;
+    ComponentInfo displayInfo;
 )";
             m_metaData += "\tdisplayInfo.setComponentName(\"" + info.name + "\");\n";
             int sliderCounter = 0;

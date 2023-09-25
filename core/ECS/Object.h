@@ -26,6 +26,8 @@ namespace Tengine
 		template<typename T>
 		void removeComponent();
 
+		void removeComponent(std::shared_ptr<Component> component);
+
 		template<typename T>
 		std::shared_ptr<T> getComponent() const;
 

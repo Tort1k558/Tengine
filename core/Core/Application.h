@@ -22,15 +22,16 @@ namespace Tengine
 		Application& operator=(const Application&) = delete;
 		Application& operator=(Application&&) = delete;
 
-		virtual void update() = 0;
-		virtual void create() = 0;
+		virtual void update() {}
+		virtual void create() {}
+		virtual void close() {}
 		
 		void init();
 		void run();
 		void lockFps();
 		void unlockFps();
 		void setMaxFps(size_t fps);
-		void close();
+		void destroy();
 		
 		size_t getMaxFps() const;
 		std::shared_ptr<Window> getWindow() const;

@@ -59,7 +59,16 @@ namespace Tengine
 			m_components.push_back(component);
 		}
 	}
-
+	void Object::removeComponent(std::shared_ptr<Component> component)
+	{
+		for (size_t i = 0; i < m_components.size(); i++)
+		{
+			if (m_components[i].get() == component.get())
+			{
+				m_components.erase(m_components.begin() + i);
+			}
+		}
+	}
 	std::vector<std::shared_ptr<Component>> Object::getComponents()
 	{
 		return m_components;

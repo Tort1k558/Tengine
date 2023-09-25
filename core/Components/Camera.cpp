@@ -1,7 +1,6 @@
 #include "Camera.h"
 
 #include"Components/Transform.h"
-#include"Scene/SceneSerializer.h"
 
 namespace Tengine
 {
@@ -47,9 +46,9 @@ namespace Tengine
 		Mat4 rotateMatrix = getRotationMatrix(rotation);
 		return rotateMatrix * Vec4(m_up, 1.0f);
 	}
-	DisplayInfo Camera::getDisplayInfo()
+	ComponentInfo Camera::getInfo()
 	{
-		DisplayInfo displayInfo;
+		ComponentInfo displayInfo;
 		displayInfo.setComponentName("Camera");
 		std::shared_ptr<DisplayInfoElementCombo> projectionType = std::make_shared<DisplayInfoElementCombo>();
 		projectionType->name = "Projection";

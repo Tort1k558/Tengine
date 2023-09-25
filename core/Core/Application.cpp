@@ -25,9 +25,7 @@ namespace Tengine
         RendererSystem::GetInstance()->setRendererType(RendererType::OpenGL);
         RendererSystem::GetInstance()->setTextureFilter(TextureFilter::Anisotropic16);
         RendererSystem::GetInstance()->updateViewport(m_window->getSize());
-        SystemManager::AddSystem(RendererSystem::GetInstance());
-        SystemManager::AddSystem(ScriptSystem::GetInstance());
-        SystemManager::InitSystems();
+        RendererSystem::GetInstance()->init();
 
         m_eventDispatcher = EventDispatcher();
         m_eventDispatcher.addEvent<EventMouseMoved>([](EventMouseMoved& event)
@@ -81,6 +79,7 @@ namespace Tengine
 
             Input::Update();
             m_window->update();
+            RendererSystem::GetInstance()->update();
             SystemManager::UpdateSystems();
 
             update();
@@ -91,7 +90,9 @@ namespace Tengine
                 nextFrame += std::chrono::duration<double>(maxDelta);
             }
         }
+        close();
         SystemManager::DestroySystems();
+        RendererSystem::GetInstance()->destroy();
     }
 
     void Application::lockFps()
@@ -109,7 +110,7 @@ namespace Tengine
         m_maxFps = fps;
     }
 
-    void Application::close()
+    void Application::destroy()
     {
         m_isRunning = false;
     }

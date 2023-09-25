@@ -11,26 +11,26 @@ namespace Tengine
 		return m_parent.lock();
 	}
 
-	DisplayInfo Component::getDisplayInfo()
+	ComponentInfo Component::getInfo()
 	{
-		return DisplayInfo();
+		return ComponentInfo();
 	}
 
-	void DisplayInfo::addElement(std::shared_ptr<DisplayInfoElement> element)
+	void ComponentInfo::addElement(std::shared_ptr<DisplayInfoElement> element)
 	{
 		m_elements.push_back(element);
 	}
 
-	void DisplayInfo::setComponentName(const std::string& name)
+	void ComponentInfo::setComponentName(const std::string& name)
 	{
 		m_componentName = name;
 	}
-	std::string DisplayInfo::getComponentName() const
+	std::string ComponentInfo::getComponentName() const
 	{
 		return m_componentName;
 	}
 
-	std::vector<std::shared_ptr<DisplayInfoElement>> DisplayInfo::getElements() const
+	std::vector<std::shared_ptr<DisplayInfoElement>> ComponentInfo::getElements() const
 	{
 		return m_elements;
 	}

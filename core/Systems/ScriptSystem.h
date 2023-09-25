@@ -7,6 +7,7 @@
 #include"Scene/SceneManager.h"
 #include"Core/Core.h"
 #include"ECS/Object.h"
+#include"Components/Script.h"
 
 namespace Tengine
 {
@@ -14,7 +15,7 @@ namespace Tengine
 	{
 		using UpdateScriptsFn = void(*)();
 		using StartScriptsFn = void(*)();
-		using AddScriptFn = void(*)(std::shared_ptr<Object> object, std::string_view nameScript);
+		using AddScriptFn = void*(*)(std::shared_ptr<Object> object, std::string_view nameScript);
 		using GetScriptNamesFn = std::vector<std::string>(*)();
 	public:
 		void init() final;
@@ -22,7 +23,7 @@ namespace Tengine
 		void destroy() final;
 		void reload();
 		void freeModule();
-		void addScript(std::shared_ptr<Object> object, std::string_view nameScript);
+		std::shared_ptr<Component> addScript(std::shared_ptr<Object> object, std::string_view nameScript);
 		std::vector<std::string> getScriptNames();
 		static std::shared_ptr<ScriptSystem> GetInstance();
 	private:

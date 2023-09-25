@@ -65,12 +65,17 @@ namespace Tengine
 		}
 	}
 
-	void ScriptSystem::addScript(std::shared_ptr<Object> object, std::string_view nameScript)
+	std::shared_ptr<Component> ScriptSystem::addScript(std::shared_ptr<Object> object, std::string_view nameScript)
 	{
 		if (m_addScript)
 		{
-			m_addScript(object, nameScript);
+			void* script = m_addScript(object, nameScript);
+			if (script)
+			{
+				return *static_cast<std::shared_ptr<Component>*>(script);
+			}
 		}
+		return nullptr;
 	}
 
 	std::vector<std::string> ScriptSystem::getScriptNames()

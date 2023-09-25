@@ -1,7 +1,7 @@
 #include"Editor.h"
 #include"Core/Logger.h"
 
-using namespace Tengine;
+using namespace TengineEditor;
 int main(int argc, char** argv)
 {
     Logger::SetLevel(LogLevel::Debug);

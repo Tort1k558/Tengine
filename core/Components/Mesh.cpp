@@ -1,7 +1,6 @@
 #include "Mesh.h"
 
 #include"Core/AssetManager.h"
-#include"Scene/SceneSerializer.h"
 #include"Utils/Primitives.h"
 
 namespace Tengine
@@ -82,21 +81,44 @@ namespace Tengine
 		}
 	}
 
-	DisplayInfo Mesh::getDisplayInfo()
+	ComponentInfo Mesh::getInfo()
 	{
-		DisplayInfo displayInfo;
+		ComponentInfo displayInfo;
 
 		displayInfo.setComponentName("Mesh");
 		std::shared_ptr<DisplayInfoElementFileDialog> loadMeshButton = std::make_shared<DisplayInfoElementFileDialog>();
 		loadMeshButton->name = "Load Mesh";
+		loadMeshButton->path = m_path;
 		loadMeshButton->callback = [this](const std::string& path)
 		{
-			std::shared_ptr<Mesh> newMesh = AssetManager::LoadMesh(path);
-			if (newMesh)
+			if (path == "Primitive::Quad")
 			{
-				newMesh->setParent(this->getParent());
+				*this = *Primitives::CreateQuad();
 			}
-			this->getParent()->addComponent(newMesh);
+			else if (path == "Primitive::Cube")
+			{
+				*this = *Primitives::CreateCube();
+			}
+			else if (path.find("Primitive::Sphere::") != std::string::npos)
+			{
+				size_t sectorsPos = path.find("::Sectors::");
+				size_t stacksPos = path.rfind("::Stacks::");
+
+				int sectors;
+				int stacks;
+
+				if (sectorsPos == std::string::npos || stacksPos == std::string::npos || sectorsPos == stacksPos) {
+					sectors = 1;
+					stacks = 1;
+				}
+				sectors = std::stoi(path.substr(sectorsPos + 11, stacksPos - sectorsPos - 11));
+				stacks = std::stoi(path.substr(stacksPos + 10));
+				*this = *Primitives::CreateSphere(sectors, stacks);
+			}
+			else
+			{
+				*this = *AssetManager::LoadMesh(path);
+			}
 		};
 		displayInfo.addElement(loadMeshButton);
 		std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshesHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();

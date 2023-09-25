@@ -32,7 +32,6 @@ namespace Tengine
 	struct DisplayElementSlider
 	{
 		virtual ~DisplayElementSlider() = default;
-		void* data;
 		float minValue;
 		float maxValue;
 		std::function<void()> callback;
@@ -40,6 +39,7 @@ namespace Tengine
 
 	struct DisplayInfoElementSlider : public DisplayInfoElement, DisplayElementSlider
 	{
+		float* data;
 		DisplayInfoElementSlider()
 		{
 			type = DisplayTypeElement::Slider;
@@ -48,6 +48,7 @@ namespace Tengine
 
 	struct DisplayInfoElementSlider2 : public DisplayInfoElement, DisplayElementSlider
 	{
+		Vec2* data;
 		DisplayInfoElementSlider2()
 		{
 			type = DisplayTypeElement::Slider2;
@@ -55,6 +56,7 @@ namespace Tengine
 	};
 	struct DisplayInfoElementSlider3 : public DisplayInfoElement, DisplayElementSlider
 	{
+		Vec3* data;
 		DisplayInfoElementSlider3()
 		{
 			type = DisplayTypeElement::Slider3;
@@ -62,6 +64,7 @@ namespace Tengine
 	};
 	struct DisplayInfoElementSlider4 : public DisplayInfoElement, DisplayElementSlider
 	{
+		Vec4* data;
 		DisplayInfoElementSlider4()
 		{
 			type = DisplayTypeElement::Slider4;
@@ -115,13 +118,14 @@ namespace Tengine
 		{
 			type = DisplayTypeElement::FileDialog;
 		}
+		std::filesystem::path path;
 		std::function<void(const std::string& path)> callback;
 	};
 
-	class TENGINE DisplayInfo
+	class TENGINE ComponentInfo
 	{
 	public:
-		DisplayInfo() = default;
+		ComponentInfo() = default;
 		void addElement(std::shared_ptr<DisplayInfoElement> element);
 		void setComponentName(const std::string& name);
 		std::string getComponentName() const;

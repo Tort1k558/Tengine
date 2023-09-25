@@ -11,10 +11,10 @@
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
 #include"Core/AssetManager.h"
-#include"Scene/SceneSerializer.h"
+#include"Scene/SceneManager.h"
 #include"Systems/ScriptSystem.h"
 
-namespace Tengine
+namespace TengineEditor
 {
     Editor::Editor(unsigned int width, unsigned int height, const std::string& title) :
         Application(width, height, title)
@@ -24,8 +24,8 @@ namespace Tengine
 
     void Editor::create()
     {
+        ScriptSystem::GetInstance()->reload();
         UISystem::GetInstance()->setWindow(getWindow());
-        SystemManager::AddSystem(UISystem::GetInstance());
         UISystem::GetInstance()->init();
         std::shared_ptr<Scene> scene = Scene::Create();
         SceneManager::SetCurrentScene(scene);
@@ -54,9 +54,14 @@ namespace Tengine
 
     void Editor::update()
     {
+        UISystem::GetInstance()->update();
         if (Input::IsKeyPressed(KeyCode::ESCAPE))
         {
-            close();
+            destroy();
         }
+    }
+    void Editor::close()
+    {
+        UISystem::GetInstance()->destroy();
     }
 }

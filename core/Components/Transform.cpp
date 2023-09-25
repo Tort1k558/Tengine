@@ -1,7 +1,5 @@
 #include"Transform.h"
 
-#include"Scene/SceneSerializer.h"
-
 namespace Tengine
 {
 	Transform::Transform()
@@ -105,20 +103,9 @@ namespace Tengine
 		return translateMatrix * rotateMatrix * scaleMatrix;
 	}
 
-	void Transform::serialize(nlohmann::json& data)
+	ComponentInfo Transform::getInfo()
 	{
-		// Serialize
-		Vec3 position = getPosition();
-		data["transform"]["position"] = { position.x,position.y,position.z };
-		Vec3 rotation = getRotation();
-		data["transform"]["rotation"] = { rotation.x,rotation.y,rotation.z };
-		Vec3 scale = getScale();
-		data["transform"]["scale"] = { scale.x,scale.y,scale.z };
-	}
-
-	DisplayInfo Transform::getDisplayInfo()
-	{
-		DisplayInfo displayInfo;
+		ComponentInfo displayInfo;
 		displayInfo.setComponentName("Transform");
 
 		std::shared_ptr<DisplayInfoElementSlider3> positionSlider = std::make_shared<DisplayInfoElementSlider3>();

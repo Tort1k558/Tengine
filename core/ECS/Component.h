@@ -1,9 +1,5 @@
 #pragma once
 
-//#define TRACEABLE \
-//	template<typename T> \
-//	friend class reflang::Class;
-
 #include<memory>
 #include<nlohmann/json.hpp>
 
@@ -25,7 +21,7 @@ namespace Tengine
 		template<typename T, typename... Args>
 		static std::shared_ptr<T> Create(Args... args);
 
-		virtual DisplayInfo getDisplayInfo();
+		virtual ComponentInfo getInfo();
 		virtual void serialize(nlohmann::json& data) {}
 	private:
 		std::weak_ptr<Object> m_parent;

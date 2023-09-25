@@ -10,8 +10,6 @@ namespace Tengine
 		virtual ~Script() = default;
 		virtual void start() {};
 		virtual void update() {};
-		virtual void serialize() {};
-		virtual void deserialize() {};
 	private:
 		
 	};

@@ -26,7 +26,7 @@ namespace Tengine
 		virtual ~Resource() = default;
 		std::filesystem::path getPath() const;
 		void setPath(std::filesystem::path path);
-	private:
+	protected:
 		std::filesystem::path m_path;
 	};
 
