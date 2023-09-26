@@ -129,44 +129,44 @@ namespace Tengine
 		SetCurrentScene(scene);
 		return scene;
 	}
-	void SceneManager::DeserializeField(nlohmann::json& data,std::shared_ptr<DisplayInfoElement> element)
+	void SceneManager::DeserializeField(nlohmann::json& data,std::shared_ptr<FieldInfo> element)
 	{
 		switch (element->type)
 		{
-		case DisplayTypeElement::Slider:
+		case FieldType::Slider:
 		{
-			std::shared_ptr<DisplayInfoElementSlider> field = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+			std::shared_ptr<FieldFloat> field = std::dynamic_pointer_cast<FieldFloat>(element);
 			*field->data = static_cast<float>(data[0]);
 			break;
 		}
-		case DisplayTypeElement::Slider2:
+		case FieldType::Vec2:
 		{
-			std::shared_ptr<DisplayInfoElementSlider2> field = std::dynamic_pointer_cast<DisplayInfoElementSlider2>(element);
+			std::shared_ptr<FieldVec2> field = std::dynamic_pointer_cast<FieldVec2>(element);
 			*field->data = Vec2(data[0], data[1]);
 			break;
 		}
-		case DisplayTypeElement::Slider3:
+		case FieldType::Vec3:
 		{
-			std::shared_ptr<DisplayInfoElementSlider3> field = std::dynamic_pointer_cast<DisplayInfoElementSlider3>(element);
+			std::shared_ptr<FieldVec3> field = std::dynamic_pointer_cast<FieldVec3>(element);
 			*field->data = Vec3(data[0], data[1], data[2]);
 			break;
 		}
-		case DisplayTypeElement::Slider4:
+		case FieldType::Vec4:
 		{
-			std::shared_ptr<DisplayInfoElementSlider4> field = std::dynamic_pointer_cast<DisplayInfoElementSlider4>(element);
+			std::shared_ptr<FieldVec4> field = std::dynamic_pointer_cast<FieldVec4>(element);
 			*field->data = Vec4(data[0], data[1], data[2], data[3]);
 			break;
 		}
-		case DisplayTypeElement::Combo:
+		case FieldType::Enum:
 		{
-			std::shared_ptr<DisplayInfoElementCombo> field = std::dynamic_pointer_cast<DisplayInfoElementCombo>(element);
+			std::shared_ptr<FieldEnum> field = std::dynamic_pointer_cast<FieldEnum>(element);
 			*field->currentElement = data;
 			field->callback(*field->currentElement);
 			break;
 		}
-		case DisplayTypeElement::FileDialog:
+		case FieldType::File:
 		{
-			std::shared_ptr<DisplayInfoElementFileDialog> field = std::dynamic_pointer_cast<DisplayInfoElementFileDialog>(element);
+			std::shared_ptr<FieldFile> field = std::dynamic_pointer_cast<FieldFile>(element);
 			field->callback(data);
 			break;
 		}
@@ -174,43 +174,43 @@ namespace Tengine
 			break;
 		}
 	}
-	void SceneManager::SerializeField(nlohmann::json& data, std::shared_ptr<DisplayInfoElement> element)
+	void SceneManager::SerializeField(nlohmann::json& data, std::shared_ptr<FieldInfo> element)
 	{
 		switch (element->type)
 		{
-		case DisplayTypeElement::Slider:
+		case FieldType::Slider:
 		{
-			std::shared_ptr<DisplayInfoElementSlider> field = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+			std::shared_ptr<FieldFloat> field = std::dynamic_pointer_cast<FieldFloat>(element);
 			data = {*field->data};
 			break;
 		}
-		case DisplayTypeElement::Slider2:
+		case FieldType::Vec2:
 		{
-			std::shared_ptr<DisplayInfoElementSlider2> field = std::dynamic_pointer_cast<DisplayInfoElementSlider2>(element);
+			std::shared_ptr<FieldVec2> field = std::dynamic_pointer_cast<FieldVec2>(element);
 			data = { field->data->x,field->data->y };
 			break;
 		}
-		case DisplayTypeElement::Slider3:
+		case FieldType::Vec3:
 		{
-			std::shared_ptr<DisplayInfoElementSlider3> field = std::dynamic_pointer_cast<DisplayInfoElementSlider3>(element);
+			std::shared_ptr<FieldVec3> field = std::dynamic_pointer_cast<FieldVec3>(element);
 			data = { field->data->x,field->data->y,field->data->z };
 			break;
 		}
-		case DisplayTypeElement::Slider4:
+		case FieldType::Vec4:
 		{
-			std::shared_ptr<DisplayInfoElementSlider4> field = std::dynamic_pointer_cast<DisplayInfoElementSlider4>(element);
+			std::shared_ptr<FieldVec4> field = std::dynamic_pointer_cast<FieldVec4>(element);
 			data = { field->data->x,field->data->y,field->data->z,field->data->w };
 			break;
 		}
-		case DisplayTypeElement::Combo:
+		case FieldType::Enum:
 		{
-			std::shared_ptr<DisplayInfoElementCombo> field = std::dynamic_pointer_cast<DisplayInfoElementCombo>(element);
+			std::shared_ptr<FieldEnum> field = std::dynamic_pointer_cast<FieldEnum>(element);
 			data = *field->currentElement;
 			break;
 		}
-		case DisplayTypeElement::FileDialog:
+		case FieldType::File:
 		{
-			std::shared_ptr<DisplayInfoElementFileDialog> field = std::dynamic_pointer_cast<DisplayInfoElementFileDialog>(element);
+			std::shared_ptr<FieldFile> field = std::dynamic_pointer_cast<FieldFile>(element);
 			data = field->path;
 			break;
 		}

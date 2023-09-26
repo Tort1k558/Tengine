@@ -290,19 +290,19 @@ std::vector<std::string> GetScriptNames()
     ComponentInfo displayInfo;
 )";
             m_metaData += "\tdisplayInfo.setComponentName(\"" + info.name + "\");\n";
-            int sliderCounter = 0;
+            int fieldCounter = 0;
             for (const auto& field : info.fields)
             {
                 if (field.type == "float" || field.type == "double" || field.type == "int")
                 {
-                    std::string varName = "slider" + std::to_string(sliderCounter);
-                    m_metaData += "\tstd::shared_ptr<DisplayInfoElementSlider> " + varName + " = std::make_shared<DisplayInfoElementSlider>(); \n";
+                    std::string varName = "field" + std::to_string(fieldCounter);
+                    m_metaData += "\tstd::shared_ptr<FieldFloat> " + varName + " = std::make_shared<FieldFloat>(); \n";
                     m_metaData += "\t" + varName + "->minValue = 0.0f;\n";
                     m_metaData += "\t" + varName + "->maxValue = 20.0f;\n";
                     m_metaData += "\t" + varName + "->name = \"" + field.name + "\";\n";
                     m_metaData += "\t" + varName + "->data = &" + field.name + ";\n";
                     m_metaData += "\tdisplayInfo.addElement(" + varName + ");\n";
-                    sliderCounter++;
+                    fieldCounter++;
                 }
             }
 

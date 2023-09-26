@@ -5,7 +5,7 @@
 
 namespace Tengine
 {
-	struct FieldInfo
+	struct FieldScriptInfo
 	{
 		std::string type;
 		std::string name;
@@ -14,7 +14,7 @@ namespace Tengine
 	{
 		std::string name;
 		std::filesystem::path path;
-		std::vector<FieldInfo> fields;
+		std::vector<FieldScriptInfo> fields;
 	};
 	class CodeGenerator
 	{

@@ -23,7 +23,7 @@ namespace Tengine
 		static void Save(std::shared_ptr<Scene> scene);
 		static std::shared_ptr<Scene> Load(std::filesystem::path path);
 	private:
-		static void DeserializeField(nlohmann::json& data, std::shared_ptr<DisplayInfoElement> element);
-		static void SerializeField(nlohmann::json& data, std::shared_ptr<DisplayInfoElement> element);
+		static void DeserializeField(nlohmann::json& data, std::shared_ptr<FieldInfo> element);
+		static void SerializeField(nlohmann::json& data, std::shared_ptr<FieldInfo> element);
 	};
 }

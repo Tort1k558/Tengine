@@ -4,7 +4,7 @@
 
 #include"Core/Window.h"
 #include"ECS/System.h"
-#include<Utils/EditorElements/DisplayInfo.h>
+#include<Utils/EditorElements/ComponentInfo.h>
 
 namespace TengineEditor
 {
@@ -20,7 +20,7 @@ namespace TengineEditor
 
 		static std::shared_ptr<UISystem> GetInstance();
 	private:
-		void displayElement(std::shared_ptr<DisplayInfoElement> element);
+		void displayElement(std::shared_ptr<FieldInfo> element);
 		void renderMenuBar();
 		void renderWindowObjects();
 		void renderWindowComponents();

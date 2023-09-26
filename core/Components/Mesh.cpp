@@ -72,21 +72,12 @@ namespace Tengine
 		return m_submeshes;
 	}
 
-	void Mesh::serialize(nlohmann::json& data)
-	{
-		//Serialize
-		if (!getPath().empty())
-		{
-			data["mesh"]["path"] = getPath().string();
-		}
-	}
-
 	ComponentInfo Mesh::getInfo()
 	{
 		ComponentInfo displayInfo;
 
 		displayInfo.setComponentName("Mesh");
-		std::shared_ptr<DisplayInfoElementFileDialog> loadMeshButton = std::make_shared<DisplayInfoElementFileDialog>();
+		std::shared_ptr<FieldFile> loadMeshButton = std::make_shared<FieldFile>();
 		loadMeshButton->name = "Load Mesh";
 		loadMeshButton->path = m_path;
 		loadMeshButton->callback = [this](const std::string& path)
@@ -121,20 +112,20 @@ namespace Tengine
 			}
 		};
 		displayInfo.addElement(loadMeshButton);
-		std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshesHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();
+		std::shared_ptr<FiledCollapsingHeader> submeshesHeader = std::make_shared<FiledCollapsingHeader>();
 		submeshesHeader->name = "Submeshes";
 		for (size_t i = 0; i < m_submeshes.size(); i++)
 		{
-			std::shared_ptr<DisplayInfoElementCollapsingHeader> submeshHeader = std::make_shared<DisplayInfoElementCollapsingHeader>();
+			std::shared_ptr<FiledCollapsingHeader> submeshHeader = std::make_shared<FiledCollapsingHeader>();
 			submeshHeader->name = "Submesh" + std::to_string(i);
 			std::shared_ptr<Material> material = m_submeshes[i]->getMaterial();
-			std::shared_ptr<DisplayInfoElementImage> diffuse = std::make_shared<DisplayInfoElementImage>();
+			std::shared_ptr<FieldImage> diffuse = std::make_shared<FieldImage>();
 			diffuse->name = "Diffuse Texture";
 			diffuse->size = { 75,75 };
-			std::shared_ptr<DisplayInfoElementImage> specular = std::make_shared<DisplayInfoElementImage>();
+			std::shared_ptr<FieldImage> specular = std::make_shared<FieldImage>();
 			specular->name = "Specular Texture";
 			specular->size = { 75,75 };
-			std::shared_ptr<DisplayInfoElementImage> normals = std::make_shared<DisplayInfoElementImage>();
+			std::shared_ptr<FieldImage> normals = std::make_shared<FieldImage>();
 			normals->name = "Normal Texture";
 			normals->size = { 75,75 };
 			if (material)

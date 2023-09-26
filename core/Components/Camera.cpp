@@ -50,9 +50,9 @@ namespace Tengine
 	{
 		ComponentInfo displayInfo;
 		displayInfo.setComponentName("Camera");
-		std::shared_ptr<DisplayInfoElementCombo> projectionType = std::make_shared<DisplayInfoElementCombo>();
+		std::shared_ptr<FieldEnum> projectionType = std::make_shared<FieldEnum>();
 		projectionType->name = "Projection";
-		projectionType->type = DisplayTypeElement::Combo;
+		projectionType->type = FieldType::Enum;
 		projectionType->elements = { "Perspective","Orthographical" };
 		projectionType->currentElement = reinterpret_cast<int*>(&m_projectionType);
 		projectionType->callback = [this](int element)
@@ -61,20 +61,20 @@ namespace Tengine
 		};
 		displayInfo.addElement(projectionType);
 
-		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsZNear = std::make_shared<DisplayInfoElementSlider>();
+		std::shared_ptr<FieldFloat> projectionSettingsZNear = std::make_shared<FieldFloat>();
 		projectionSettingsZNear->data = &m_projection->m_zNear;
 		projectionSettingsZNear->minValue = 0.01f;
 		projectionSettingsZNear->maxValue = 10000.0f;
 		projectionSettingsZNear->name = "zNear";
-		projectionSettingsZNear->type = DisplayTypeElement::Slider;
+		projectionSettingsZNear->type = FieldType::Slider;
 		projectionSettingsZNear->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsZNear);
-		std::shared_ptr<DisplayInfoElementSlider> projectionSettingsZFar = std::make_shared<DisplayInfoElementSlider>();
+		std::shared_ptr<FieldFloat> projectionSettingsZFar = std::make_shared<FieldFloat>();
 		projectionSettingsZFar->data = &m_projection->m_zFar;
 		projectionSettingsZFar->minValue = 0.01f;
 		projectionSettingsZFar->maxValue = 10000.0f;
 		projectionSettingsZFar->name = "zFar";
-		projectionSettingsZFar->type = DisplayTypeElement::Slider;
+		projectionSettingsZFar->type = FieldType::Slider;
 		projectionSettingsZFar->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsZFar);
 
@@ -83,20 +83,20 @@ namespace Tengine
 		case ProjectionType::Perspective:
 		{
 			std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
-			std::shared_ptr<DisplayInfoElementSlider> projectionSettingsAspect = std::make_shared<DisplayInfoElementSlider>();
+			std::shared_ptr<FieldFloat> projectionSettingsAspect = std::make_shared<FieldFloat>();
 			projectionSettingsAspect->data = &perspective->m_aspectRatio;
 			projectionSettingsAspect->minValue = 0.0f;
 			projectionSettingsAspect->maxValue = 3.0f;
 			projectionSettingsAspect->name = "Aspect";
-			projectionSettingsAspect->type = DisplayTypeElement::Slider;
+			projectionSettingsAspect->type = FieldType::Slider;
 			projectionSettingsAspect->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsAspect);
-			std::shared_ptr<DisplayInfoElementSlider> projectionSettingsFov = std::make_shared<DisplayInfoElementSlider>();
+			std::shared_ptr<FieldFloat> projectionSettingsFov = std::make_shared<FieldFloat>();
 			projectionSettingsFov->data = &perspective->m_fov;
 			projectionSettingsFov->minValue = 0.0f;
 			projectionSettingsFov->maxValue = 360.0f;
 			projectionSettingsFov->name = "Fov";
-			projectionSettingsFov->type = DisplayTypeElement::Slider;
+			projectionSettingsFov->type = FieldType::Slider;
 			projectionSettingsFov->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsFov);
 			break;
@@ -104,36 +104,36 @@ namespace Tengine
 		case ProjectionType::Orthographical:
 		{
 			std::shared_ptr<OrthographicalProjection> projection = getOrthographicalProjection();
-			std::shared_ptr<DisplayInfoElementSlider> projectionSettingsLeft = std::make_shared<DisplayInfoElementSlider>();
+			std::shared_ptr<FieldFloat> projectionSettingsLeft = std::make_shared<FieldFloat>();
 			projectionSettingsLeft->data = &projection->m_left;
 			projectionSettingsLeft->minValue = -0.01f;
 			projectionSettingsLeft->maxValue = -10.0f;
 			projectionSettingsLeft->name = "Left";
-			projectionSettingsLeft->type = DisplayTypeElement::Slider;
+			projectionSettingsLeft->type = FieldType::Slider;
 			projectionSettingsLeft->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsLeft);
-			std::shared_ptr<DisplayInfoElementSlider> projectionSettingsRight = std::make_shared<DisplayInfoElementSlider>();
+			std::shared_ptr<FieldFloat> projectionSettingsRight = std::make_shared<FieldFloat>();
 			projectionSettingsRight->data = &projection->m_right;
 			projectionSettingsRight->minValue = 0.01f;
 			projectionSettingsRight->maxValue = 10.0f;
 			projectionSettingsRight->name = "Right";
-			projectionSettingsRight->type = DisplayTypeElement::Slider;
+			projectionSettingsRight->type = FieldType::Slider;
 			projectionSettingsRight->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsRight);
-			std::shared_ptr<DisplayInfoElementSlider> projectionSettingsBottom = std::make_shared<DisplayInfoElementSlider>();
+			std::shared_ptr<FieldFloat> projectionSettingsBottom = std::make_shared<FieldFloat>();
 			projectionSettingsBottom->data = &projection->m_bottom;
 			projectionSettingsBottom->minValue = -0.01f;
 			projectionSettingsBottom->maxValue = -10.0f;
 			projectionSettingsBottom->name = "Bottom";
-			projectionSettingsBottom->type = DisplayTypeElement::Slider;
+			projectionSettingsBottom->type = FieldType::Slider;
 			projectionSettingsBottom->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsBottom);
-			std::shared_ptr<DisplayInfoElementSlider> projectionSettingsTop = std::make_shared<DisplayInfoElementSlider>();
+			std::shared_ptr<FieldFloat> projectionSettingsTop = std::make_shared<FieldFloat>();
 			projectionSettingsTop->data = &projection->m_top;
 			projectionSettingsTop->minValue = 0.01f;
 			projectionSettingsTop->maxValue = 10.0f;
 			projectionSettingsTop->name = "Top";
-			projectionSettingsTop->type = DisplayTypeElement::Slider;
+			projectionSettingsTop->type = FieldType::Slider;
 			projectionSettingsTop->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsTop);
 			break;
@@ -169,38 +169,6 @@ namespace Tengine
 	RotationOrder Camera::getRotationOrder() const
 	{
 		return m_rotationOrder;
-	}
-
-	void Camera::serialize(nlohmann::json& data)
-	{
-		// Serialize
-		data["camera"]["rotationOrder"] = getRotationOrder();
-		data["camera"]["projectionType"] = getProjectionType();
-		switch (getProjectionType())
-		{
-		case ProjectionType::Perspective:
-		{
-			std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
-			data["camera"]["perspective"]["zNear"] = perspective->getZNear();
-			data["camera"]["perspective"]["zFar"] = perspective->getZFar();
-			data["camera"]["perspective"]["fov"] = perspective->getFov();
-			data["camera"]["perspective"]["aspectRatio"] = perspective->getAspectRatio();
-			break;
-		}
-		case ProjectionType::Orthographical:
-		{
-			std::shared_ptr<OrthographicalProjection> orthographical = getOrthographicalProjection();
-			data["camera"]["orthographical"]["zNear"] = orthographical->getZNear();
-			data["camera"]["orthographical"]["zFar"] = orthographical->getZFar();
-			data["camera"]["orthographical"]["left"] = orthographical->getLeft();
-			data["camera"]["orthographical"]["right"] = orthographical->getRight();
-			data["camera"]["orthographical"]["bottom"] = orthographical->getBottom();
-			data["camera"]["orthographical"]["top"] = orthographical->getTop();
-			break;
-		}
-		default:
-			break;
-		}
 	}
 
 	Mat4 Camera::getRotationMatrix(Vec3 rotation) const

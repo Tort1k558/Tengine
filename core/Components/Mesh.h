@@ -46,8 +46,6 @@ namespace Tengine
 		void addSubmesh(std::shared_ptr<SubMesh> submesh);
 		bool hasSubmeshes() const;
 		std::vector<std::shared_ptr<SubMesh>> getSubmeshes() const;
-
-		void serialize(nlohmann::json& data) final;
 		ComponentInfo getInfo() override;
 	private:
 		std::vector<std::shared_ptr<SubMesh>> m_submeshes;

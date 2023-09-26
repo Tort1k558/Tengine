@@ -108,21 +108,21 @@ namespace Tengine
 		ComponentInfo displayInfo;
 		displayInfo.setComponentName("Transform");
 
-		std::shared_ptr<DisplayInfoElementSlider3> positionSlider = std::make_shared<DisplayInfoElementSlider3>();
+		std::shared_ptr<FieldVec3> positionSlider = std::make_shared<FieldVec3>();
 		positionSlider->minValue = -10.0f;
 		positionSlider->maxValue = 10.0f;
 		positionSlider->name = "Position";
 		positionSlider->data = &m_position;
 		displayInfo.addElement(positionSlider);
 
-		std::shared_ptr<DisplayInfoElementSlider3> rotationSlider = std::make_shared<DisplayInfoElementSlider3>();
+		std::shared_ptr<FieldVec3> rotationSlider = std::make_shared<FieldVec3>();
 		rotationSlider->minValue = -360.0f;
 		rotationSlider->maxValue = 360.0f;
 		rotationSlider->name = "Rotation";
 		rotationSlider->data = &m_rotation;
 		displayInfo.addElement(rotationSlider);
 
-		std::shared_ptr<DisplayInfoElementSlider3> scaleSlider = std::make_shared<DisplayInfoElementSlider3>();
+		std::shared_ptr<FieldVec3> scaleSlider = std::make_shared<FieldVec3>();
 		scaleSlider->minValue = 0.0f;
 		scaleSlider->maxValue = 10.0f;
 		scaleSlider->name = "Scale";

@@ -46,6 +46,7 @@ namespace TengineEditor
         style.GrabMinSize = 5.0f;
         style.GrabRounding = 3.0f;
         style.WindowMenuButtonPosition = ImGuiDir_None;
+        style.WindowMinSize = { 100.0f,100.0f };
 
         colors[ImGuiCol_Text] = { 0.80f, 0.80f, 0.83f, 1.00f };
         colors[ImGuiCol_TextDisabled] = { 0.24f, 0.23f, 0.29f, 1.00f };
@@ -85,7 +86,6 @@ namespace TengineEditor
         glfwInit();
         ImGui_ImplOpenGL3_Init();
         ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
-        m_info.isInitialized = true;
     }
 
     void UISystem::update()
@@ -130,17 +130,11 @@ namespace TengineEditor
         static bool isGameRunning = false;
         static bool isGameStop = false;
         ImGui::Begin("Game", nullptr);
-
         if (isGameRunning) {
             if (ImGui::Button("stop")) {
                 isGameRunning = false;
                 SystemManager::DestroySystems();
-            }
-            else
-            {
-                ImVec2 availableArea = ImGui::GetContentRegionAvail();
-                ImGui::Image((void*)texture->getId(), availableArea, { 0, 1 }, { 1, 0 });
-                RendererSystem::GetInstance()->updateViewport({ availableArea.x, availableArea.y });
+                SceneManager::Load("Scene0.json");
             }
         }
         else {
@@ -151,6 +145,9 @@ namespace TengineEditor
                 SystemManager::InitSystems();
             }
         }
+        availableArea = ImGui::GetContentRegionAvail();
+        ImGui::Image((void*)texture->getId(), availableArea, { 0, 1 }, { 1, 0 });
+
         ImGui::End();
 
         //Render
@@ -181,15 +178,15 @@ namespace TengineEditor
         return m_instance;
     }
 
-    void UISystem::displayElement(std::shared_ptr<DisplayInfoElement> element)
+    void UISystem::displayElement(std::shared_ptr<FieldInfo> element)
     {
         switch (element->type)
         {
-        case DisplayTypeElement::None:
+        case FieldType::None:
             break;
-        case DisplayTypeElement::Slider:
+        case FieldType::Slider:
         {
-            std::shared_ptr<DisplayInfoElementSlider> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider>(element);
+            std::shared_ptr<FieldFloat> slider = std::dynamic_pointer_cast<FieldFloat>(element);
             if (ImGui::SliderFloat(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
@@ -199,27 +196,27 @@ namespace TengineEditor
             }
             break;
         }
-        case DisplayTypeElement::Slider2:
+        case FieldType::Vec2:
         {
-            std::shared_ptr<DisplayInfoElementSlider2> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider2>(element);
+            std::shared_ptr<FieldVec2> slider = std::dynamic_pointer_cast<FieldVec2>(element);
             ImGui::SliderFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), slider->minValue, slider->maxValue);
             break;
         }
-        case DisplayTypeElement::Slider3:
+        case FieldType::Vec3:
         {
-            std::shared_ptr<DisplayInfoElementSlider3> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider3>(element);
+            std::shared_ptr<FieldVec3> slider = std::dynamic_pointer_cast<FieldVec3>(element);
             ImGui::SliderFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), slider->minValue, slider->maxValue);
             break;
         }
-        case DisplayTypeElement::Slider4:
+        case FieldType::Vec4:
         {
-            std::shared_ptr<DisplayInfoElementSlider4> slider = std::dynamic_pointer_cast<DisplayInfoElementSlider4>(element);
+            std::shared_ptr<FieldVec4> slider = std::dynamic_pointer_cast<FieldVec4>(element);
             ImGui::SliderFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), slider->minValue, slider->maxValue);
             break;
         }
-        case DisplayTypeElement::Combo:
+        case FieldType::Enum:
         {
-            std::shared_ptr<DisplayInfoElementCombo> combo = std::dynamic_pointer_cast<DisplayInfoElementCombo>(element);
+            std::shared_ptr<FieldEnum> combo = std::dynamic_pointer_cast<FieldEnum>(element);
             if (ImGui::BeginCombo(combo->name.c_str(), combo->elements[*combo->currentElement].c_str()))
             {
                 for (int i = 0; i < combo->elements.size(); ++i)
@@ -240,9 +237,9 @@ namespace TengineEditor
             }
             break;
         }
-        case DisplayTypeElement::Image:
+        case FieldType::Image:
         {
-            std::shared_ptr<DisplayInfoElementImage> image = std::dynamic_pointer_cast<DisplayInfoElementImage>(element);
+            std::shared_ptr<FieldImage> image = std::dynamic_pointer_cast<FieldImage>(element);
             ImGui::Text(image->name.c_str());
             if (image->texture)
             {
@@ -254,9 +251,9 @@ namespace TengineEditor
             }
             break;
         }
-        case DisplayTypeElement::CollapsingHeader:
+        case FieldType::CollapsingHeader:
         {
-            std::shared_ptr<DisplayInfoElementCollapsingHeader> header = std::dynamic_pointer_cast<DisplayInfoElementCollapsingHeader>(element);
+            std::shared_ptr<FiledCollapsingHeader> header = std::dynamic_pointer_cast<FiledCollapsingHeader>(element);
             if (ImGui::CollapsingHeader(header->name.c_str()))
             {
                 for (size_t i = 0; i < header->elements.size(); i++)
@@ -266,18 +263,18 @@ namespace TengineEditor
             };
             break;
         }
-        case DisplayTypeElement::Button:
+        case FieldType::Button:
         {
-            std::shared_ptr<DisplayInfoElementButton> button = std::dynamic_pointer_cast<DisplayInfoElementButton>(element);
+            std::shared_ptr<FieldButton> button = std::dynamic_pointer_cast<FieldButton>(element);
             if (ImGui::Button(button->name.c_str()))
             {
                 button->callback();
             };
             break;
         }
-        case DisplayTypeElement::FileDialog:
+        case FieldType::File:
         {
-            std::shared_ptr<DisplayInfoElementFileDialog> fileDialog = std::dynamic_pointer_cast<DisplayInfoElementFileDialog>(element);
+            std::shared_ptr<FieldFile> fileDialog = std::dynamic_pointer_cast<FieldFile>(element);
 
             if (ImGui::Button(fileDialog->name.c_str()))
             {

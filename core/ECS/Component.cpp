@@ -16,7 +16,7 @@ namespace Tengine
 		return ComponentInfo();
 	}
 
-	void ComponentInfo::addElement(std::shared_ptr<DisplayInfoElement> element)
+	void ComponentInfo::addElement(std::shared_ptr<FieldInfo> element)
 	{
 		m_elements.push_back(element);
 	}
@@ -30,7 +30,7 @@ namespace Tengine
 		return m_componentName;
 	}
 
-	std::vector<std::shared_ptr<DisplayInfoElement>> ComponentInfo::getElements() const
+	std::vector<std::shared_ptr<FieldInfo>> ComponentInfo::getElements() const
 	{
 		return m_elements;
 	}

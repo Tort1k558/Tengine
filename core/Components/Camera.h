@@ -102,8 +102,6 @@ namespace Tengine
 		std::shared_ptr<Projection> getProjection() const;
 		RotationOrder getRotationOrder() const;
 		ProjectionType getProjectionType() const;
-
-		void serialize(nlohmann::json& data) final;
 		ComponentInfo getInfo() override;
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;

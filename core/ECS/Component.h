@@ -4,7 +4,7 @@
 #include<nlohmann/json.hpp>
 
 #include"ECS/Object.h"
-#include"Utils/EditorElements/DisplayInfo.h"
+#include"Utils/EditorElements/ComponentInfo.h"
 
 namespace Tengine
 {
@@ -22,7 +22,6 @@ namespace Tengine
 		static std::shared_ptr<T> Create(Args... args);
 
 		virtual ComponentInfo getInfo();
-		virtual void serialize(nlohmann::json& data) {}
 	private:
 		std::weak_ptr<Object> m_parent;
 	protected:
