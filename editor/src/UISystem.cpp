@@ -16,6 +16,7 @@
 #include"Scripts/CodeGenerator.h"
 #include"Systems/ScriptSystem.h"
 #include"Systems/RendererSystem.h"
+#include"Project.h"
 
 namespace TengineEditor
 {
@@ -140,6 +141,7 @@ namespace TengineEditor
         else {
             if (ImGui::Button("start")) {
                 isGameRunning = true;
+                SceneManager::Save(SceneManager::GetCurrentScene());
                 SystemManager::AddSystem(ScriptSystem::GetInstance());
                 SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
                 SystemManager::InitSystems();
@@ -294,6 +296,31 @@ namespace TengineEditor
     void UISystem::renderMenuBar()
     {
         if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("Project"))
+            {
+                if (ImGui::MenuItem("Save Project"))
+                {
+                    SceneManager::Save(SceneManager::GetCurrentScene());
+                    Project::GetInstance()->save();
+                }
+                if (ImGui::MenuItem("Load Project"))
+                {
+                    nfdchar_t* outPath = nullptr;
+                    nfdresult_t result = NFD_OpenDialog("project", nullptr, &outPath);
+                    if (result == NFD_OKAY) {
+                        Project::LoadProject(outPath);
+                    }
+                }
+                if (ImGui::MenuItem("Create Project"))
+                {
+                    nfdchar_t* outPath = nullptr;
+                    nfdresult_t result = NFD_PickFolder(nullptr, &outPath);
+                    if (result == NFD_OKAY) {
+                        Project::CreateProject(outPath);
+                    }
+                }
+                ImGui::EndMenu();
+            }
             if (ImGui::BeginMenu("Scene")) {
                 if (ImGui::MenuItem("Save Scene"))
                 {

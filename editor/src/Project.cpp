@@ -21,18 +21,18 @@ namespace TengineEditor
 	std::shared_ptr<Project> Project::LoadProject(std::filesystem::path path)
 	{
 		m_instance = std::shared_ptr<Project>(new Project());
-		m_instance->m_path = path.root_directory();
+		m_instance->m_path = path.parent_path();
 		std::ifstream file(path);
 		nlohmann::json data = nlohmann::json::parse(file);
 		m_instance->m_name = data["name"];
 		m_instance->m_scenes = data["scenes"];
-		for (const auto& scene : data["scenes"])
+		for (const auto& scene : m_instance->m_scenes)
 		{
-			m_instance->addScene(scene);
+			SceneManager::AddScene(scene.filename().string(), scene);
 		}
 		if(!m_instance->m_scenes.empty())
 		{
-			SceneManager::LoadByPath(m_instance->m_scenes[0]);
+			SceneManager::LoadByPath(m_instance->getPath().parent_path().string() + "/" + m_instance->m_scenes[0].string());
 		}
 		return m_instance;
 	}
@@ -56,10 +56,7 @@ namespace TengineEditor
 	{
 		nlohmann::json data;
 		data["name"] = m_name;
-		for (const auto& scene : m_scenes)
-		{
-			data["scenes"] = scene;
-		}
+		data["scenes"] = m_scenes;
 		std::ofstream file(m_path.string() +"/" + m_name + ".project");
 		if (file.is_open()) {
 			file << data.dump(4);

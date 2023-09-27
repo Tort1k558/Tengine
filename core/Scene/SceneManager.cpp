@@ -40,8 +40,8 @@ namespace Tengine
 		}
 
 		//Write data to file
-		scene->setPath(scene->getPath().parent_path().string() + "/" + scene->getName());
-		std::ofstream file(scene->getPath().string() + ".scene",std::ios_base::out);
+		scene->setPath(scene->getPath().parent_path().string() + "/" + scene->getName() + scene->getPath().extension().string());
+		std::ofstream file(scene->getPath().string(),std::ios_base::out);
 		if (file.is_open()) {
 			file << data.dump(4);
 			file.close();
@@ -55,7 +55,7 @@ namespace Tengine
 	{
 		std::shared_ptr<Scene> scene = Scene::Create();
 		SetCurrentScene(scene);
-		std::ifstream file(path.string() + ".scene");
+		std::ifstream file(path.string());
 		if (file.is_open())
 		{
 			nlohmann::json data = nlohmann::json::parse(file);
@@ -205,6 +205,7 @@ namespace Tengine
 			break;
 		}
 	}
+
 	void SceneManager::SerializeField(nlohmann::json& data, std::shared_ptr<FieldInfo> element)
 	{
 		switch (element->type)
@@ -249,6 +250,7 @@ namespace Tengine
 			break;
 		}
 	}
+
 	std::shared_ptr<Scene> SceneManager::GetCurrentScene()
 	{
 		return m_currentScene;
