@@ -13,9 +13,14 @@ namespace Tengine
 		return m_name;
 	}
 
+	std::filesystem::path Scene::getPath()
+	{
+		return m_path;
+	}
+
 	std::shared_ptr<Scene> Scene::Create()
 	{
-		return std::make_shared<Scene>();
+		return std::shared_ptr<Scene>(new Scene());
 	}
 
 	void Scene::addObject(std::shared_ptr<Object> object)
@@ -43,6 +48,11 @@ namespace Tengine
 	void Scene::setName(std::string_view name)
 	{
 		m_name = name;
+	}
+
+	void Scene::setPath(std::filesystem::path path)
+	{
+		m_path = path;
 	}
 
 	std::shared_ptr<Object> Scene::getObjectByUUID(UUID id) const

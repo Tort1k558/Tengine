@@ -13,6 +13,7 @@ namespace Tengine
 {
 
 	std::shared_ptr<Scene> SceneManager::m_currentScene;
+	std::unordered_map<std::string, std::filesystem::path> SceneManager::m_sceneNames;
 
 	void SceneManager::SetCurrentScene(std::shared_ptr<Scene> scene)
 	{
@@ -39,95 +40,125 @@ namespace Tengine
 		}
 
 		//Write data to file
-		std::ofstream file(scene->getName() + ".json");
+		scene->setPath(scene->getPath().parent_path().string() + "/" + scene->getName());
+		std::ofstream file(scene->getPath().string() + ".scene",std::ios_base::out);
 		if (file.is_open()) {
 			file << data.dump(4);
 			file.close();
 		}
 		else {
-			Logger::Critical("ERROR::Serializer::Failed to open the file for writing!");
+			Logger::Critical("ERROR::SceneManager::Failed to save the scene file!");
 		}
 	}
 
-	std::shared_ptr<Scene> SceneManager::Load(std::filesystem::path path)
+	std::shared_ptr<Scene> SceneManager::LoadByPath(std::filesystem::path path)
 	{
 		std::shared_ptr<Scene> scene = Scene::Create();
-		SceneManager::SetCurrentScene(scene);
-		std::ifstream file(path);
-		nlohmann::json data = nlohmann::json::parse(file);
-		scene->setName(data["name"].get<std::string>());
-		for (const auto& item : data.items())
+		SetCurrentScene(scene);
+		std::ifstream file(path.string() + ".scene");
+		if (file.is_open())
 		{
-			if (item.key() != "name")
+			nlohmann::json data = nlohmann::json::parse(file);
+			scene->setPath(path);
+			scene->setName(data["name"].get<std::string>());
+			for (const auto& item : data.items())
 			{
-				std::string objectId = item.key();
-				std::shared_ptr<Object> object = Object::Create(UUID(objectId));
-				nlohmann::json dataObject = item.value();
-				for (auto it = dataObject.begin(); it != dataObject.end(); ++it)
+				if (item.key() != "name")
 				{
-					if (it.key() == "name")
+					std::string objectId = item.key();
+					std::shared_ptr<Object> object = Object::Create(UUID(objectId));
+					nlohmann::json dataObject = item.value();
+					for (auto it = dataObject.begin(); it != dataObject.end(); ++it)
 					{
-						object->setName(it.value());
-					}
-					else if (it.key() == "Transform")
-					{
-						std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-						ComponentInfo info = transform->getInfo();
-						auto elements = info.getElements();
-						auto& componentData = dataObject[info.getComponentName()];
-						for (size_t i = 0; i < elements.size(); i++)
+						if (it.key() == "name")
 						{
-							DeserializeField(componentData[elements[i]->name], elements[i]);
+							object->setName(it.value());
 						}
-					}
-					else if (it.key() == "Camera")
-					{
-						std::shared_ptr<Camera> camera;
-						camera = Component::Create<Camera>();
-						ComponentInfo info = camera->getInfo();
-						auto elements = info.getElements();
-						auto& componentData = dataObject[info.getComponentName()];
-						for (size_t i = 0; i < elements.size(); i++)
+						else if (it.key() == "Transform")
 						{
-							DeserializeField(componentData[elements[i]->name], elements[i]);
-						}
-						object->addComponent(camera);
-					}
-					else if (it.key() == "Mesh")
-					{
-						std::shared_ptr<Mesh> mesh = Component::Create<Mesh>();
-						ComponentInfo info = mesh->getInfo();
-						auto elements = info.getElements();
-						auto& componentData = dataObject[info.getComponentName()];
-						for (size_t i = 0; i < elements.size(); i++)
-						{
-							DeserializeField(componentData[elements[i]->name], elements[i]);
-						}
-						object->addComponent(mesh);
-					}
-					else
-					{
-						std::vector<std::string> nameScripts = ScriptSystem::GetInstance()->getScriptNames();
-						for (size_t i = 0; i < nameScripts.size(); i++)
-						{
-							if (nameScripts[i] == it.key())
+							std::shared_ptr<Transform> transform = object->getComponent<Transform>();
+							ComponentInfo info = transform->getInfo();
+							auto elements = info.getElements();
+							auto& componentData = dataObject[info.getComponentName()];
+							for (size_t i = 0; i < elements.size(); i++)
 							{
-								std::shared_ptr<Component> script = ScriptSystem::GetInstance()->addScript(object, it.key());
-								ComponentInfo info = script->getInfo();
-								auto elements = info.getElements();
-								auto& componentData = dataObject[info.getComponentName()];
-								for (size_t i = 0; i < elements.size(); i++)
+								DeserializeField(componentData[elements[i]->name], elements[i]);
+							}
+						}
+						else if (it.key() == "Camera")
+						{
+							std::shared_ptr<Camera> camera;
+							camera = Component::Create<Camera>();
+							ComponentInfo info = camera->getInfo();
+							auto elements = info.getElements();
+							auto& componentData = dataObject[info.getComponentName()];
+							for (size_t i = 0; i < elements.size(); i++)
+							{
+								DeserializeField(componentData[elements[i]->name], elements[i]);
+							}
+							object->addComponent(camera);
+						}
+						else if (it.key() == "Mesh")
+						{
+							std::shared_ptr<Mesh> mesh = Component::Create<Mesh>();
+							ComponentInfo info = mesh->getInfo();
+							auto elements = info.getElements();
+							auto& componentData = dataObject[info.getComponentName()];
+							for (size_t i = 0; i < elements.size(); i++)
+							{
+								DeserializeField(componentData[elements[i]->name], elements[i]);
+							}
+							object->addComponent(mesh);
+						}
+						else
+						{
+							std::vector<std::string> nameScripts = ScriptSystem::GetInstance()->getScriptNames();
+							for (size_t i = 0; i < nameScripts.size(); i++)
+							{
+								if (nameScripts[i] == it.key())
 								{
-									DeserializeField(componentData[elements[i]->name], elements[i]);
+									std::shared_ptr<Component> script = ScriptSystem::GetInstance()->addScript(object, it.key());
+									ComponentInfo info = script->getInfo();
+									auto elements = info.getElements();
+									auto& componentData = dataObject[info.getComponentName()];
+									for (size_t i = 0; i < elements.size(); i++)
+									{
+										DeserializeField(componentData[elements[i]->name], elements[i]);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			file.close();
 		}
-		SetCurrentScene(scene);
+		else
+		{
+			Logger::Critical("ERROR::SceneManager::Failed to open the scene file!");
+		}
 		return scene;
+	}
+
+	std::shared_ptr<Scene> SceneManager::LoadByName(const std::string& name)
+	{
+		std::shared_ptr<Scene> scene;
+		if (m_sceneNames.find(name) != m_sceneNames.end())
+		{
+			scene = LoadByPath(m_sceneNames[name]);
+		}
+		else
+		{
+			Logger::Critical("ERROR::SceneManager::Failed to load the scene, scene name {0} doesn't exists", name);
+			scene = Scene::Create();
+			SetCurrentScene(scene);
+		}
+
+		return scene;
+	}
+	void SceneManager::AddScene(const std::string& name, std::filesystem::path path)
+	{
+		m_sceneNames.insert({ name, path });
 	}
 	void SceneManager::DeserializeField(nlohmann::json& data,std::shared_ptr<FieldInfo> element)
 	{

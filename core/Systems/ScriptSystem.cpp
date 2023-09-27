@@ -34,7 +34,7 @@ namespace Tengine
 	}
 	void ScriptSystem::reload()
 	{
-		m_dllHandle = LoadLibrary("build/scriptModule.dll");
+		m_dllHandle = LoadLibrary(m_pathToDll.string().c_str());
 		if (m_dllHandle == nullptr) {
 			Logger::Critical("ERROR::ScriptSystem::Could not load script dll: scriptModule.dll");
 			return;
@@ -76,6 +76,16 @@ namespace Tengine
 			}
 		}
 		return nullptr;
+	}
+
+	void ScriptSystem::setPathToDll(std::filesystem::path path)
+	{
+		m_pathToDll = path;
+	}
+
+	std::filesystem::path ScriptSystem::getPathToDll()
+	{
+		return m_pathToDll;
 	}
 
 	std::vector<std::string> ScriptSystem::getScriptNames()

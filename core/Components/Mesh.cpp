@@ -82,9 +82,11 @@ namespace Tengine
 		loadMeshButton->path = m_path;
 		loadMeshButton->callback = [this](const std::string& path)
 		{
+			std::shared_ptr<Object> previousParent = this->getParent();
 			if (path == "Primitive::Quad")
 			{
 				*this = *Primitives::CreateQuad();
+				
 			}
 			else if (path == "Primitive::Cube")
 			{
@@ -110,6 +112,7 @@ namespace Tengine
 			{
 				*this = *AssetManager::LoadMesh(path);
 			}
+			this->setParent(previousParent);
 		};
 		displayInfo.addElement(loadMeshButton);
 		std::shared_ptr<FiledCollapsingHeader> submeshesHeader = std::make_shared<FiledCollapsingHeader>();

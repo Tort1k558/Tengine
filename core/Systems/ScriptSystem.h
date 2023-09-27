@@ -24,6 +24,8 @@ namespace Tengine
 		void reload();
 		void freeModule();
 		std::shared_ptr<Component> addScript(std::shared_ptr<Object> object, std::string_view nameScript);
+		void setPathToDll(std::filesystem::path path);
+		std::filesystem::path getPathToDll();
 		std::vector<std::string> getScriptNames();
 		static std::shared_ptr<ScriptSystem> GetInstance();
 	private:
@@ -34,7 +36,7 @@ namespace Tengine
 		GetScriptNamesFn m_getScriptNames = nullptr;
 		HMODULE m_dllHandle = nullptr;
 		bool m_isLoaded = false;
-
+		std::filesystem::path m_pathToDll;
 		static std::shared_ptr<ScriptSystem> m_instance;
 	};
 }

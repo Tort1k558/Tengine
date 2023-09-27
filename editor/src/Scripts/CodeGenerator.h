@@ -3,8 +3,10 @@
 #include<filesystem>
 #include<unordered_set>
 
-namespace Tengine
+
+namespace TengineEditor
 {
+
 	struct FieldScriptInfo
 	{
 		std::string type;

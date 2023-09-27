@@ -134,14 +134,14 @@ namespace TengineEditor
             if (ImGui::Button("stop")) {
                 isGameRunning = false;
                 SystemManager::DestroySystems();
-                SceneManager::Load("Scene0.json");
+                SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
             }
         }
         else {
             if (ImGui::Button("start")) {
                 isGameRunning = true;
                 SystemManager::AddSystem(ScriptSystem::GetInstance());
-                SceneManager::Load("Scene0.json");
+                SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
                 SystemManager::InitSystems();
             }
         }
@@ -304,7 +304,7 @@ namespace TengineEditor
                     nfdchar_t* outPath = nullptr;
                     nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
                     if (result == NFD_OKAY) {
-                        SceneManager::Load(outPath);
+                        SceneManager::LoadByPath(outPath);
                         m_nameOfSelectedObject.clear();
                     }
                 }
