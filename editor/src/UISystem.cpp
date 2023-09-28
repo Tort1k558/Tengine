@@ -17,6 +17,7 @@
 #include"Systems/ScriptSystem.h"
 #include"Systems/RendererSystem.h"
 #include"Project.h"
+#include"ProjectManager.h"
 
 namespace TengineEditor
 {
@@ -301,14 +302,14 @@ namespace TengineEditor
                 if (ImGui::MenuItem("Save Project"))
                 {
                     SceneManager::Save(SceneManager::GetCurrentScene());
-                    Project::GetInstance()->save();
+                    ProjectManager::Save();
                 }
                 if (ImGui::MenuItem("Load Project"))
                 {
                     nfdchar_t* outPath = nullptr;
                     nfdresult_t result = NFD_OpenDialog("project", nullptr, &outPath);
                     if (result == NFD_OKAY) {
-                        Project::LoadProject(outPath);
+                        ProjectManager::Load(outPath);
                     }
                 }
                 if (ImGui::MenuItem("Create Project"))
@@ -316,7 +317,7 @@ namespace TengineEditor
                     nfdchar_t* outPath = nullptr;
                     nfdresult_t result = NFD_PickFolder(nullptr, &outPath);
                     if (result == NFD_OKAY) {
-                        Project::CreateProject(outPath);
+                        ProjectManager::Create(outPath);
                     }
                 }
                 ImGui::EndMenu();
@@ -337,7 +338,9 @@ namespace TengineEditor
                 }
                 if (ImGui::MenuItem("Create Scene"))
                 {
-                    SceneManager::SetCurrentScene(Scene::Create());
+                    std::shared_ptr<Scene> scene = Scene::Create();
+                    scene->setPath(ProjectManager::GetInstance()->getPath().string() + "/" + scene->getName());
+                    SceneManager::SetCurrentScene(scene);
                     m_nameOfSelectedObject.clear();
                 }
                 ImGui::EndMenu();

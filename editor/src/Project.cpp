@@ -7,66 +7,6 @@ namespace TengineEditor
 {
 	using namespace Tengine;
 
-	std::shared_ptr<Project> Project::m_instance;
-
-	std::shared_ptr<Project> Project::GetInstance()
-	{
-		if (!m_instance)
-		{
-			m_instance = CreateProject("Project");
-		}
-		return m_instance;
-	}
-
-	std::shared_ptr<Project> Project::LoadProject(std::filesystem::path path)
-	{
-		m_instance = std::shared_ptr<Project>(new Project());
-		m_instance->m_path = path.parent_path();
-		std::ifstream file(path);
-		nlohmann::json data = nlohmann::json::parse(file);
-		m_instance->m_name = data["name"];
-		m_instance->m_scenes = data["scenes"];
-		for (const auto& scene : m_instance->m_scenes)
-		{
-			SceneManager::AddScene(scene.filename().string(), scene);
-		}
-		if(!m_instance->m_scenes.empty())
-		{
-			SceneManager::LoadByPath(m_instance->getPath().parent_path().string() + "/" + m_instance->m_scenes[0].string());
-		}
-		return m_instance;
-	}
-
-	std::shared_ptr<Project> Project::CreateProject(std::filesystem::path path)
-	{
-		m_instance = std::shared_ptr<Project>(new Project());
-		m_instance->m_name = "Project";
-		m_instance->m_path = path;
-		std::shared_ptr<Scene> defaultScene = Scene::Create();
-		defaultScene->setName("DefaultScene");
-		defaultScene->setPath(m_instance->m_path.string() + "/" + defaultScene->getName() + ".scene");
-		m_instance->addScene(defaultScene->getPath().string());
-		SceneManager::Save(defaultScene);
-		SceneManager::SetCurrentScene(defaultScene);
-		m_instance->save();
-		return m_instance;
-	}
-
-	void Project::save()
-	{
-		nlohmann::json data;
-		data["name"] = m_name;
-		data["scenes"] = m_scenes;
-		std::ofstream file(m_path.string() +"/" + m_name + ".project");
-		if (file.is_open()) {
-			file << data.dump(4);
-			file.close();
-		}
-		else {
-			Logger::Critical("ERROR::Serializer::Failed to open the file for writing!");
-		}
-	}
-
 	std::filesystem::path Project::getPath()
 	{
 		return m_path;
@@ -92,6 +32,13 @@ namespace TengineEditor
 				return;
 			}
 		}
+	}
+
+	void Project::setPath(std::filesystem::path path)
+	{
+		std::string sPath = path.string();
+		std::replace(sPath.begin(), sPath.end(), '\\', '/');
+		m_path = sPath;
 	}
 
 	void Project::setName(const std::string& name)

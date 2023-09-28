@@ -13,7 +13,7 @@
 #include"Core/AssetManager.h"
 #include"Scene/SceneManager.h"
 #include"Systems/ScriptSystem.h"
-#include"Project.h"
+#include"ProjectManager.h"
 
 namespace TengineEditor
 {
@@ -29,9 +29,7 @@ namespace TengineEditor
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
 
-        Project::CreateProject("Project");
-        ScriptSystem::GetInstance()->setPathToDll(Project::GetInstance()->getPath().string() + "/build/scriptModule.dll");
-        ScriptSystem::GetInstance()->reload();
+        ProjectManager::Create("Project");
         //std::shared_ptr<Scene> scene = Scene::Create();
         //SceneManager::SetCurrentScene(scene);
         //
@@ -62,7 +60,7 @@ namespace TengineEditor
         UISystem::GetInstance()->update();
         if (Input::IsKeyPressed(KeyCode::ESCAPE))
         {
-            Project::GetInstance()->save();
+            ProjectManager::Save();
             destroy();
         }
     }

@@ -14,10 +14,6 @@ namespace Tengine
 	{
 	public:
 		SceneManager() = delete;
-		SceneManager(const SceneManager&) = delete;
-		SceneManager(SceneManager&&) = delete;
-		SceneManager& operator=(const SceneManager&) = delete;
-		SceneManager& operator=(SceneManager&&) = delete;
 
 		static std::shared_ptr<Scene> GetCurrentScene();
 		static void SetCurrentScene(std::shared_ptr<Scene> scene);

@@ -5,7 +5,7 @@
 #include<sstream>
 #include"Core/Logger.h"
 #include"Systems/ScriptSystem.h"
-#include"Project.h"
+#include"ProjectManager.h"
 
 namespace TengineEditor
 {
@@ -49,8 +49,8 @@ namespace TengineEditor
     void CodeGenerator::CompileScripts()
     {
         ScriptSystem::GetInstance()->freeModule();
-        std::filesystem::create_directory(Project::GetInstance()->getPath().string() + "/Scripts");
-        std::filesystem::create_directory(Project::GetInstance()->getPath().string() + "/build");
+        std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/Scripts");
+        std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build");
         GetScriptInfo();
         GenerateMetaData();
         GenerateInitFiles();
@@ -60,14 +60,14 @@ namespace TengineEditor
     }
     void CodeGenerator::BuildDll()
     {
-        std::string cmakeBuildCommand = "cmake --build " + Project::GetInstance()->getPath().string() + "/build --config Debug";
+        std::string cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build --config Debug";
         std::system(cmakeBuildCommand.c_str());
     }
 
     void CodeGenerator::GenerateInitFiles()
     {
         //Header file
-        std::ofstream initHeaderFile(Project::GetInstance()->getPath().string() + "/build/SystemModule.h");
+        std::ofstream initHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/SystemModule.h");
         if (initHeaderFile.is_open())
         {
             initHeaderFile << \
@@ -99,7 +99,7 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
         }
 
         //Source file
-        std::ofstream initSourceFile(Project::GetInstance()->getPath().string() + "/build/SystemModule.cpp");
+        std::ofstream initSourceFile(ProjectManager::GetInstance()->getPath().string() + "/build/SystemModule.cpp");
         if (initSourceFile.is_open())
         {
             initSourceFile << \
@@ -198,7 +198,7 @@ std::vector<std::string> GetScriptNames()
     void CodeGenerator::GetScriptInfo()
     {
         m_scriptInfo.clear();
-        for (const auto& entry : std::filesystem::directory_iterator(Project::GetInstance()->getPath().string() + "/Scripts")) {
+        for (const auto& entry : std::filesystem::directory_iterator(ProjectManager::GetInstance()->getPath().string() + "/Scripts")) {
             if (entry.is_regular_file() && entry.path().extension() == ".h")
             {
                 ScriptInfo info;
@@ -317,16 +317,10 @@ std::vector<std::string> GetScriptNames()
     
     void CodeGenerator::GenerateCmake()
 	{
-		std::ofstream cmakeFile(Project::GetInstance()->getPath().string() + "/build/CMakeLists.txt");
+		std::ofstream cmakeFile(ProjectManager::GetInstance()->getPath().string() + "/build/CMakeLists.txt");
         if (cmakeFile.is_open()) {
             std::string pathToEditor = std::filesystem::current_path().string();
-            for (char& ch : pathToEditor)
-            {
-                if (ch == '\\')
-                {
-                    ch = '/';
-                }
-            }
+            std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             cmakeFile <<
 R"(cmake_minimum_required(VERSION 3.2)
@@ -375,7 +369,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         else {
             Logger::Critical("ERROR::CodeGenerator::Error creating Premake file");
         }
-        std::string cmakeCommand = "cmake -S " + Project::GetInstance()->getPath().string() + "/build" + " -B "+ Project::GetInstance()->getPath().string() + "/build";
+        std::string cmakeCommand = "cmake -S " + ProjectManager::GetInstance()->getPath().string() + "/build" + " -B "+ ProjectManager::GetInstance()->getPath().string() + "/build";
         std::system(cmakeCommand.c_str());
 	}
 }
