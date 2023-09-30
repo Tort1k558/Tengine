@@ -119,7 +119,6 @@ namespace TengineEditor
         renderWindowInfo();
         renderWindowObjects();
         renderWindowComponents();
-
         //Scene
         ImGui::Begin("Scene", nullptr);
         ImVec2 availableArea = ImGui::GetContentRegionAvail();
@@ -296,6 +295,7 @@ namespace TengineEditor
 
     void UISystem::renderMenuBar()
     {
+        static bool isOpenedProjectSettings = false;
         if (ImGui::BeginMenuBar()) {
             if (ImGui::BeginMenu("Project"))
             {
@@ -319,6 +319,10 @@ namespace TengineEditor
                     if (result == NFD_OKAY) {
                         ProjectManager::Create(outPath);
                     }
+                }
+                if (ImGui::MenuItem("Project Settings"))
+                {
+                    isOpenedProjectSettings = true;
                 }
                 ImGui::EndMenu();
             }
@@ -354,6 +358,49 @@ namespace TengineEditor
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
+        }
+        if (isOpenedProjectSettings)
+        {
+            if (ImGui::Begin("Project Settings", &isOpenedProjectSettings, ImGuiWindowFlags_NoCollapse))
+            {
+                std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
+                static int draggedStringIndex = -1;
+                for (int i = 0; i < pathToScenes.size(); ++i) {
+                    ImGui::Button(pathToScenes[i].string().c_str());
+                    
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        ImGui::SetDragDropPayload("DND_STRING", &i, sizeof(int));
+                        ImGui::Text("%s", pathToScenes[i].string().c_str());
+                        ImGui::EndDragDropSource();
+                    }
+                    if (ImGui::BeginDragDropTarget()) {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STRING")) {
+                            IM_ASSERT(payload->DataSize == sizeof(int));
+                            int dropped_idx = *(const int*)payload->Data;
+                            if (dropped_idx != i)
+                            {
+                                ProjectManager::GetInstance()->swapScenes(i, dropped_idx);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+
+                    ImGui::SameLine();
+                    ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Delete").x);
+                    if (ImGui::Button("Delete##"))
+                    {
+                        ProjectManager::GetInstance()->removeScene(pathToScenes[i].string());
+                        --i;
+                    }
+                }
+
+                static std::string newString;
+                if (ImGui::InputText("New Scene", newString.data(), 1024, ImGuiInputTextFlags_EnterReturnsTrue))
+                {
+                    ProjectManager::GetInstance()->addScene(newString.data());
+                }
+                ImGui::End();
+            }
         }
     }
 

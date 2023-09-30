@@ -19,6 +19,8 @@ namespace TengineEditor
 		std::string getName();
 		void removeScene(std::shared_ptr<Scene> scene);
 		void removeScene(const std::string& nameScene);
+		void swapScenes(size_t index1, size_t index2);
+		std::vector<std::filesystem::path> getPathToScenes();
 	private:
 		void setPath(std::filesystem::path path);
 		Project() = default;

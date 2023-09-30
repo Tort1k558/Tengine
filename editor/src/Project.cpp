@@ -34,6 +34,16 @@ namespace TengineEditor
 		}
 	}
 
+	void Project::swapScenes(size_t index1, size_t index2)
+	{
+		std::iter_swap(m_scenes.begin() + index1, m_scenes.begin() + index2);
+	}
+
+	std::vector<std::filesystem::path> Project::getPathToScenes()
+	{
+		return m_scenes;
+	}
+
 	void Project::setPath(std::filesystem::path path)
 	{
 		std::string sPath = path.string();
@@ -49,6 +59,6 @@ namespace TengineEditor
 	void Project::addScene(std::filesystem::path path)
 	{
 		m_scenes.push_back(path);
-		SceneManager::AddScene(path.filename().string(),path);
+		SceneManager::AddScene(path.filename().string(),getPath().string() + path.string());
 	}
 }

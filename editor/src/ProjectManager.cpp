@@ -32,7 +32,7 @@ namespace TengineEditor
 		}
 		if (!m_instance->m_scenes.empty())
 		{
-			SceneManager::LoadByPath(m_instance->getPath().parent_path().string() + "/" + m_instance->m_scenes[0].string());
+			SceneManager::LoadByPath(m_instance->getPath().string() + "/" + m_instance->m_scenes[0].string());
 		}
 		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/scriptModule.dll");
 		ScriptSystem::GetInstance()->reload();
@@ -46,7 +46,7 @@ namespace TengineEditor
 		std::shared_ptr<Scene> defaultScene = Scene::Create();
 		defaultScene->setName("DefaultScene");
 		defaultScene->setPath(m_instance->getPath().string() + "/DefaultScene.scene");
-		m_instance->addScene(defaultScene->getPath().string());
+		m_instance->addScene("DefaultScene.scene");
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
