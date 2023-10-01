@@ -25,6 +25,8 @@ namespace Tengine
 
 		std::shared_ptr<Texture> getColorTexture() final;
 		std::shared_ptr<Texture> getDepthTexture() final;
+
+		static void SetDefaultBuffer();
 	private:
 		GLuint m_id;
 		std::shared_ptr<TextureOpenGL> m_colorTexture;

@@ -17,4 +17,15 @@ namespace Tengine
 		}
 		return nullptr;
 	}
+	void FrameBuffer::SetDefaultBuffer()
+	{
+		switch (RendererSystem::GetInstance()->getRendererType())
+		{
+		case RendererType::None:
+			Logger::Critical("ERROR::Renderer not initialized!");
+			return;
+		case RendererType::OpenGL:
+			FrameBufferOpenGL::SetDefaultBuffer();
+		}
+	}
 }

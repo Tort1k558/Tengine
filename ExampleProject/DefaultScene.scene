@@ -1,0 +1,94 @@
+{
+    "T14418735376590037108": {
+        "Mesh": {
+            "Load Mesh": "data/Meshes/backpack/backpack.obj",
+            "Submeshes": null
+        },
+        "Transform": {
+            "Position": [
+                0.0,
+                2.0,
+                0.0
+            ],
+            "Rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "name": "Object2"
+    },
+    "T17885905985383901994": {
+        "Mesh": {
+            "Load Mesh": "Primitive::Sphere::Sectors::50::Stacks::50",
+            "Submeshes": null
+        },
+        "Transform": {
+            "Position": [
+                0.0,
+                -1.0,
+                0.0
+            ],
+            "Rotation": [
+                -90.0,
+                0.0,
+                0.0
+            ],
+            "Scale": [
+                10.0,
+                10.0,
+                1.0
+            ]
+        },
+        "name": "Object0"
+    },
+    "T687399021193990759": {
+        "Camera": {
+            "Aspect": [
+                1.7777777910232544
+            ],
+            "Fov": [
+                60.0
+            ],
+            "Projection": 0,
+            "zFar": [
+                10000.0
+            ],
+            "zNear": [
+                0.009999999776482582
+            ]
+        },
+        "CameraController": {
+            "cameraSensitivity": [
+                0.3140000104904175
+            ],
+            "speed": [
+                7.0
+            ]
+        },
+        "Transform": {
+            "Position": [
+                0.0,
+                0.0,
+                2.0
+            ],
+            "Rotation": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "Scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "name": "Camera"
+    },
+    "name": "DefaultScene"
+}

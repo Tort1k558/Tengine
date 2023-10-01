@@ -9,8 +9,8 @@ namespace Tengine
 {
 	enum class ShaderType
 	{
-		VertexShader = 0,
-		FragmentShader
+		Vertex = 0,
+		Fragment
 	};
 
 	class Shader : public Resource

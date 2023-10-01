@@ -14,7 +14,7 @@
 #include"Scene/Scene.h"
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
-
+#include"Renderer/Shaders/ShaderCode.h"
 namespace Tengine
 {
 	std::shared_ptr<RendererSystem> RendererSystem::m_instance;
@@ -33,9 +33,10 @@ namespace Tengine
 		}
 		m_context->init();
 		m_context->enableDepthTest();
-		AssetManager::LoadShader("data/Shaders/GLSL/vs.vs", "data/Shaders/GLSL/fs.fs");
-		AssetManager::LoadShader("data/Shaders/GLSL/screenShader.vs", "data/Shaders/GLSL/screenShader.fs");
-		AssetManager::LoadTexture("data/Textures/whiteblackquads.png");
+		ShaderSource defaultShaderSource = ShaderCode::GetDefaultShader();
+		AssetManager::AddShader("DefaultShader", defaultShaderSource.getSourceShader(ShaderType::Vertex), defaultShaderSource.getSourceShader(ShaderType::Fragment));
+		ShaderSource framebufferShaderSource = ShaderCode::GetFramebufferShader();
+		AssetManager::AddShader("FramebufferShader", framebufferShaderSource.getSourceShader(ShaderType::Vertex), framebufferShaderSource.getSourceShader(ShaderType::Fragment));
 		m_framebuffer = FrameBuffer::Create(m_viewportSize);
 
 	}
@@ -49,7 +50,7 @@ namespace Tengine
 		for (auto& camera : cameras)
 		{
 			std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
-			std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("data/Shaders/GLSL/vs.vsdata/Shaders/GLSL/fs.fs");
+			std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("DefaultShader");
 			defaultShader->bind();
 			defaultShader->setUniformMat4("u_view", camera->getViewMatrix());
 			defaultShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
@@ -74,15 +75,10 @@ namespace Tengine
 			}
 		}
 		m_framebuffer->unbind();
-
-		//m_context->clearColor({ 1.0f,1.0f,1.0f, 1.0f });
-		//m_context->clear();
-		//std::shared_ptr<Shader> screenShader = AssetManager::GetResource<Shader>("data/Shaders/GLSL/screenShader.vsdata/Shaders/GLSL/screenShader.fs");
-		//screenShader->bind();
-		//m_framebuffer->getColorTexture()->bind(0);
-		//std::shared_ptr<Mesh> quad = Primitives::CreateQuad();
-		//m_context->drawIndexed(quad->getSubmeshes()[0]->getVertexArray());
-
+		if (renderToDefaultFramebuffer)
+		{
+			renderFramebuffer(m_framebuffer);
+		}
 	}
 
 	void RendererSystem::updateViewport(UVec2 size)
@@ -108,6 +104,28 @@ namespace Tengine
 	std::shared_ptr<FrameBuffer> RendererSystem::getFramebuffer()
 	{
 		return m_framebuffer;
+	}
+
+	void RendererSystem::renderFramebuffer(std::shared_ptr<FrameBuffer> framebuffer)
+	{
+		FrameBuffer::SetDefaultBuffer();
+		m_context->clearColor({ 1.0f,1.0f,1.0f, 1.0f });
+		m_context->clear();
+		std::shared_ptr<Shader> framebufferShader = AssetManager::GetResource<Shader>("FramebufferShader");
+		framebufferShader->bind();
+		framebuffer->getColorTexture()->bind(0);
+		std::shared_ptr<Mesh> quad = Primitives::CreateQuad();
+		m_context->drawIndexed(quad->getSubmeshes()[0]->getVertexArray());
+	}
+
+	void RendererSystem::disableRenderToDefaultFramebuffer()
+	{
+		renderToDefaultFramebuffer = false;
+	}
+
+	void RendererSystem::enableRenderToDefaultFramebuffer()
+	{
+		renderToDefaultFramebuffer = true;
 	}
 
 	std::shared_ptr<RendererSystem> RendererSystem::GetInstance()

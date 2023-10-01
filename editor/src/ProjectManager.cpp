@@ -34,7 +34,7 @@ namespace TengineEditor
 		{
 			SceneManager::LoadByPath(m_instance->getPath().string() + "/" + m_instance->m_scenes[0].string());
 		}
-		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/scriptModule.dll");
+		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/scriptModule.dll");
 		ScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
@@ -50,12 +50,13 @@ namespace TengineEditor
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
-		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/scriptModule.dll");
+		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/scriptModule.dll");
 		ScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
 	void ProjectManager::Save()
 	{
+		SceneManager::Save(SceneManager::GetCurrentScene());
 		nlohmann::json data;
 		data["name"] = m_instance->getName();
 		data["scenes"] = m_instance->m_scenes;

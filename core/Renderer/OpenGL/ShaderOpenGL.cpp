@@ -44,10 +44,10 @@ namespace Tengine
         int shaderType = 0;
         switch (type)
         {
-        case ShaderType::VertexShader:
+        case ShaderType::Vertex:
             shaderType = GL_VERTEX_SHADER;
             break;
-        case ShaderType::FragmentShader:
+        case ShaderType::Fragment:
             shaderType = GL_FRAGMENT_SHADER;
             break;
         default:

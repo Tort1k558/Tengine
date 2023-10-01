@@ -59,6 +59,7 @@ namespace Tengine
             });
 
         create();
+        SystemManager::InitSystems();
     }
 
     void Application::run()

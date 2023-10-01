@@ -34,17 +34,15 @@ namespace Tengine
 	{
 	public:
 		AssetManager() = delete;
-		AssetManager(const AssetManager&) = delete;
-		AssetManager(AssetManager&&) = delete;
-		AssetManager& operator=(const AssetManager&) = delete;
-		AssetManager& operator=(AssetManager&&) = delete;
 
 		static std::shared_ptr<Shader> LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader);
 		static std::shared_ptr<Texture> LoadTexture(std::filesystem::path path);
 		static std::shared_ptr<Mesh> LoadMesh(std::filesystem::path path);
+		static std::shared_ptr<Shader> AddShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+		
 
 		template<typename T>
-		static std::shared_ptr<T> GetResource(std::filesystem::path path);
+		static std::shared_ptr<T> GetResource(const std::string& name);
 	private:
 		static std::string ReadFile(std::filesystem::path path);
 		static std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory);
@@ -55,13 +53,13 @@ namespace Tengine
 	};
 
 	template<typename T>
-	inline std::shared_ptr<T> AssetManager::GetResource(std::filesystem::path path)
+	inline std::shared_ptr<T> AssetManager::GetResource(const std::string& name)
 	{
-		if (m_resources.find(path.string()) == m_resources.end())
+		if (m_resources.find(name) == m_resources.end())
 		{
 			return nullptr;
 		}
-		return std::dynamic_pointer_cast<T>(m_resources.at(path.string()));
+		return std::dynamic_pointer_cast<T>(m_resources.at(name));
 	}
 
 }

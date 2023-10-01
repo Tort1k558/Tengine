@@ -68,4 +68,8 @@ namespace Tengine
 	{
 		return m_depthTexture;
 	}
+	void FrameBufferOpenGL::SetDefaultBuffer()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 }

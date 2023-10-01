@@ -18,6 +18,7 @@
 #include"Systems/RendererSystem.h"
 #include"Project.h"
 #include"ProjectManager.h"
+#include"Builder.h"
 
 namespace TengineEditor
 {
@@ -99,12 +100,10 @@ namespace TengineEditor
         ImGuiWindowFlags windowsFlags = ImGuiWindowFlags_MenuBar;
         windowsFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
         windowsFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-        windowsFlags |= ImGuiWindowFlags_NoBackground;
 
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
-        //ImGui::SetNextWindowViewport(viewport->ID);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -301,7 +300,6 @@ namespace TengineEditor
             {
                 if (ImGui::MenuItem("Save Project"))
                 {
-                    SceneManager::Save(SceneManager::GetCurrentScene());
                     ProjectManager::Save();
                 }
                 if (ImGui::MenuItem("Load Project"))
@@ -323,6 +321,11 @@ namespace TengineEditor
                 if (ImGui::MenuItem("Project Settings"))
                 {
                     isOpenedProjectSettings = true;
+                }
+                if (ImGui::MenuItem("Build Project"))
+                {
+                    ProjectManager::Save();
+                    Builder::Build();
                 }
                 ImGui::EndMenu();
             }

@@ -17,5 +17,6 @@ namespace Tengine
 		virtual std::shared_ptr<Texture> getDepthTexture() = 0;
 
 		static std::shared_ptr<FrameBuffer> Create(UVec2 size);
+		static void SetDefaultBuffer();
 	};
 }

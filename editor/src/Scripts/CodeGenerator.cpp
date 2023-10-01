@@ -51,6 +51,7 @@ namespace TengineEditor
         ScriptSystem::GetInstance()->freeModule();
         std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/Scripts");
         std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build");
+        std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule");
         GetScriptInfo();
         GenerateMetaData();
         GenerateInitFiles();
@@ -60,14 +61,14 @@ namespace TengineEditor
     }
     void CodeGenerator::BuildDll()
     {
-        std::string cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build --config Debug";
+        std::string cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule --config Debug";
         std::system(cmakeBuildCommand.c_str());
     }
 
     void CodeGenerator::GenerateInitFiles()
     {
         //Header file
-        std::ofstream initHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/SystemModule.h");
+        std::ofstream initHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/SystemModule.h");
         if (initHeaderFile.is_open())
         {
             initHeaderFile << \
@@ -99,7 +100,7 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
         }
 
         //Source file
-        std::ofstream initSourceFile(ProjectManager::GetInstance()->getPath().string() + "/build/SystemModule.cpp");
+        std::ofstream initSourceFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/SystemModule.cpp");
         if (initSourceFile.is_open())
         {
             initSourceFile << \
@@ -317,9 +318,11 @@ std::vector<std::string> GetScriptNames()
     
     void CodeGenerator::GenerateCmake()
 	{
-		std::ofstream cmakeFile(ProjectManager::GetInstance()->getPath().string() + "/build/CMakeLists.txt");
-        if (cmakeFile.is_open()) {
+		std::ofstream cmakeFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/CMakeLists.txt");
+        if (cmakeFile.is_open()) 
+        {
             std::string pathToEditor = std::filesystem::current_path().string();
+            std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
             std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             cmakeFile <<
@@ -334,15 +337,18 @@ project(${PROJECT_NAME})
 
 set(DIRS_SRC_MODULE 
 	"*.h" "*.cpp"
-    "../Scripts/*.h" "../Scripts/*.cpp" 
+    "../../Scripts/*.h" "../../Scripts/*.cpp" 
 	)
 file(GLOB TARGET_SRC_MODULE ${DIRS_SRC_MODULE})
 
 include_directories()" + pathToEngineDirectory+ R"(/core)
+include_directories()" + pathToEngineDirectory+ R"(/external/glfw/include)
+include_directories()" + pathToEngineDirectory+ R"(/external/Assimp/include)
 include_directories()" + pathToEngineDirectory+ R"(/external/spdlog/include)
 include_directories()" + pathToEngineDirectory+ R"(/external/nlohmann/include)
+include_directories()" + pathToEngineDirectory+ R"(/external/stbi)
 include_directories()" + pathToEngineDirectory+ R"(/external/glm)
-include_directories(../Scripts)
+include_directories(../../Scripts)
 include_directories(/)
 
 
@@ -365,11 +371,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 )";
             cmakeFile.close();
+            std::string cmakeCommand = "cmake -S " + pathToProject + "/build/ScriptModule" + " -B " + pathToProject + "/build/ScriptModule";
+            std::system(cmakeCommand.c_str());
         }
         else {
-            Logger::Critical("ERROR::CodeGenerator::Error creating Premake file");
+            Logger::Critical("ERROR::CodeGenerator::Error creating CMakefile");
         }
-        std::string cmakeCommand = "cmake -S " + ProjectManager::GetInstance()->getPath().string() + "/build" + " -B "+ ProjectManager::GetInstance()->getPath().string() + "/build";
-        std::system(cmakeCommand.c_str());
 	}
 }

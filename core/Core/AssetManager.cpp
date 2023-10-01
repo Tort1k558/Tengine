@@ -26,8 +26,8 @@ namespace Tengine
             return shader;
         }
         shader = Shader::Create();
-        shader->addShader(ReadFile(pathToVertexShader), ShaderType::VertexShader);
-        shader->addShader(ReadFile(pathToFragmentShader), ShaderType::FragmentShader);
+        shader->addShader(ReadFile(pathToVertexShader), ShaderType::Vertex);
+        shader->addShader(ReadFile(pathToFragmentShader), ShaderType::Fragment);
         shader->compile();
         m_resources[pathToVertexShader.string() + pathToFragmentShader.string()] = shader;
 
@@ -76,7 +76,7 @@ namespace Tengine
 
     std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
     {
-        std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path);
+        std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path.string());
         if (mesh)
         {
             return mesh;
@@ -93,6 +93,17 @@ namespace Tengine
         ProcessNode(mesh, scene->mRootNode, scene, path.parent_path());
         m_resources[path] = std::dynamic_pointer_cast<Resource>(std::make_shared<Mesh>(*mesh));
         return mesh;
+    }
+
+    std::shared_ptr<Shader> AssetManager::AddShader(const std::string& name,const std::string& vertexSource, const std::string& fragmentSource)
+    {
+        std::shared_ptr<Shader> shader = Shader::Create();
+        shader->addShader(vertexSource, ShaderType::Vertex);
+        shader->addShader(fragmentSource, ShaderType::Fragment);
+        shader->compile();
+        m_resources[name] = shader;
+
+        return shader;
     }
 
     std::string AssetManager::ReadFile(std::filesystem::path path)
