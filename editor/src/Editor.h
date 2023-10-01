@@ -1,6 +1,6 @@
 #pragma once
 
-#include"Core/Application.h"
+#include<Core/Application.h>
 
 
 namespace TengineEditor

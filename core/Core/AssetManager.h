@@ -38,11 +38,11 @@ namespace Tengine
 		static std::shared_ptr<Shader> LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader);
 		static std::shared_ptr<Texture> LoadTexture(std::filesystem::path path);
 		static std::shared_ptr<Mesh> LoadMesh(std::filesystem::path path);
-		static std::shared_ptr<Shader> AddShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
+		static std::shared_ptr<Shader> AddShader(std::string_view name, std::string_view vertexSource, std::string_view fragmentSource);
 		
 
 		template<typename T>
-		static std::shared_ptr<T> GetResource(const std::string& name);
+		static std::shared_ptr<T> GetResource(std::string_view name);
 	private:
 		static std::string ReadFile(std::filesystem::path path);
 		static std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory);
@@ -53,7 +53,7 @@ namespace Tengine
 	};
 
 	template<typename T>
-	inline std::shared_ptr<T> AssetManager::GetResource(const std::string& name)
+	inline std::shared_ptr<T> AssetManager::GetResource(std::string_view name)
 	{
 		if (m_resources.find(name) == m_resources.end())
 		{

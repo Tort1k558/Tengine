@@ -94,71 +94,71 @@ namespace Tengine
         }
     }
 
-    void ShaderOpenGL::setUniformInt(const std::string& name, const int value)
+    void ShaderOpenGL::setUniformInt(std::string_view name, const int value)
     {
         bind();
-        GLuint location = glGetUniformLocation(m_id, name.c_str());
+        GLuint location = glGetUniformLocation(m_id, name.data());
         glUniform1i(location, value);
     }
 
-    void ShaderOpenGL::setUniformFloat(const std::string& name, const float value)
+    void ShaderOpenGL::setUniformFloat(std::string_view name, const float value)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniform1f(location, value);
     }
 
-    void ShaderOpenGL::setUniformVec2(const std::string& name, const Vec2& vec)
+    void ShaderOpenGL::setUniformVec2(std::string_view name, const Vec2& vec)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniform2f(location, vec[0], vec[1]);
     }
 
-    void ShaderOpenGL::setUniformVec3(const std::string& name, const Vec3& vec)
+    void ShaderOpenGL::setUniformVec3(std::string_view name, const Vec3& vec)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniform3f(location, vec[0], vec[1], vec[2]);
     }
 
-    void ShaderOpenGL::setUniformVec4(const std::string& name, const Vec4& vec)
+    void ShaderOpenGL::setUniformVec4(std::string_view name, const Vec4& vec)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniform4f(location, vec[0], vec[1], vec[2], vec[3]);
     }
 
-    void ShaderOpenGL::setUniformMat2(const std::string& name, const Mat2& mat)
+    void ShaderOpenGL::setUniformMat2(std::string_view name, const Mat2& mat)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniformMatrix2fv(location, 1, GL_FALSE, &(mat[0].x));
     }
 
-    void ShaderOpenGL::setUniformMat3(const std::string& name, const Mat3& mat)
+    void ShaderOpenGL::setUniformMat3(std::string_view name, const Mat3& mat)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniformMatrix3fv(location, 1, GL_FALSE, &(mat[0].x));
     }
 
-    void ShaderOpenGL::setUniformMat4(const std::string& name, const Mat4& mat)
+    void ShaderOpenGL::setUniformMat4(std::string_view name, const Mat4& mat)
     {
         bind();
-        GLuint location = findUniformLocation(name);
+        GLuint location = findUniformLocation(name.data());
         glUniformMatrix4fv(location, 1, GL_FALSE, &(mat[0].x));
     }
 
-    GLuint ShaderOpenGL::findUniformLocation(const std::string& name)
+    GLuint ShaderOpenGL::findUniformLocation(std::string_view name)
     {
-        auto loc = m_uniformLocations.find(name);
+        auto loc = m_uniformLocations.find(name.data());
         if (loc != m_uniformLocations.end())
         {
             return loc->second;
         }
-        m_uniformLocations[name] = glGetUniformLocation(m_id, name.c_str());
+        m_uniformLocations[name.data()] = glGetUniformLocation(m_id, name.data());
 
-        return m_uniformLocations[name];
+        return m_uniformLocations[name.data()];
     }
 }

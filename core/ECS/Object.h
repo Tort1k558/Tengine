@@ -36,7 +36,7 @@ namespace Tengine
 
 		std::vector<std::shared_ptr<Component>> getComponents();
 
-		void setName(const std::string& name);
+		void setName(std::string_view name);
 		std::string getName() const;
 
 		UUID getId() const;

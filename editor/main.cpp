@@ -1,5 +1,6 @@
+#include<Core/Logger.h>
+
 #include"Editor.h"
-#include"Core/Logger.h"
 
 using namespace TengineEditor;
 int main(int argc, char** argv)

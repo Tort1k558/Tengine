@@ -95,7 +95,7 @@ namespace Tengine
         return mesh;
     }
 
-    std::shared_ptr<Shader> AssetManager::AddShader(const std::string& name,const std::string& vertexSource, const std::string& fragmentSource)
+    std::shared_ptr<Shader> AssetManager::AddShader(std::string_view name,std::string_view vertexSource, std::string_view fragmentSource)
     {
         std::shared_ptr<Shader> shader = Shader::Create();
         shader->addShader(vertexSource, ShaderType::Vertex);

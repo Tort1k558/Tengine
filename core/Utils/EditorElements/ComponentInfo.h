@@ -127,7 +127,7 @@ namespace Tengine
 	public:
 		ComponentInfo() = default;
 		void addElement(std::shared_ptr<FieldInfo> element);
-		void setComponentName(const std::string& name);
+		void setComponentName(std::string_view name);
 		std::string getComponentName() const;
 		std::vector< std::shared_ptr<FieldInfo>> getElements() const;
 	private:

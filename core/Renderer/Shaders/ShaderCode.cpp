@@ -19,7 +19,7 @@ namespace Tengine
         return source;
     }
 
-    void ShaderSource::addSourceShader(ShaderType type, const std::string& source)
+    void ShaderSource::addSourceShader(ShaderType type, std::string_view source)
     {
         m_source[static_cast<int>(type)] = source;
     }

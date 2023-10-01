@@ -4,6 +4,7 @@
 #include<Core/Logger.h>
 
 #include"ProjectManager.h"
+
 namespace TengineEditor
 {
 	void Builder::Build()
@@ -24,7 +25,7 @@ namespace TengineEditor
 		std::ofstream gameHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/Game.h");
 		if (gameHeaderFile.is_open())
 		{
-			gameHeaderFile << R"(#include"Core/Application.h"
+			gameHeaderFile << R"(#include<Core/Application.h>
 
 using namespace Tengine;
 
@@ -186,6 +187,10 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 		std::string pathToEditor = std::filesystem::current_path().string();
 		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
 		std::filesystem::copy(pathToEditor + "/TengineCored.dll", pathToProject + "/build/Game/bin/TengineCored.dll",
+			std::filesystem::copy_options::overwrite_existing);
+
+		//Copy ScriptModule
+		std::filesystem::copy(pathToProject + "/build/ScriptModule/scriptModule.dll", pathToProject + "/build/Game/bin/scriptModule.dll",
 			std::filesystem::copy_options::overwrite_existing);
 	}
 }

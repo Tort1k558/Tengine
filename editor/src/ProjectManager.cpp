@@ -2,9 +2,9 @@
 
 #include<fstream>
 #include<nlohmann/json.hpp>
+#include<Scene/SceneManager.h>
+#include<Systems/ScriptSystem.h>
 
-#include"Scene/SceneManager.h"
-#include"Systems/ScriptSystem.h"
 
 namespace TengineEditor
 {

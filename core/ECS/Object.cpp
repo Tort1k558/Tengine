@@ -20,7 +20,7 @@ namespace Tengine
 		m_id = id;
 	}
 
-	void Object::setName(const std::string& name)
+	void Object::setName(std::string_view name)
 	{
 		m_name = name;
 	}

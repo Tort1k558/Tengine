@@ -3,8 +3,9 @@
 #include<fstream>
 #include<filesystem>
 #include<sstream>
-#include"Core/Logger.h"
-#include"Systems/ScriptSystem.h"
+#include<Core/Logger.h>
+#include<Systems/ScriptSystem.h>
+
 #include"ProjectManager.h"
 
 namespace TengineEditor

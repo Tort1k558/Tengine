@@ -1,19 +1,20 @@
 #include "Editor.h"
 
+#include<ECS/SystemManager.h>
+#include<Components/Transform.h>
+#include<Components/Camera.h>
+#include<Components/Mesh.h>
+#include<Core/Timer.h>
+#include<Core/Logger.h>
+#include<Core/Input.h>
+#include<Scene/SceneManager.h>
+#include<Utils/Primitives.h>
+#include<Core/AssetManager.h>
+#include<Scene/SceneManager.h>
+#include<Systems/ScriptSystem.h>
+#include<Systems/RendererSystem.h>
+
 #include"UISystem.h"
-#include"ECS/SystemManager.h"
-#include"Components/Transform.h"
-#include"Components/Camera.h"
-#include"Components/Mesh.h"
-#include"Core/Timer.h"
-#include"Core/Logger.h"
-#include"Core/Input.h"
-#include"Scene/SceneManager.h"
-#include"Utils/Primitives.h"
-#include"Core/AssetManager.h"
-#include"Scene/SceneManager.h"
-#include"Systems/ScriptSystem.h"
-#include"Systems/RendererSystem.h"
 #include"ProjectManager.h"
 
 namespace TengineEditor

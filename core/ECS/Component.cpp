@@ -21,7 +21,7 @@ namespace Tengine
 		m_elements.push_back(element);
 	}
 
-	void ComponentInfo::setComponentName(const std::string& name)
+	void ComponentInfo::setComponentName(std::string_view name)
 	{
 		m_componentName = name;
 	}

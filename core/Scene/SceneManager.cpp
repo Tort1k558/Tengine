@@ -140,12 +140,12 @@ namespace Tengine
 		return scene;
 	}
 
-	std::shared_ptr<Scene> SceneManager::LoadByName(const std::string& name)
+	std::shared_ptr<Scene> SceneManager::LoadByName(std::string_view name)
 	{
 		std::shared_ptr<Scene> scene;
-		if (m_sceneNames.find(name) != m_sceneNames.end())
+		if (m_sceneNames.find(name.data()) != m_sceneNames.end())
 		{
-			scene = LoadByPath(m_sceneNames[name]);
+			scene = LoadByPath(m_sceneNames[name.data()]);
 		}
 		else
 		{
@@ -156,9 +156,9 @@ namespace Tengine
 
 		return scene;
 	}
-	void SceneManager::AddScene(const std::string& name, std::filesystem::path path)
+	void SceneManager::AddScene(std::string_view name, std::filesystem::path path)
 	{
-		m_sceneNames.insert({ name, path });
+		m_sceneNames.insert({ name.data(), path});
 	}
 	void SceneManager::DeserializeField(nlohmann::json& data,std::shared_ptr<FieldInfo> element)
 	{

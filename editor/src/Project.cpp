@@ -1,8 +1,8 @@
 #include "Project.h"
 
 #include<fstream>
+#include<Scene/SceneManager.h>
 
-#include"Scene/SceneManager.h"
 namespace TengineEditor
 {
 	using namespace Tengine;
