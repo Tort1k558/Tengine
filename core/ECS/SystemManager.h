@@ -2,8 +2,8 @@
 
 #include<functional>
 #include<unordered_map>
+#include<thread>
 #include"System.h"
-
 namespace Tengine
 {
 	class TENGINE SystemManager
@@ -22,6 +22,12 @@ namespace Tengine
 		static void UpdateSystems();
 		static void DestroySystems();
 	private:
-		static std::vector<std::shared_ptr<System>> m_systems;
+		struct SystemInfo
+		{
+			std::shared_ptr<System> system;
+			std::thread updateThread;
+			bool isDestroyed;
+		};
+		static std::vector<SystemInfo> m_systemsInfo;
 	};
 }

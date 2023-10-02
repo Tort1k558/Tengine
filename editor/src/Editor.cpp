@@ -31,7 +31,6 @@ namespace TengineEditor
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
         RendererSystem::GetInstance()->disableRenderToDefaultFramebuffer();
-
         ProjectManager::Create("ExampleProject");
         std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
         

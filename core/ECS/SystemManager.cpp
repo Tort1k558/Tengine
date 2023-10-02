@@ -1,62 +1,95 @@
 #include "SystemManager.h"
 
-#include<thread>
+#include<Core/Timer.h>
 
 namespace Tengine
 {
-	std::vector<std::shared_ptr<System>> SystemManager::m_systems;
+	std::vector<SystemManager::SystemInfo> SystemManager::m_systemsInfo;
 
 	void SystemManager::AddSystem(std::shared_ptr<System> system)
 	{
-		for (const auto& sys : m_systems)
+		for (const auto& systemInfo : m_systemsInfo)
 		{
-			if (sys.get() == system.get())
+			if (systemInfo.system.get() == system.get())
 			{
 				return;
 			}
 		}
-		m_systems.push_back(system);
+		m_systemsInfo.push_back({ system });
 	}
 
 	void SystemManager::RemoveSystem(std::shared_ptr<System> system)
 	{
-		for (size_t i = 0; i < m_systems.size(); i++)
+		for (size_t i = 0; i < m_systemsInfo.size(); i++)
 		{
-			if (system.get() == m_systems[i].get())
+			if (system.get() == m_systemsInfo[i].system.get())
 			{
-				m_systems[i]->destroy();
-				m_systems.erase(m_systems.begin() + i);
+				m_systemsInfo[i].system->destroy();
+				m_systemsInfo.erase(m_systemsInfo.begin() + i);
 			}
 		}
 	}
 
 	void SystemManager::InitSystems()
 	{
-		for (auto& system : m_systems)
+		for (auto& systemInfo : m_systemsInfo)
 		{
-			if (system->isInitialized())
+			if (systemInfo.system->isInitialized())
 			{
 				continue;
 			}
-			system->init();
-			system->m_isInitialized = true;
+			systemInfo.system->init();
+			systemInfo.system->m_isInitialized = true;
 		}
 	}
 
 	void SystemManager::UpdateSystems()
 	{
-		for (auto& system : m_systems)
+		for (auto& systemInfo : m_systemsInfo)
 		{
-			system->update();
+			if (!systemInfo.updateThread.joinable())
+			{
+				systemInfo.updateThread = std::thread([&systemInfo]()
+					{
+						while (!systemInfo.isDestroyed)
+						{
+							static std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<double>> nextFrame = Timer::GetNowPoint();
+							if (systemInfo.system->getUpdatesPerSecond() != 0)
+							{
+								double maxDelta = 1.0 / static_cast<double>(systemInfo.system->getUpdatesPerSecond());
+
+								if (Timer::GetDeltaTime() < maxDelta)
+								{
+									std::this_thread::sleep_until(nextFrame);
+								}
+
+								systemInfo.system->update();
+
+								nextFrame += std::chrono::duration<double>(maxDelta);
+							}
+							else
+							{
+								std::this_thread::sleep_until(nextFrame);
+								systemInfo.system->update();
+								nextFrame += std::chrono::duration<double>(Timer::GetDeltaTime());
+							}
+						}
+					});
+			}
 		}
 	}
 
 	void SystemManager::DestroySystems()
 	{
-		for (int i = m_systems.size() - 1; i >= 0; i--)
+		for (auto& systemInfo : m_systemsInfo)
 		{
-			m_systems[i]->destroy();
-			m_systems.erase(m_systems.begin() + i);
+			systemInfo.isDestroyed = true;
+			systemInfo.updateThread.join();
+		}
+		for (int i = m_systemsInfo.size() - 1; i >= 0; i--)
+		{
+			m_systemsInfo[i].system->destroy();
+			m_systemsInfo.erase(m_systemsInfo.begin() + i);
 		}
 	}
 }
