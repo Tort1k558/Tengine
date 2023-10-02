@@ -253,10 +253,10 @@ namespace TengineEditor
         {
         case FieldType::None:
             break;
-        case FieldType::Slider:
+        case FieldType::Float:
         {
             std::shared_ptr<FieldFloat> slider = std::dynamic_pointer_cast<FieldFloat>(element);
-            if (ImGui::SliderFloat(slider->name.c_str(), static_cast<float*>(slider->data), slider->minValue, slider->maxValue))
+            if (ImGui::DragFloat(slider->name.c_str(), static_cast<float*>(slider->data),0.0f ,slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -268,19 +268,19 @@ namespace TengineEditor
         case FieldType::Vec2:
         {
             std::shared_ptr<FieldVec2> slider = std::dynamic_pointer_cast<FieldVec2>(element);
-            ImGui::SliderFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), slider->minValue, slider->maxValue);
+            ImGui::DragFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
             break;
         }
         case FieldType::Vec3:
         {
             std::shared_ptr<FieldVec3> slider = std::dynamic_pointer_cast<FieldVec3>(element);
-            ImGui::SliderFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), slider->minValue, slider->maxValue);
+            ImGui::DragFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
             break;
         }
         case FieldType::Vec4:
         {
             std::shared_ptr<FieldVec4> slider = std::dynamic_pointer_cast<FieldVec4>(element);
-            ImGui::SliderFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), slider->minValue, slider->maxValue);
+            ImGui::DragFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
             break;
         }
         case FieldType::Enum:
@@ -434,41 +434,70 @@ namespace TengineEditor
         {
             if (ImGui::Begin("Project Settings", &isOpenedProjectSettings, ImGuiWindowFlags_NoCollapse))
             {
-                std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
-                static int draggedStringIndex = -1;
-                for (int i = 0; i < pathToScenes.size(); ++i) {
-                    ImGui::Button(pathToScenes[i].string().c_str());
-                    
-                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                        ImGui::SetDragDropPayload("DND_STRING", &i, sizeof(int));
-                        ImGui::Text("%s", pathToScenes[i].string().c_str());
-                        ImGui::EndDragDropSource();
+                float windowWidth = ImGui::GetWindowWidth();
+
+                ImGui::Columns(2);
+                ImGui::SetColumnWidth(0, windowWidth * 0.3f);
+                static std::string selectedMenu;
+                if (ImGui::BeginListBox("##List", ImVec2(-1, -1)))
+                {
+                    if (ImGui::Selectable("Build", true))
+                    {
+                        selectedMenu = "Build";
                     }
-                    if (ImGui::BeginDragDropTarget()) {
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STRING")) {
-                            IM_ASSERT(payload->DataSize == sizeof(int));
-                            int dropped_idx = *(const int*)payload->Data;
-                            if (dropped_idx != i)
-                            {
-                                ProjectManager::GetInstance()->swapScenes(i, dropped_idx);
-                            }
-                        }
-                        ImGui::EndDragDropTarget();
+                    
+                    if (ImGui::Selectable("Render", false))
+                    {
+                        selectedMenu = "Render";
                     }
 
-                    ImGui::SameLine();
-                    ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Delete").x);
-                    if (ImGui::Button("Delete##"))
+                    ImGui::EndListBox();
+                }
+                
+                ImGui::NextColumn();
+                
+                if (selectedMenu == "Build")
+                {
+                    std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
+                    static int draggedStringIndex = -1;
+                    for (int i = 0; i < pathToScenes.size(); ++i) {
+                        ImGui::Button(pathToScenes[i].string().c_str());
+
+                        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                            ImGui::SetDragDropPayload("DND_STRING", &i, sizeof(int));
+                            ImGui::Text("%s", pathToScenes[i].string().c_str());
+                            ImGui::EndDragDropSource();
+                        }
+                        if (ImGui::BeginDragDropTarget()) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STRING")) {
+                                IM_ASSERT(payload->DataSize == sizeof(int));
+                                int dropped_idx = *(const int*)payload->Data;
+                                if (dropped_idx != i)
+                                {
+                                    ProjectManager::GetInstance()->swapScenes(i, dropped_idx);
+                                }
+                            }
+                            ImGui::EndDragDropTarget();
+                        }
+
+                        ImGui::SameLine();
+                        ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Delete").x);
+                        if (ImGui::Button("Delete##"))
+                        {
+                            ProjectManager::GetInstance()->removeScene(pathToScenes[i].string());
+                            --i;
+                        }
+                    }
+
+                    static std::string newString;
+                    if (ImGui::InputText("New Scene", newString.data(), 1024, ImGuiInputTextFlags_EnterReturnsTrue))
                     {
-                        ProjectManager::GetInstance()->removeScene(pathToScenes[i].string());
-                        --i;
+                        ProjectManager::GetInstance()->addScene(newString.data());
                     }
                 }
-
-                static std::string newString;
-                if (ImGui::InputText("New Scene", newString.data(), 1024, ImGuiInputTextFlags_EnterReturnsTrue))
+                else if (selectedMenu == "Render")
                 {
-                    ProjectManager::GetInstance()->addScene(newString.data());
+
                 }
                 ImGui::End();
             }

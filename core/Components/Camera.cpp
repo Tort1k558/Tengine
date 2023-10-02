@@ -68,7 +68,7 @@ namespace Tengine
 		projectionSettingsZNear->minValue = 0.01f;
 		projectionSettingsZNear->maxValue = 10000.0f;
 		projectionSettingsZNear->name = "zNear";
-		projectionSettingsZNear->type = FieldType::Slider;
+		projectionSettingsZNear->type = FieldType::Float;
 		projectionSettingsZNear->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsZNear);
 		std::shared_ptr<FieldFloat> projectionSettingsZFar = std::make_shared<FieldFloat>();
@@ -76,7 +76,7 @@ namespace Tengine
 		projectionSettingsZFar->minValue = 0.01f;
 		projectionSettingsZFar->maxValue = 10000.0f;
 		projectionSettingsZFar->name = "zFar";
-		projectionSettingsZFar->type = FieldType::Slider;
+		projectionSettingsZFar->type = FieldType::Float;
 		projectionSettingsZFar->callback = [this]() {m_projection->updateProjection(); };
 		displayInfo.addElement(projectionSettingsZFar);
 
@@ -90,7 +90,7 @@ namespace Tengine
 			projectionSettingsAspect->minValue = 0.0f;
 			projectionSettingsAspect->maxValue = 3.0f;
 			projectionSettingsAspect->name = "Aspect";
-			projectionSettingsAspect->type = FieldType::Slider;
+			projectionSettingsAspect->type = FieldType::Float;
 			projectionSettingsAspect->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsAspect);
 			std::shared_ptr<FieldFloat> projectionSettingsFov = std::make_shared<FieldFloat>();
@@ -98,7 +98,7 @@ namespace Tengine
 			projectionSettingsFov->minValue = 0.0f;
 			projectionSettingsFov->maxValue = 360.0f;
 			projectionSettingsFov->name = "Fov";
-			projectionSettingsFov->type = FieldType::Slider;
+			projectionSettingsFov->type = FieldType::Float;
 			projectionSettingsFov->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsFov);
 			break;
@@ -111,7 +111,7 @@ namespace Tengine
 			projectionSettingsLeft->minValue = -0.01f;
 			projectionSettingsLeft->maxValue = -10.0f;
 			projectionSettingsLeft->name = "Left";
-			projectionSettingsLeft->type = FieldType::Slider;
+			projectionSettingsLeft->type = FieldType::Float;
 			projectionSettingsLeft->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsLeft);
 			std::shared_ptr<FieldFloat> projectionSettingsRight = std::make_shared<FieldFloat>();
@@ -119,7 +119,7 @@ namespace Tengine
 			projectionSettingsRight->minValue = 0.01f;
 			projectionSettingsRight->maxValue = 10.0f;
 			projectionSettingsRight->name = "Right";
-			projectionSettingsRight->type = FieldType::Slider;
+			projectionSettingsRight->type = FieldType::Float;
 			projectionSettingsRight->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsRight);
 			std::shared_ptr<FieldFloat> projectionSettingsBottom = std::make_shared<FieldFloat>();
@@ -127,7 +127,7 @@ namespace Tengine
 			projectionSettingsBottom->minValue = -0.01f;
 			projectionSettingsBottom->maxValue = -10.0f;
 			projectionSettingsBottom->name = "Bottom";
-			projectionSettingsBottom->type = FieldType::Slider;
+			projectionSettingsBottom->type = FieldType::Float;
 			projectionSettingsBottom->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsBottom);
 			std::shared_ptr<FieldFloat> projectionSettingsTop = std::make_shared<FieldFloat>();
@@ -135,7 +135,7 @@ namespace Tengine
 			projectionSettingsTop->minValue = 0.01f;
 			projectionSettingsTop->maxValue = 10.0f;
 			projectionSettingsTop->name = "Top";
-			projectionSettingsTop->type = FieldType::Slider;
+			projectionSettingsTop->type = FieldType::Float;
 			projectionSettingsTop->callback = [this]() {m_projection->updateProjection(); };
 			displayInfo.addElement(projectionSettingsTop);
 			break;

@@ -11,7 +11,7 @@ namespace Tengine
 	enum class FieldType
 	{
 		None,
-		Slider,
+		Float,
 		Vec2,
 		Vec3,
 		Vec4,
@@ -42,7 +42,7 @@ namespace Tengine
 		float* data;
 		FieldFloat()
 		{
-			type = FieldType::Slider;
+			type = FieldType::Float;
 		}
 	};
 

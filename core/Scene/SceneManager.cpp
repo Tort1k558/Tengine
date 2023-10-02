@@ -164,7 +164,7 @@ namespace Tengine
 	{
 		switch (element->type)
 		{
-		case FieldType::Slider:
+		case FieldType::Float:
 		{
 			std::shared_ptr<FieldFloat> field = std::dynamic_pointer_cast<FieldFloat>(element);
 			*field->data = static_cast<float>(data[0]);
@@ -210,7 +210,7 @@ namespace Tengine
 	{
 		switch (element->type)
 		{
-		case FieldType::Slider:
+		case FieldType::Float:
 		{
 			std::shared_ptr<FieldFloat> field = std::dynamic_pointer_cast<FieldFloat>(element);
 			data = {*field->data};

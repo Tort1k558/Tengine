@@ -4,7 +4,7 @@
 #include<nlohmann/json.hpp>
 
 #include"ECS/Object.h"
-#include"Utils/EditorElements/ComponentInfo.h"
+#include"ComponentInfo.h"
 
 namespace Tengine
 {
