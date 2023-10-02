@@ -4,7 +4,7 @@
 
 #include<Core/Window.h>
 #include<ECS/System.h>
-#include<Utils/EditorElements/ComponentInfo.h>
+#include<ECS/ComponentInfo.h>
 #include<ECS/Object.h>
 #include<Renderer/FrameBuffer.h>
 
