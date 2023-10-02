@@ -55,6 +55,11 @@ namespace Tengine
 		m_path = path;
 	}
 
+	void Scene::setMainCamera(std::shared_ptr<Camera> camera)
+	{
+		m_mainCamera = camera;
+	}
+
 	std::shared_ptr<Object> Scene::getObjectByUUID(UUID id) const
 	{
 		if (m_objects.find(id) != m_objects.end())
@@ -84,5 +89,9 @@ namespace Tengine
 			objects.push_back(object.second);
 		}
 		return objects;
+	}
+	std::shared_ptr<Camera> Scene::getMainCamera()
+	{
+		return m_mainCamera;
 	}
 }

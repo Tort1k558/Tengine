@@ -2,7 +2,6 @@
 
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
 #include"Components/Transform.h"
-#include"Components/Camera.h"
 #include"Components/Mesh.h"
 #include"Core/Logger.h"
 #include"Core/Timer.h"
@@ -28,7 +27,7 @@ namespace Tengine
 			return;
 		case RendererType::OpenGL:
 		{
-			m_context = std::make_unique<RendererContextOpenGL>();
+			m_context = std::make_shared<RendererContextOpenGL>();
 		}
 		}
 		m_context->init();
@@ -44,35 +43,27 @@ namespace Tengine
 	void RendererSystem::update()
 	{
 		m_framebuffer->bind();
-		m_context->clearColor({ 0.1f,0.1f,0.1f, 1.0f });
-		m_context->clear();
-		std::vector<std::shared_ptr<Camera>> cameras = SceneManager::GetCurrentScene()->getComponents<Camera>();
-		for (auto& camera : cameras)
+		std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
+		if (scene)
 		{
-			std::vector<std::shared_ptr<Mesh>> meshes = SceneManager::GetCurrentScene()->getComponents<Mesh>();
-			std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("DefaultShader");
-			defaultShader->bind();
-			defaultShader->setUniformMat4("u_view", camera->getViewMatrix());
-			defaultShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
-			for (auto& mesh : meshes)
+			std::shared_ptr<Camera> camera = scene->getMainCamera();
+			if (!camera)
 			{
-				std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
-				defaultShader->setUniformMat4("u_model", transform->getMatrix());
-
-				std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
-				for (auto& submesh : submeshes)
+				std::vector<std::shared_ptr<Camera>> cameras = scene->getComponents<Camera>();
+				if (!cameras.empty())
 				{
-					if (submesh->hasMaterial())
-					{
-						std::shared_ptr<Material> material = submesh->getMaterial();
-						if (material->hasTexture(MaterialTexture::Diffuse))
-						{
-							material->getTexture(MaterialTexture::Diffuse)->bind(0);
-						}
-					}
-					m_context->drawIndexed(submesh->getVertexArray());
+					scene->setMainCamera(cameras[0]);
+					camera = cameras[0];
+				}
+				else
+				{
+					return;
 				}
 			}
+			m_context->clearColor({ 0.1f,0.1f,0.1f, 1.0f });
+			m_context->clear();
+			renderCamera(camera);
+			
 		}
 		m_framebuffer->unbind();
 		if (renderToDefaultFramebuffer)
@@ -126,6 +117,40 @@ namespace Tengine
 	void RendererSystem::enableRenderToDefaultFramebuffer()
 	{
 		renderToDefaultFramebuffer = true;
+	}
+
+	void RendererSystem::renderCamera(std::shared_ptr<Camera> camera)
+	{
+		std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
+		std::vector<std::shared_ptr<Mesh>> meshes = scene->getComponents<Mesh>();
+		std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("DefaultShader");
+		defaultShader->bind();
+		defaultShader->setUniformMat4("u_view", camera->getViewMatrix());
+		defaultShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
+		for (auto& mesh : meshes)
+		{
+			std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
+			defaultShader->setUniformMat4("u_model", transform->getMatrix());
+
+			std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
+			for (auto& submesh : submeshes)
+			{
+				if (submesh->hasMaterial())
+				{
+					std::shared_ptr<Material> material = submesh->getMaterial();
+					if (material->hasTexture(MaterialTexture::Diffuse))
+					{
+						material->getTexture(MaterialTexture::Diffuse)->bind(0);
+					}
+				}
+				m_context->drawIndexed(submesh->getVertexArray());
+			}
+		}
+	}
+
+	std::shared_ptr<RendererContext> RendererSystem::getRendererContext()
+	{
+		return m_context;
 	}
 
 	std::shared_ptr<RendererSystem> RendererSystem::GetInstance()

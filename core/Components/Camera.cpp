@@ -1,6 +1,7 @@
 #include "Camera.h"
 
 #include"Components/Transform.h"
+#include"Scene/SceneManager.h"
 
 namespace Tengine
 {
@@ -46,6 +47,7 @@ namespace Tengine
 		Mat4 rotateMatrix = getRotationMatrix(rotation);
 		return rotateMatrix * Vec4(m_up, 1.0f);
 	}
+	
 	ComponentInfo Camera::getInfo()
 	{
 		ComponentInfo displayInfo;
@@ -143,6 +145,7 @@ namespace Tengine
 		}
 		return displayInfo;
 	}
+
 	std::shared_ptr<PerspectiveProjection> Camera::getPerspectiveProjection() const
 	{
 		if (m_projectionType == ProjectionType::Perspective)

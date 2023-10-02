@@ -4,18 +4,20 @@
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
 #include<nfd.h>
-#include"Core/Timer.h"
-#include"Core/Logger.h"
-#include"Components/Mesh.h"
-#include"Components/Camera.h"
-#include"Components/Script.h"
-#include"ECS/Object.h"
-#include"ECS/SystemManager.h"
-#include"Scene/SceneManager.h"
-#include"Core/AssetManager.h"
-#include"Scripts/CodeGenerator.h"
-#include"Systems/ScriptSystem.h"
-#include"Systems/RendererSystem.h"
+#include<Core/Timer.h>
+#include<Core/Logger.h>
+#include<Core/Input.h>
+#include<Components/Mesh.h>
+#include<Components/Camera.h>
+#include<Components/Script.h>
+#include<ECS/Object.h>
+#include<ECS/SystemManager.h>
+#include<Scene/SceneManager.h>
+#include<Core/AssetManager.h>
+#include<Scripts/CodeGenerator.h>
+#include<Systems/ScriptSystem.h>
+#include<Systems/RendererSystem.h>
+
 #include"Project.h"
 #include"ProjectManager.h"
 #include"Builder.h"
@@ -89,6 +91,12 @@ namespace TengineEditor
         glfwInit();
         ImGui_ImplOpenGL3_Init();
         ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
+
+        m_sceneFramebuffer = FrameBuffer::Create({ 1024,768 });
+        m_sceneCamera = std::make_shared<Object>();
+        m_sceneCamera->setName("SceneCamera");
+        m_sceneCamera->addComponent(Component::Create<Transform>());
+        m_sceneCamera->addComponent(Component::Create<Camera>());
     }
 
     void UISystem::update()
@@ -120,15 +128,73 @@ namespace TengineEditor
         renderWindowComponents();
         //Scene
         ImGui::Begin("Scene", nullptr);
-        ImVec2 availableArea = ImGui::GetContentRegionAvail();
-        std::shared_ptr<Texture> texture = RendererSystem::GetInstance()->getFramebuffer()->getColorTexture();
-        ImGui::Image((void*)texture->getId(), availableArea, { 0, 1 }, { 1, 0 });
-        RendererSystem::GetInstance()->updateViewport({ availableArea.x, availableArea.y });
+
+        std::shared_ptr<Camera> sceneCamera = m_sceneCamera->getComponent<Camera>();
+        std::shared_ptr<Transform> sceneCameraTransform = m_sceneCamera->getComponent<Transform>();
+        if(ImGui::IsWindowFocused())
+        {
+            static float speed = 7.0f;
+            static float cameraSensitivity = 0.314f;
+            if (Input::IsKeyPressed(KeyCode::W))
+            {
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + sceneCamera->getDirection() * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
+            }
+            if (Input::IsKeyPressed(KeyCode::S))
+            {
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + sceneCamera->getDirection() * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
+            }
+            if (Input::IsKeyPressed(KeyCode::A))
+            {
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Normalize(Cross(sceneCamera->getDirection(), sceneCamera->getUp()))
+                    * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
+            }
+            if (Input::IsKeyPressed(KeyCode::D))
+            {
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Normalize(Cross(sceneCamera->getDirection(), sceneCamera->getUp()))
+                    * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
+            }
+            if (Input::IsKeyPressed(KeyCode::LEFT_SHIFT))
+            {
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Vec3(0.0f, static_cast<float>(-speed * Timer::GetDeltaTime()), 0.0f));
+            }
+            if (Input::IsKeyPressed(KeyCode::SPACE))
+            {
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Vec3(0.0f, static_cast<float>(speed * Timer::GetDeltaTime()), 0.0f));
+            }
+            if (Input::IsMouseButtonPressed(MouseButton::BUTTON_2))
+            {
+                static Vec2 deltaMouse(0.0f, 0.0f);
+                if (deltaMouse.x != 0)
+                {
+                    sceneCameraTransform->setRotationY(sceneCameraTransform->getRotation().y + deltaMouse.x * cameraSensitivity);
+                }
+                if (deltaMouse.y != 0)
+                {
+                    if (sceneCameraTransform->getRotation().x + deltaMouse.y * cameraSensitivity < 89.0f && sceneCameraTransform->getRotation().x + deltaMouse.y * cameraSensitivity > -89.0f)
+                    {
+                        sceneCameraTransform->setRotationX(sceneCameraTransform->getRotation().x + deltaMouse.y * cameraSensitivity);
+                    }
+                }
+                deltaMouse = Input::GetDeltaMousePosition();
+            }
+        }
+        m_sceneFramebuffer->bind();
+        RendererSystem::GetInstance()->getRendererContext()->clear();
+        RendererSystem::GetInstance()->getRendererContext()->clearColor({ 0.1f,0.1f,0.1f,1.0f });
+        RendererSystem::GetInstance()->renderCamera(m_sceneCamera->getComponent<Camera>());
+        m_sceneFramebuffer->unbind();
+
+        ImVec2 availableAreaSceneWindow = ImGui::GetContentRegionAvail();
+        std::shared_ptr<Texture> sceneTexture = m_sceneFramebuffer->getColorTexture();
+        ImGui::Image((void*)sceneTexture->getId(), availableAreaSceneWindow, { 0, 1 }, { 1, 0 });
+        if (UVec2(availableAreaSceneWindow.x,availableAreaSceneWindow.y) != m_sceneFramebuffer->getSize())
+        {
+            m_sceneFramebuffer = FrameBuffer::Create({ availableAreaSceneWindow.x,availableAreaSceneWindow.y });
+        }
         ImGui::End();
 
         //Game
         static bool isGameRunning = false;
-        static bool isGameStop = false;
         ImGui::Begin("Game", nullptr);
         if (isGameRunning) {
             if (ImGui::Button("stop")) {
@@ -145,9 +211,11 @@ namespace TengineEditor
                 SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
                 SystemManager::InitSystems();
             }
-        }
-        availableArea = ImGui::GetContentRegionAvail();
-        ImGui::Image((void*)texture->getId(), availableArea, { 0, 1 }, { 1, 0 });
+        } 
+        ImVec2 availableAreaGameWindow = ImGui::GetContentRegionAvail();
+        std::shared_ptr<Texture> gameTexture = RendererSystem::GetInstance()->getFramebuffer()->getColorTexture();
+        ImGui::Image((void*)gameTexture->getId(), availableAreaGameWindow, { 0, 1 }, { 1, 0 });
+        RendererSystem::GetInstance()->updateViewport({ availableAreaGameWindow.x, availableAreaGameWindow.y });
 
         ImGui::End();
 

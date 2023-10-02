@@ -6,6 +6,8 @@ namespace Tengine
 {
 	FrameBufferOpenGL::FrameBufferOpenGL(UVec2 size)
 	{
+		m_size = size;
+
 		glCreateFramebuffers(1, &m_id);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 		m_colorTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(nullptr, size, TextureType::RGBA8, TextureFilter::Bilinear));

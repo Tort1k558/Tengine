@@ -17,13 +17,11 @@ namespace Tengine
 
     void Input::PressKey(KeyCode code)
     {
-        //Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
         m_keys[code] = true;
     }
 
     void Input::ReleaseKey(KeyCode code)
     {
-        //Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));;
         m_keys[code] = false;
     }
 
@@ -34,13 +32,11 @@ namespace Tengine
 
     void Input::PressMouseButton(MouseButton code)
     {
-        //Logger::Debug("EVENT::The mouse button is pressed with the code {0}", static_cast<int>(code));
         m_mouseButtons[code] = true;
     }
 
     void Input::ReleaseMouseButton(MouseButton code)
     {
-        //Logger::Debug("EVENT::The mouse button is released with the code {0}", static_cast<int>(code));
         m_mouseButtons[code] = false;
     }
 
@@ -51,7 +47,6 @@ namespace Tengine
 
     void Input::SetMousePosition(Vec2 position)
     {
-        //Logger::Debug("EVENT::The Mouse Moved to {0}x{1}", event.x, event.y);
         m_mousePosition = position;
     }
 

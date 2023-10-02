@@ -2,9 +2,11 @@
 
 #include<memory>
 
-#include"Core/Window.h"
-#include"ECS/System.h"
+#include<Core/Window.h>
+#include<ECS/System.h>
 #include<Utils/EditorElements/ComponentInfo.h>
+#include<ECS/Object.h>
+#include<Renderer/FrameBuffer.h>
 
 namespace TengineEditor
 {
@@ -27,6 +29,9 @@ namespace TengineEditor
 		void renderWindowInfo();
 		std::shared_ptr<Window> m_window;
 		std::string m_nameOfSelectedObject;
+		std::shared_ptr<Object> m_sceneCamera;
+		std::shared_ptr<FrameBuffer> m_sceneFramebuffer;
+
 		static std::shared_ptr<UISystem> m_instance;
 	};
 }

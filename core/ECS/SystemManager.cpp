@@ -1,5 +1,7 @@
 #include "SystemManager.h"
 
+#include<thread>
+
 namespace Tengine
 {
 	std::vector<std::shared_ptr<System>> SystemManager::m_systems;
@@ -32,12 +34,12 @@ namespace Tengine
 	{
 		for (auto& system : m_systems)
 		{
-			if (system->m_info.isInitialized)
+			if (system->isInitialized())
 			{
 				continue;
 			}
 			system->init();
-			system->m_info.isInitialized = true;
+			system->m_isInitialized = true;
 		}
 	}
 

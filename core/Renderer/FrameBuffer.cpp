@@ -5,6 +5,10 @@
 #include"OpenGL/FrameBufferOpenGL.h"
 namespace Tengine
 {
+	UVec2 FrameBuffer::getSize()
+	{
+		return m_size;
+	}
 	std::shared_ptr<FrameBuffer> Tengine::FrameBuffer::Create(UVec2 size)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
