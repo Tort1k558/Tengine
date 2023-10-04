@@ -15,7 +15,7 @@ namespace Tengine
 	{
 		using UpdateScriptsFn = void(*)();
 		using StartScriptsFn = void(*)();
-		using AddScriptFn = void*(*)(std::shared_ptr<Object> object, std::string_view nameScript);
+		using AddScriptFn = void*(*)(std::string_view nameScript);
 		using GetScriptNamesFn = std::vector<std::string>(*)();
 	public:
 		void init() final;

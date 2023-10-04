@@ -69,10 +69,12 @@ namespace Tengine
 	{
 		if (m_addScript)
 		{
-			void* script = m_addScript(object, nameScript);
+			void* script = m_addScript(nameScript);
 			if (script)
 			{
-				return *static_cast<std::shared_ptr<Component>*>(script);
+				std::shared_ptr<Component> component(static_cast<Component*>(script));
+				object->addComponent(component);
+				return component;
 			}
 		}
 		return nullptr;

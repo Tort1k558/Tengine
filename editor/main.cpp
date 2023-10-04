@@ -5,7 +5,6 @@
 using namespace TengineEditor;
 int main(int argc, char** argv)
 {
-    Logger::SetLevel(LogLevel::Debug);
 
     Editor editor(800, 600, "Tengine");
     editor.init();

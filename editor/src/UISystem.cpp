@@ -4,6 +4,7 @@
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
 #include<nfd.h>
+
 #include<Core/Timer.h>
 #include<Core/Logger.h>
 #include<Core/Input.h>
@@ -14,13 +15,13 @@
 #include<ECS/SystemManager.h>
 #include<Scene/SceneManager.h>
 #include<Core/AssetManager.h>
-#include<Scripts/CodeGenerator.h>
 #include<Systems/ScriptSystem.h>
 #include<Systems/RendererSystem.h>
 
+#include"Scripts/ScriptCompiler.h"
 #include"Project.h"
 #include"ProjectManager.h"
-#include"Builder.h"
+#include"ProjectBuilder.h"
 
 namespace TengineEditor
 {
@@ -393,7 +394,7 @@ namespace TengineEditor
                 if (ImGui::MenuItem("Build Project"))
                 {
                     ProjectManager::Save();
-                    Builder::Build();
+                    ProjectBuilder::Build();
                 }
                 ImGui::EndMenu();
             }
@@ -424,7 +425,7 @@ namespace TengineEditor
             {
                 if (ImGui::MenuItem("Compile scripts"))
                 {
-                    CodeGenerator::CompileScripts();
+                    ScriptCompiler::Compile();
                 }
                 ImGui::EndMenu();
             }
@@ -494,6 +495,27 @@ namespace TengineEditor
                     {
                         ProjectManager::GetInstance()->addScene(newString.data());
                     }
+                    static BuildConfiguration buildConfiguration = BuildConfiguration::Debug;
+                    const char* buildConfigurations[] = { "Debug","Release" };
+                    if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildConfiguration)]))
+                    {
+                        for (int i = 0; i < 2; i++)
+                        {
+                            const bool isSelected = (static_cast<int>(buildConfiguration) == i);
+                            if (ImGui::Selectable(buildConfigurations[i], isSelected))
+                            {
+                                buildConfiguration = static_cast<BuildConfiguration>(i);
+                                ProjectBuilder::SetBuildConfiguration(buildConfiguration);
+                            }
+
+                            if (isSelected)
+                            {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
                 }
                 else if (selectedMenu == "Render")
                 {
@@ -504,7 +526,7 @@ namespace TengineEditor
         }
     }
 
-    void UISystem::renderWindowObjects()
+    void UISystem::renderWindowObjects() 
     {
 
         static int currentItem = 0;

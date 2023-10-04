@@ -1,14 +1,18 @@
-#include "Builder.h"
+#include "ProjectBuilder.h"
 
 #include<fstream>
 #include<Core/Logger.h>
 
 #include"ProjectManager.h"
+#include"Scripts/ScriptCompiler.h"
 
 namespace TengineEditor
 {
-	void Builder::Build()
+	BuildConfiguration ProjectBuilder::m_buildConfiguration = BuildConfiguration::Debug;
+
+	void ProjectBuilder::Build()
 	{
+		ScriptCompiler::Compile();
 		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
 		std::filesystem::create_directory(pathToProject + "/build");
 		std::filesystem::create_directory(pathToProject + "/build/Game");
@@ -18,7 +22,16 @@ namespace TengineEditor
 		BuildSolution();
 		CollectFiles();
 	}
-	void Builder::GenerateInitFiles()
+	void ProjectBuilder::SetBuildConfiguration(BuildConfiguration config)
+	{
+		m_buildConfiguration = config;
+	}
+	BuildConfiguration ProjectBuilder::GetBuildConfiguration()
+	{
+		return m_buildConfiguration;
+	}
+
+	void ProjectBuilder::GenerateInitFiles()
 	{
         //Source file
 		std::string projectName = ProjectManager::GetInstance()->getName();
@@ -84,7 +97,7 @@ void Game::close()
 		}
 		else
 		{
-			Logger::Critical("ERROR::Builder::Error creating game header file");
+			Logger::Critical("ERROR::ProjectBuilder::Error creating game header file");
 		}
         std::ofstream mainFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/main.cpp");
         if (mainFile.is_open())
@@ -105,10 +118,11 @@ int main(int argc, char** argv)
         }
         else
         {
-            Logger::Critical("ERROR::Builder::Error creating main file");
+            Logger::Critical("ERROR::ProjectBuilder::Error creating main file");
         }
 	}
-	void Builder::GenerateCMake()
+
+	void ProjectBuilder::GenerateCMake()
 	{
 		std::string projectName = ProjectManager::GetInstance()->getName();
 		std::ofstream cmakeFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/CMakeLists.txt");
@@ -151,7 +165,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     )" + pathToEditor + R"(
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE TengineCored)
+target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)
 
 
 target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
@@ -161,20 +175,37 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 			std::system(cmakeCommand.c_str());
 		}
 	}
-	void Builder::BuildSolution()
+
+	void ProjectBuilder::BuildSolution()
 	{
-		std::string cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/Game --config Debug";
+		
+		std::string cmakeBuildCommand;
+		if (m_buildConfiguration == BuildConfiguration::Debug)
+		{
+			cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/Game --config Debug";
+		}
+		else if(m_buildConfiguration == BuildConfiguration::Release)
+		{
+			cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/Game --config Release";
+		}
 		std::system(cmakeBuildCommand.c_str());
 	}
-	void Builder::CollectFiles()
+	void ProjectBuilder::CollectFiles()
 	{
 		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
 		std::string projectName = ProjectManager::GetInstance()->getName();
 
 		//Copy executable file
-		std::filesystem::copy(pathToProject+ "/build/Game/Debug/" + projectName + ".exe", pathToProject + "/build/Game/bin/" + projectName + ".exe",
-			std::filesystem::copy_options::overwrite_existing);
-
+		if (m_buildConfiguration == BuildConfiguration::Debug)
+		{
+			std::filesystem::copy(pathToProject + "/build/Game/Debug/" + projectName + ".exe", pathToProject + "/build/Game/bin/" + projectName + ".exe",
+				std::filesystem::copy_options::overwrite_existing);
+		}
+		else if (m_buildConfiguration == BuildConfiguration::Release)
+		{
+			std::filesystem::copy(pathToProject + "/build/Game/Release/" + projectName + ".exe", pathToProject + "/build/Game/bin/" + projectName + ".exe",
+				std::filesystem::copy_options::overwrite_existing);
+		}
 		//Copy all scenes;
 		std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
 		for (const auto& scene : pathToScenes)
@@ -186,9 +217,16 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 		//Copy Core Shared Library
 		std::string pathToEditor = std::filesystem::current_path().string();
 		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
-		std::filesystem::copy(pathToEditor + "/TengineCored.dll", pathToProject + "/build/Game/bin/TengineCored.dll",
-			std::filesystem::copy_options::overwrite_existing);
-
+		if (m_buildConfiguration == BuildConfiguration::Debug)
+		{
+			std::filesystem::copy(pathToEditor + "/TengineCored.dll", pathToProject + "/build/Game/bin/TengineCore.dll",
+				std::filesystem::copy_options::overwrite_existing);
+		}
+		else if (m_buildConfiguration == BuildConfiguration::Release)
+		{
+			std::filesystem::copy(pathToEditor + "/TengineCore.dll", pathToProject + "/build/Game/bin/TengineCore.dll",
+				std::filesystem::copy_options::overwrite_existing);
+		}
 		//Copy ScriptModule
 		std::filesystem::copy(pathToProject + "/build/ScriptModule/scriptModule.dll", pathToProject + "/build/Game/bin/scriptModule.dll",
 			std::filesystem::copy_options::overwrite_existing);

@@ -2,7 +2,7 @@
 
 #include<filesystem>
 #include<unordered_set>
-
+ 
 
 namespace TengineEditor
 {
@@ -18,16 +18,16 @@ namespace TengineEditor
 		std::filesystem::path path;
 		std::vector<FieldScriptInfo> fields;
 	};
-	class CodeGenerator
+	class ScriptCompiler
 	{
 	public:
-		static void CompileScripts();
+		static void Compile();
 	private:
 		static void GetScriptInfo();
 		static void GenerateMetaData();
 		static void GenerateCmake();
-		static void BuildDll();
 		static void GenerateInitFiles();
+		static void BuildDll();
 		static std::vector<ScriptInfo> m_scriptInfo;
 		static std::string m_metaData;
 	};

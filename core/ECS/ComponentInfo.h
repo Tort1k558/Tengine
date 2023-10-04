@@ -3,6 +3,7 @@
 #include<vector>
 #include<functional>
 #include<string>
+#include<filesystem>
 
 #include"Renderer/Texture.h"
 
@@ -22,14 +23,14 @@ namespace Tengine
 		File
 	};
 
-	struct FieldInfo
+	struct TENGINE FieldInfo
 	{
 		virtual ~FieldInfo() = default;
 		FieldType type;
 		std::string name;
 	};
 
-	struct FieldNumber
+	struct TENGINE FieldNumber
 	{
 		virtual ~FieldNumber() = default;
 		float minValue;
@@ -37,7 +38,7 @@ namespace Tengine
 		std::function<void()> callback;
 	};
 
-	struct FieldFloat : public FieldInfo, FieldNumber
+	struct TENGINE FieldFloat : public FieldInfo, FieldNumber
 	{
 		float* data;
 		FieldFloat()
@@ -46,7 +47,7 @@ namespace Tengine
 		}
 	};
 
-	struct FieldVec2 : public FieldInfo, FieldNumber
+	struct TENGINE FieldVec2 : public FieldInfo, FieldNumber
 	{
 		Vec2* data;
 		FieldVec2()
@@ -54,7 +55,7 @@ namespace Tengine
 			type = FieldType::Vec2;
 		}
 	};
-	struct FieldVec3 : public FieldInfo, FieldNumber
+	struct TENGINE FieldVec3 : public FieldInfo, FieldNumber
 	{
 		Vec3* data;
 		FieldVec3()
@@ -62,7 +63,7 @@ namespace Tengine
 			type = FieldType::Vec3;
 		}
 	};
-	struct FieldVec4 : public FieldInfo, FieldNumber
+	struct TENGINE FieldVec4 : public FieldInfo, FieldNumber
 	{
 		Vec4* data;
 		FieldVec4()
@@ -71,7 +72,7 @@ namespace Tengine
 		}
 	};
 
-	struct FieldEnum : public FieldInfo
+	struct TENGINE FieldEnum : public FieldInfo
 	{
 		FieldEnum()
 		{
@@ -84,7 +85,7 @@ namespace Tengine
 		std::function<void(int element)> callback;
 	};
 
-	struct FieldImage : public FieldInfo
+	struct TENGINE FieldImage : public FieldInfo
 	{
 		FieldImage()
 		{
@@ -94,7 +95,7 @@ namespace Tengine
 		Vec2 size;
 	};
 
-	struct FiledCollapsingHeader : public FieldInfo
+	struct TENGINE FiledCollapsingHeader : public FieldInfo
 	{
 		FiledCollapsingHeader()
 		{
@@ -103,7 +104,7 @@ namespace Tengine
 		std::vector<std::shared_ptr<FieldInfo>> elements;
 	};
 
-	struct FieldButton : public FieldInfo
+	struct TENGINE FieldButton : public FieldInfo
 	{
 		FieldButton()
 		{
@@ -112,7 +113,7 @@ namespace Tengine
 		std::function<void()> callback;
 	};
 
-	struct FieldFile : public FieldInfo
+	struct TENGINE FieldFile : public FieldInfo
 	{
 		FieldFile()
 		{
