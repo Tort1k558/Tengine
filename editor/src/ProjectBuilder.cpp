@@ -12,15 +12,23 @@ namespace TengineEditor
 
 	void ProjectBuilder::Build()
 	{
+		BuildConfiguration prevScriptCompilerConfig = ScriptCompiler::GetScriptBuildConfiguration();
+		BuildConfiguration prevCoreScriptCompilerConfig = ScriptCompiler::GetCoreBuildConfiguration();
+
+		ScriptCompiler::SetScriptBuildConfiguration(m_buildConfiguration);
+		ScriptCompiler::SetCoreBuildConfiguration(m_buildConfiguration);
 		ScriptCompiler::Compile();
 		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
 		std::filesystem::create_directory(pathToProject + "/build");
 		std::filesystem::create_directory(pathToProject + "/build/Game");
-		std::filesystem::create_directory(pathToProject + "/build/Game/bin");
 		GenerateInitFiles();
 		GenerateCMake();
 		BuildSolution();
 		CollectFiles();
+
+		ScriptCompiler::SetScriptBuildConfiguration(prevScriptCompilerConfig);
+		ScriptCompiler::SetCoreBuildConfiguration(prevCoreScriptCompilerConfig);
+		ScriptCompiler::Compile();
 	}
 	void ProjectBuilder::SetBuildConfiguration(BuildConfiguration config)
 	{
@@ -71,8 +79,9 @@ Game::Game(unsigned int width, unsigned int height, const std::string& title) :
 
 void Game::create()
 {
-	ScriptSystem::GetInstance()->setPathToDll("scriptModule.dll");
-	ScriptSystem::GetInstance()->reload();)";
+	ScriptSystem::GetInstance()->setPathToDll("ScriptModule.dll");
+	ScriptSystem::GetInstance()->reload();
+)";
 			std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
 			for (const auto& scene : pathToScenes)
 			{
@@ -164,10 +173,17 @@ add_executable(${PROJECT_NAME} ${TARGET_SRC_MODULE})
 target_link_directories(${PROJECT_NAME} PRIVATE
     )" + pathToEditor + R"(
 )
+)";
+			if (m_buildConfiguration == BuildConfiguration::Debug)
+			{
+				cmakeFile << "target_link_libraries(${PROJECT_NAME} PRIVATE TengineCored)\n";
+			}
+			else if (m_buildConfiguration == BuildConfiguration::Release)
+			{
+				cmakeFile << "target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)\n";
+			}
 
-target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)
-
-
+			cmakeFile << R"(
 target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 )";
 			cmakeFile.close();
@@ -190,11 +206,13 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 		}
 		std::system(cmakeBuildCommand.c_str());
 	}
+
 	void ProjectBuilder::CollectFiles()
 	{
 		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
 		std::string projectName = ProjectManager::GetInstance()->getName();
-
+		std::filesystem::remove_all(pathToProject + "/build/Game/bin");
+		std::filesystem::create_directory(pathToProject + "/build/Game/bin");
 		//Copy executable file
 		if (m_buildConfiguration == BuildConfiguration::Debug)
 		{
@@ -219,7 +237,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
 		if (m_buildConfiguration == BuildConfiguration::Debug)
 		{
-			std::filesystem::copy(pathToEditor + "/TengineCored.dll", pathToProject + "/build/Game/bin/TengineCore.dll",
+			std::filesystem::copy(pathToEditor + "/TengineCored.dll", pathToProject + "/build/Game/bin/TengineCored.dll",
 				std::filesystem::copy_options::overwrite_existing);
 		}
 		else if (m_buildConfiguration == BuildConfiguration::Release)
@@ -228,7 +246,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 				std::filesystem::copy_options::overwrite_existing);
 		}
 		//Copy ScriptModule
-		std::filesystem::copy(pathToProject + "/build/ScriptModule/scriptModule.dll", pathToProject + "/build/Game/bin/scriptModule.dll",
+		std::filesystem::copy(pathToProject + "/build/ScriptModule/ScriptModule.dll", pathToProject + "/build/Game/bin/ScriptModule.dll",
 			std::filesystem::copy_options::overwrite_existing);
 	}
 }

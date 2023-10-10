@@ -44,8 +44,10 @@ namespace TengineEditor
         return tokens;
     }
 
-    std::vector<ScriptInfo> ScriptCompiler::m_scriptInfo;
+    std::vector<ScriptCompiler::ScriptInfo> ScriptCompiler::m_scriptInfo;
     std::string ScriptCompiler::m_metaData;
+    BuildConfiguration ScriptCompiler::m_scriptBuildConfiguration;
+    BuildConfiguration ScriptCompiler::m_coreBuildConfiguration;
 
     void ScriptCompiler::Compile()
     {
@@ -59,6 +61,22 @@ namespace TengineEditor
         GenerateCmake();
         BuildDll();
         ScriptSystem::GetInstance()->reload();
+    }
+    void ScriptCompiler::SetScriptBuildConfiguration(BuildConfiguration config)
+    {
+        m_scriptBuildConfiguration = config;
+    }
+    void ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration config)
+    {
+        m_coreBuildConfiguration = config;
+    }
+    BuildConfiguration ScriptCompiler::GetScriptBuildConfiguration()
+    {
+        return m_scriptBuildConfiguration;
+    }
+    BuildConfiguration ScriptCompiler::GetCoreBuildConfiguration()
+    {
+        return m_coreBuildConfiguration;
     }
     void ScriptCompiler::GetScriptInfo()
     {
@@ -317,24 +335,25 @@ std::vector<std::string> GetScriptNames()
             std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             std::string compilerOptions;
-#ifdef NDEBUG 
-            compilerOptions = R"(
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MT")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT")";
-#else 
-            compilerOptions = R"(
+            std::string nameLib;
+            if (m_coreBuildConfiguration == BuildConfiguration::Debug)
+            {
+                compilerOptions = R"(
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MDd")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MDd")
 )";
-#endif
-            std::string nameLib;
-#ifdef NDEBUG 
-            nameLib = "TengineCore";
-#else 
-            nameLib = "TengineCored";
-#endif
+                nameLib = "TengineCored";
+            }
+            else if (m_coreBuildConfiguration == BuildConfiguration::Release)
+            {
+                compilerOptions = R"(
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MT")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT")
+)";
+                nameLib = "TengineCore";
+            }
             cmakeFile <<
 R"(cmake_minimum_required(VERSION 3.2)
 
@@ -388,7 +407,15 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
     void ScriptCompiler::BuildDll()
     {
-        std::string cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule --config Release";
+        std::string cmakeBuildCommand;
+        if (m_scriptBuildConfiguration == BuildConfiguration::Debug)
+        {
+            cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule --config Debug";
+        }
+        else if (m_scriptBuildConfiguration == BuildConfiguration::Release)
+        {
+            cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule --config Release";
+        }
         std::system(cmakeBuildCommand.c_str());
     }
 }

@@ -18,6 +18,7 @@ namespace TengineEditor
 		}
 		return m_instance;
     }
+
     std::shared_ptr<Project> ProjectManager::Load(std::filesystem::path path)
     {
 		m_instance = std::shared_ptr<Project>(new Project());
@@ -34,10 +35,11 @@ namespace TengineEditor
 		{
 			SceneManager::LoadByPath(m_instance->getPath().string() + "/" + m_instance->m_scenes[0].string());
 		}
-		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/scriptModule.dll");
+		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
 		ScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
+
     std::shared_ptr<Project> ProjectManager::Create(std::filesystem::path path)
     {
 		m_instance = std::shared_ptr<Project>(new Project());
@@ -50,10 +52,11 @@ namespace TengineEditor
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
-		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/scriptModule.dll");
+		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
 		ScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
+
 	void ProjectManager::Save()
 	{
 		SceneManager::Save(SceneManager::GetCurrentScene());

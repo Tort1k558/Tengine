@@ -17,7 +17,6 @@ namespace Tengine
 
 		static std::shared_ptr<Scene> GetCurrentScene();
 		static void SetCurrentScene(std::shared_ptr<Scene> scene);
-		static std::shared_ptr<Scene> m_currentScene;
 		static void Save(std::shared_ptr<Scene> scene);
 		static std::shared_ptr<Scene> LoadByPath(std::filesystem::path path);
 		static std::shared_ptr<Scene> LoadByName(std::string_view name);
@@ -26,5 +25,7 @@ namespace Tengine
 		static std::unordered_map<std::string, std::filesystem::path> m_sceneNames;
 		static void DeserializeField(nlohmann::json& data, std::shared_ptr<FieldInfo> element);
 		static void SerializeField(nlohmann::json& data, std::shared_ptr<FieldInfo> element);
+
+		static std::shared_ptr<Scene> m_currentScene;
 	};
 }

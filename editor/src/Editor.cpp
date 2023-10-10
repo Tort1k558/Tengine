@@ -14,6 +14,7 @@
 #include<Systems/ScriptSystem.h>
 #include<Systems/RendererSystem.h>
 
+#include"Scripts/ScriptCompiler.h"
 #include"UISystem.h"
 #include"ProjectManager.h"
 
@@ -30,6 +31,12 @@ namespace TengineEditor
 
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
+#ifdef NDEBUG
+        ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Release);
+#else
+        ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Debug);
+#endif
+
         RendererSystem::GetInstance()->disableRenderToDefaultFramebuffer();
         ProjectManager::Create("ExampleProject");
         std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();

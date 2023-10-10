@@ -452,6 +452,10 @@ namespace TengineEditor
                         selectedMenu = "Render";
                     }
 
+                    if (ImGui::Selectable("Scripts", false))
+                    {
+                        selectedMenu = "Scripts";
+                    }
                     ImGui::EndListBox();
                 }
                 
@@ -465,12 +469,12 @@ namespace TengineEditor
                         ImGui::Button(pathToScenes[i].string().c_str());
 
                         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                            ImGui::SetDragDropPayload("DND_STRING", &i, sizeof(int));
+                            ImGui::SetDragDropPayload("DNDString", &i, sizeof(int));
                             ImGui::Text("%s", pathToScenes[i].string().c_str());
                             ImGui::EndDragDropSource();
                         }
                         if (ImGui::BeginDragDropTarget()) {
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STRING")) {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DNDString")) {
                                 IM_ASSERT(payload->DataSize == sizeof(int));
                                 int dropped_idx = *(const int*)payload->Data;
                                 if (dropped_idx != i)
@@ -520,6 +524,29 @@ namespace TengineEditor
                 else if (selectedMenu == "Render")
                 {
 
+                }
+                else if (selectedMenu == "Scripts")
+                {
+                    static BuildConfiguration buildScriptConfiguration = BuildConfiguration::Debug;
+                    const char* buildConfigurations[] = { "Debug","Release" };
+                    if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildScriptConfiguration)]))
+                    {
+                        for (int i = 0; i < 2; i++)
+                        {
+                            const bool isSelected = (static_cast<int>(buildScriptConfiguration) == i);
+                            if (ImGui::Selectable(buildConfigurations[i], isSelected))
+                            {
+                                buildScriptConfiguration = static_cast<BuildConfiguration>(i);
+                                ScriptCompiler::SetScriptBuildConfiguration(buildScriptConfiguration);
+                            }
+
+                            if (isSelected)
+                            {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
                 }
                 ImGui::End();
             }
