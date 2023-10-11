@@ -6,6 +6,8 @@
 #include"ECS/Object.h"
 #include"ComponentInfo.h"
 
+#define SERIALIZABLE ComponentInfo getInfo() override;
+
 namespace Tengine
 {
 	class Object;

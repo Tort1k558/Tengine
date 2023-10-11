@@ -5,6 +5,8 @@
 #include<Scene/SceneManager.h>
 #include<Systems/ScriptSystem.h>
 
+#include"Scripts/EditorScriptSystem.h"
+
 
 namespace TengineEditor
 {
@@ -35,8 +37,8 @@ namespace TengineEditor
 		{
 			SceneManager::LoadByPath(m_instance->getPath().string() + "/" + m_instance->m_scenes[0].string());
 		}
-		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
-		ScriptSystem::GetInstance()->reload();
+		EditorScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
+		EditorScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
 
@@ -52,8 +54,8 @@ namespace TengineEditor
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
-		ScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
-		ScriptSystem::GetInstance()->reload();
+		EditorScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
+		EditorScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
 

@@ -12,12 +12,6 @@ namespace TengineEditor
 
 	void ProjectBuilder::Build()
 	{
-		BuildConfiguration prevScriptCompilerConfig = ScriptCompiler::GetScriptBuildConfiguration();
-		BuildConfiguration prevCoreScriptCompilerConfig = ScriptCompiler::GetCoreBuildConfiguration();
-
-		ScriptCompiler::SetScriptBuildConfiguration(m_buildConfiguration);
-		ScriptCompiler::SetCoreBuildConfiguration(m_buildConfiguration);
-		ScriptCompiler::Compile();
 		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
 		std::filesystem::create_directory(pathToProject + "/build");
 		std::filesystem::create_directory(pathToProject + "/build/Game");
@@ -25,10 +19,6 @@ namespace TengineEditor
 		GenerateCMake();
 		BuildSolution();
 		CollectFiles();
-
-		ScriptCompiler::SetScriptBuildConfiguration(prevScriptCompilerConfig);
-		ScriptCompiler::SetCoreBuildConfiguration(prevCoreScriptCompilerConfig);
-		ScriptCompiler::Compile();
 	}
 	void ProjectBuilder::SetBuildConfiguration(BuildConfiguration config)
 	{
@@ -41,8 +31,10 @@ namespace TengineEditor
 
 	void ProjectBuilder::GenerateInitFiles()
 	{
+		std::vector<ScriptInfo> scriptInfo = ScriptCompiler::GetScriptInfo();
         //Source file
 		std::string projectName = ProjectManager::GetInstance()->getName();
+
 		std::ofstream gameHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/Game.h");
 		if (gameHeaderFile.is_open())
 		{
@@ -61,6 +53,147 @@ public:
 )";
 			gameHeaderFile.close();
 		}
+		else
+		{
+			Logger::Critical("ERROR::ProjectBuilder::Error creating game header file");
+		}
+
+		std::ofstream gameScriptSystemHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/GameScriptSystem.h");
+		if (gameScriptSystemHeaderFile.is_open())
+		{
+			gameScriptSystemHeaderFile << R"(#pragma once
+
+#include<Systems/ScriptSystem.h>
+
+namespace Tengine
+{
+	class GameScriptSystem : public ScriptSystem
+	{
+	public:
+		void init() final;
+		void update() final;
+		void destroy() final;
+		std::shared_ptr<Component> addScript(std::shared_ptr<Object> object, std::string_view nameScript) final;
+		std::vector<std::string> getScriptNames() final;
+
+
+		static std::shared_ptr<GameScriptSystem> GetInstance();
+	};
+}
+)";
+			gameScriptSystemHeaderFile.close();
+		}
+		else
+		{
+			Logger::Critical("ERROR::ProjectBuilder::Error creating GameScriptSystem header file");
+		}
+		std::ofstream gameScriptSystemCppFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/GameScriptSystem.cpp");
+		if (gameScriptSystemCppFile.is_open())
+		{
+			gameScriptSystemCppFile << R"(#include "GameScriptSystem.h"
+
+)";
+			for (const auto& info : scriptInfo)
+			{
+				gameScriptSystemCppFile << "#include\"" + info.name + ".h\"\n";
+			}
+			gameScriptSystemCppFile << R"(
+
+namespace Tengine
+{
+
+	void GameScriptSystem::init()
+	{
+		std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
+		if (scene)
+		{
+			std::vector<std::shared_ptr<Script>> scripts = scene->getComponents<Script>();
+			for (const auto& script : scripts)
+			{
+				script->start();
+			}
+		}
+	}
+
+	void GameScriptSystem::update()
+	{
+		std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
+		if (scene)
+		{
+			std::vector<std::shared_ptr<Script>> scripts = scene->getComponents<Script>();
+			for (const auto& script : scripts)
+			{
+				script->update();
+			}
+		}
+	}
+
+	void GameScriptSystem::destroy()
+	{
+		
+	}
+
+	std::shared_ptr<Component> GameScriptSystem::addScript(std::shared_ptr<Object> object, std::string_view nameScript)
+	{
+)";
+			for (size_t i = 0; i < scriptInfo.size(); i++)
+			{
+				if (i == 0)
+				{
+					gameScriptSystemCppFile << "\t\tif (nameScript == \"" + scriptInfo[i].name + "\")\n\t{";
+					gameScriptSystemCppFile << "\t\tstd::shared_ptr<Component> script = std::make_shared<" + scriptInfo[i].name + ">();\n";
+					gameScriptSystemCppFile << "\t\tobject->addComponent(script);\n";
+					gameScriptSystemCppFile << "\t\treturn script;\n\t}\n";
+				}
+				else
+				{
+					gameScriptSystemCppFile << "\t\telse if (nameScript == " + scriptInfo[i].name + ")\n";
+					gameScriptSystemCppFile << "\t\tstd::shared_ptr<Component> script = std::make_shared<" + scriptInfo[i].name + ">();\n";
+					gameScriptSystemCppFile << "\t\tobject->addComponent(script);\n";
+					gameScriptSystemCppFile << "\t\treturn script;\n\t}\n";
+				}
+			}
+			gameScriptSystemCppFile << R"(
+	}
+
+	std::vector<std::string> GameScriptSystem::getScriptNames()
+	{
+)";
+
+			std::string nameAllScripts;
+			for (size_t i = 0; i < scriptInfo.size(); i++)
+			{
+				if (i == scriptInfo.size() - 1)
+				{
+					nameAllScripts += "\"" + scriptInfo[i].name + "\"";
+
+				}
+				else
+				{
+					nameAllScripts += "\"" + scriptInfo[i].name + "\", ";
+				}
+			}
+			gameScriptSystemCppFile << "\treturn {" + nameAllScripts + R"(};
+	}
+
+	std::shared_ptr<GameScriptSystem> GameScriptSystem::GetInstance()
+	{
+		if (!ScriptSystem::GetInstance())
+		{
+			SetInstance(std::make_shared<GameScriptSystem>());
+		}
+		return std::dynamic_pointer_cast<GameScriptSystem>(ScriptSystem::GetInstance());
+	}
+
+)";
+			gameScriptSystemCppFile << ScriptCompiler::GetMetaInfo();
+			gameScriptSystemCppFile << "\n}";
+			gameScriptSystemCppFile.close();
+		}
+		else
+		{
+			Logger::Critical("ERROR::ProjectBuilder::Error creating GameScriptSystem cpp file");
+		}
 		std::ofstream gameCppFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/Game.cpp");
 		if (gameCppFile.is_open())
 		{
@@ -71,6 +204,8 @@ public:
 #include<Scene/SceneManager.h>
 #include<ECS/SystemManager.h>
 
+#include"GameScriptSystem.h"
+
 Game::Game(unsigned int width, unsigned int height, const std::string& title) :
     Application(width, height, title)
 {
@@ -79,8 +214,7 @@ Game::Game(unsigned int width, unsigned int height, const std::string& title) :
 
 void Game::create()
 {
-	ScriptSystem::GetInstance()->setPathToDll("ScriptModule.dll");
-	ScriptSystem::GetInstance()->reload();
+	GameScriptSystem::GetInstance();
 )";
 			std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
 			for (const auto& scene : pathToScenes)
@@ -106,7 +240,7 @@ void Game::close()
 		}
 		else
 		{
-			Logger::Critical("ERROR::ProjectBuilder::Error creating game header file");
+			Logger::Critical("ERROR::ProjectBuilder::Error creating game cpp file");
 		}
         std::ofstream mainFile(ProjectManager::GetInstance()->getPath().string() + "/build/Game/main.cpp");
         if (mainFile.is_open())
@@ -153,6 +287,7 @@ project(${PROJECT_NAME})
 
 set(DIRS_SRC_MODULE 
 	"*.h" "*.cpp"
+	"../../Scripts/*.h" "../../Scripts/*.cpp" 
 	)
 file(GLOB TARGET_SRC_MODULE ${DIRS_SRC_MODULE})
 
@@ -164,6 +299,7 @@ include_directories()" + pathToEngineDirectory + R"(/external/spdlog/include)
 include_directories()" + pathToEngineDirectory + R"(/external/nlohmann/include)
 include_directories()" + pathToEngineDirectory + R"(/external/stbi)
 include_directories()" + pathToEngineDirectory + R"(/external/glm)
+include_directories(../../Scripts)
 include_directories(/)
 
 
@@ -245,8 +381,5 @@ target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
 			std::filesystem::copy(pathToEditor + "/TengineCore.dll", pathToProject + "/build/Game/bin/TengineCore.dll",
 				std::filesystem::copy_options::overwrite_existing);
 		}
-		//Copy ScriptModule
-		std::filesystem::copy(pathToProject + "/build/ScriptModule/ScriptModule.dll", pathToProject + "/build/Game/bin/ScriptModule.dll",
-			std::filesystem::copy_options::overwrite_existing);
 	}
 }

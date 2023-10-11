@@ -15,8 +15,10 @@
 #include<Systems/RendererSystem.h>
 
 #include"Scripts/ScriptCompiler.h"
+#include"Scripts/EditorScriptSystem.h"
 #include"UISystem.h"
 #include"ProjectManager.h"
+
 
 namespace TengineEditor
 {
@@ -31,6 +33,8 @@ namespace TengineEditor
 
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
+        EditorScriptSystem::GetInstance();
+
 #ifdef NDEBUG
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Release);
 #else

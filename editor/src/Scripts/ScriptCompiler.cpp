@@ -5,8 +5,8 @@
 #include<sstream>
 #include<Core/Logger.h>
 #include<Systems/ScriptSystem.h>
-
 #include"ProjectManager.h"
+#include"EditorScriptSystem.h"
 
 namespace TengineEditor
 {
@@ -43,24 +43,19 @@ namespace TengineEditor
 
         return tokens;
     }
-
-    std::vector<ScriptCompiler::ScriptInfo> ScriptCompiler::m_scriptInfo;
-    std::string ScriptCompiler::m_metaData;
     BuildConfiguration ScriptCompiler::m_scriptBuildConfiguration;
     BuildConfiguration ScriptCompiler::m_coreBuildConfiguration;
 
     void ScriptCompiler::Compile()
     {
-        ScriptSystem::GetInstance()->freeModule();
+        EditorScriptSystem::GetInstance()->freeModule();
         std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/Scripts");
         std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build");
         std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule");
-        GetScriptInfo();
-        GenerateMetaData();
         GenerateInitFiles();
         GenerateCmake();
         BuildDll();
-        ScriptSystem::GetInstance()->reload();
+        EditorScriptSystem::GetInstance()->reload();
     }
     void ScriptCompiler::SetScriptBuildConfiguration(BuildConfiguration config)
     {
@@ -78,9 +73,9 @@ namespace TengineEditor
     {
         return m_coreBuildConfiguration;
     }
-    void ScriptCompiler::GetScriptInfo()
+    std::vector<ScriptInfo> ScriptCompiler::GetScriptInfo()
     {
-        m_scriptInfo.clear();
+        std::vector<ScriptInfo> scriptinfo;
         for (const auto& entry : std::filesystem::directory_iterator(ProjectManager::GetInstance()->getPath().string() + "/Scripts")) {
             if (entry.is_regular_file() && entry.path().extension() == ".h")
             {
@@ -164,42 +159,47 @@ namespace TengineEditor
                     }
                 }
 
-                m_scriptInfo.push_back(info);
+                scriptinfo.push_back(info);
             }
         }
+        return scriptinfo;
     }
 
-    void ScriptCompiler::GenerateMetaData()
+    std::string ScriptCompiler::GetMetaInfo()
     {
-        for (const auto& info : m_scriptInfo)
+        std::string metaData;
+        for (const auto& info : GetScriptInfo())
         {
-            m_metaData += "ComponentInfo " + info.name + R"(::getInfo()
+            metaData += "ComponentInfo " + info.name + R"(::getInfo()
 {
     ComponentInfo displayInfo = ComponentInfo();
 )";
-            m_metaData += "\tdisplayInfo.setComponentName(\"" + info.name + "\");\n";
+            metaData += "\tdisplayInfo.setComponentName(\"" + info.name + "\");\n";
             int fieldCounter = 0;
             for (const auto& field : info.fields)
             {
                 if (field.type == "float" || field.type == "double" || field.type == "int")
                 {
                     std::string varName = "field" + std::to_string(fieldCounter);
-                    m_metaData += "\tstd::shared_ptr<FieldFloat> " + varName + " = std::make_shared<FieldFloat>(); \n";
-                    m_metaData += "\t" + varName + "->minValue = 0.0f;\n";
-                    m_metaData += "\t" + varName + "->maxValue = 20.0f;\n";
-                    m_metaData += "\t" + varName + "->name = \"" + field.name + "\";\n";
-                    m_metaData += "\t" + varName + "->data = &" + field.name + ";\n";
-                    m_metaData += "\tdisplayInfo.addElement(" + varName + ");\n";
+                    metaData += "\tstd::shared_ptr<FieldFloat> " + varName + " = std::make_shared<FieldFloat>(); \n";
+                    metaData += "\t" + varName + "->minValue = 0.0f;\n";
+                    metaData += "\t" + varName + "->maxValue = 20.0f;\n";
+                    metaData += "\t" + varName + "->name = \"" + field.name + "\";\n";
+                    metaData += "\t" + varName + "->data = &" + field.name + ";\n";
+                    metaData += "\tdisplayInfo.addElement(" + varName + ");\n";
                     fieldCounter++;
                 }
             }
 
-            m_metaData += "\treturn displayInfo;\n}\n";
+            metaData += "\treturn displayInfo;\n}\n";
         }
+        return metaData;
     }
 
     void ScriptCompiler::GenerateInitFiles()
     {
+        std::vector<ScriptInfo> scriptInfo = GetScriptInfo();
+
         //Header file
         std::ofstream initHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/SystemModule.h");
         if (initHeaderFile.is_open())
@@ -215,7 +215,6 @@ R"(#pragma once
 
 using namespace Tengine;
 #define EXTERN __declspec(dllexport)
-#define SHOWINEDITOR ComponentInfo getInfo() override;
 
 extern "C" EXTERN void StartScripts();
 
@@ -243,7 +242,7 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
 #include"Scene/SceneManager.h"
 #include"Components/Script.h"
 )";
-            for (const auto& info : m_scriptInfo)
+            for (const auto& info : scriptInfo)
             {
                 initSourceFile << "#include\"" + info.name + ".h\"\n";
             }
@@ -279,16 +278,16 @@ std::vector<std::string> GetScriptNames()
 {
 )";
             std::string nameAllScripts;
-            for (size_t i = 0; i < m_scriptInfo.size(); i++)
+            for (size_t i = 0; i < scriptInfo.size(); i++)
             {
-                if (i == m_scriptInfo.size() - 1)
+                if (i == scriptInfo.size() - 1)
                 {
-                    nameAllScripts += "\"" + m_scriptInfo[i].name + "\"";
+                    nameAllScripts += "\"" + scriptInfo[i].name + "\"";
 
                 }
                 else
                 {
-                    nameAllScripts += "\"" +m_scriptInfo[i].name + "\", ";
+                    nameAllScripts += "\"" + scriptInfo[i].name + "\", ";
                 }
             }
             initSourceFile << "    return {" + nameAllScripts + R"(};
@@ -297,26 +296,26 @@ std::vector<std::string> GetScriptNames()
             initSourceFile << R"(void* AddScript(std::string_view nameScript)
 {
 )";
-            for (size_t i = 0; i < m_scriptInfo.size(); i++)
+            for (size_t i = 0; i < scriptInfo.size(); i++)
             {
                 if (i == 0)
                 {
-                    initSourceFile << R"(    if (nameScript == ")" + m_scriptInfo[i].name + R"(")
+                    initSourceFile << R"(    if (nameScript == ")" + scriptInfo[i].name + R"(")
     {
 )";
-                    initSourceFile <<"\t\treturn new " + m_scriptInfo[i].name + "(); \n\t }\n";
+                    initSourceFile <<"\t\treturn new " + scriptInfo[i].name + "(); \n\t }\n";
                 }
                 else
                 {
-                    initSourceFile << R"(    else if (nameScript == )" + m_scriptInfo[i].name + R"()
+                    initSourceFile << R"(    else if (nameScript == )" + scriptInfo[i].name + R"()
     {
 )";
-                    initSourceFile << "\t\treturn new " + m_scriptInfo[i].name + "(); \n\t }\n";
+                    initSourceFile << "\t\treturn new " + scriptInfo[i].name + "(); \n\t }\n";
                 }
             }
 
             initSourceFile << "\t\treturn nullptr;\n}\n";
-            initSourceFile << m_metaData;
+            initSourceFile << GetMetaInfo();
             initSourceFile.close();
         }
         else

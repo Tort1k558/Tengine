@@ -9,7 +9,6 @@
 #include"Core/Input.h"
 #include"ECS/SystemManager.h"
 #include"Systems/RendererSystem.h"
-#include"Systems/ScriptSystem.h"
 #include"Scene/SceneManager.h"
 namespace Tengine
 {
