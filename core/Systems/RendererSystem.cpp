@@ -17,7 +17,6 @@
 namespace Tengine
 {
 	std::shared_ptr<RendererSystem> RendererSystem::m_instance;
-
 	void RendererSystem::init()
 	{
 		switch (m_rendererType)
@@ -90,6 +89,16 @@ namespace Tengine
 	void RendererSystem::setTextureFilter(TextureFilter filter)
 	{
 		m_textureFilter = filter;
+	}
+
+	RendererType RendererSystem::getRendererType()
+	{
+		return m_context->getType();
+	}
+
+	TextureFilter RendererSystem::getTextureFilter()
+	{
+		return m_textureFilter;
 	}
 
 	std::shared_ptr<FrameBuffer> RendererSystem::getFramebuffer()

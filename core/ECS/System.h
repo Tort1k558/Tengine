@@ -10,6 +10,7 @@ namespace Tengine
     public:
         System(const System&) = delete;
         System& operator=(const System&) = delete;
+
         virtual ~System() = default;
 
         virtual void init() = 0;

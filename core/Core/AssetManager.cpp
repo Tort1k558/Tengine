@@ -128,9 +128,9 @@ namespace Tengine
 
     std::unordered_map<std::string, std::shared_ptr<Resource>> AssetManager::m_resources;
 
-    std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
+    std::shared_ptr<Shader> AssetManager::LoadShader(std::string_view name, std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
     {
-        std::shared_ptr<Shader> shader = GetResource<Shader>(pathToVertexShader.string() + pathToFragmentShader.string());
+        std::shared_ptr<Shader> shader = GetResource<Shader>(name);
         if (shader)
         {
             return shader;
@@ -139,7 +139,7 @@ namespace Tengine
         shader->addShader(ReadFile(pathToVertexShader), ShaderType::Vertex);
         shader->addShader(ReadFile(pathToFragmentShader), ShaderType::Fragment);
         shader->compile();
-        m_resources[pathToVertexShader.string() + pathToFragmentShader.string()] = shader;
+        m_resources[name.data()] = shader;
 
         return shader;
     }

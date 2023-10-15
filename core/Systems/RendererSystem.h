@@ -8,6 +8,7 @@
 #include"Renderer/FrameBuffer.h"
 #include"Components/Camera.h"
 
+
 namespace Tengine
 {
 
@@ -20,8 +21,8 @@ namespace Tengine
 		void updateViewport(UVec2 size);
 		void setRendererType(RendererType type);
 		void setTextureFilter(TextureFilter filter);
-		RendererType getRendererType() { return m_context->getType(); };
-		TextureFilter getTextureFilter() { return m_textureFilter; }
+		RendererType getRendererType();
+		TextureFilter getTextureFilter();
 		std::shared_ptr<FrameBuffer> getFramebuffer();
 		void renderFramebuffer(std::shared_ptr<FrameBuffer> framebuffer);
 		void disableRenderToDefaultFramebuffer();
@@ -36,6 +37,7 @@ namespace Tengine
 		TextureFilter m_textureFilter = TextureFilter::Bilinear;
 		std::shared_ptr<FrameBuffer> m_framebuffer;
 		bool renderToDefaultFramebuffer = true;
+
 		static std::shared_ptr<RendererSystem> m_instance;
 	};
 }

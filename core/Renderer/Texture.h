@@ -16,7 +16,7 @@ namespace Tengine
 		RG8,
 		RGB8,
 		RGBA8,
-		DEPTH32
+		DEPTH32F
 	};
 
 	enum class TextureFilter

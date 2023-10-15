@@ -7,7 +7,7 @@
 namespace Tengine
 {
 
-	class RendererContextOpenGL : public RendererContext
+	class TENGINE RendererContextOpenGL : public RendererContext
 	{
 	public:
 		void init() final;
@@ -18,6 +18,5 @@ namespace Tengine
 		void enableDepthTest() final;
 		void disableDepthTest() final;
 		void enableDebugInfo() final;
-		RendererType getType() final;
 	};
 }

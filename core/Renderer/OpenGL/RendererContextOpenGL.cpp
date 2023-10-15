@@ -41,13 +41,20 @@ namespace Tengine
 
     void RendererContextOpenGL::init()
     {
+        m_type = RendererType::OpenGL;
+
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
             Logger::Critical("Failed to load glad!");
             return;
         }
         Logger::Info("OpenGL context");
-        Logger::Info("OpenGL version: {0}", reinterpret_cast<const char*>(glGetString(GL_VERSION)));
+        std::string version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+        if (version.find("OpenGL ES") != std::string::npos)
+        {
+            m_type = RendererType::OpenGLES;
+        }
+        Logger::Info("OpenGL version: {0}", version);
         Logger::Info("Vendor: {0}", reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
         Logger::Info("Renderer: {0}", reinterpret_cast<const char*>(glGetString(GL_RENDERER)));
     }
@@ -108,10 +115,5 @@ namespace Tengine
                     Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
                 }
             }, nullptr);
-    }
-
-    RendererType RendererContextOpenGL::getType()
-    {
-        return RendererType::OpenGL;
     }
 }

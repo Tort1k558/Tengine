@@ -4,6 +4,7 @@
 
 #include"VertexArray.h"
 #include"Core/Math.h"
+#include"Core/Core.h"
 
 namespace Tengine
 {
@@ -15,7 +16,7 @@ namespace Tengine
 		OpenGLES
 	};
 
-	class RendererContext
+	class TENGINE RendererContext
 	{
 	public:
 		virtual ~RendererContext() = default;
@@ -28,6 +29,8 @@ namespace Tengine
 		virtual void enableDepthTest() = 0;
 		virtual void disableDepthTest() = 0;
 		virtual void enableDebugInfo() = 0;
-		virtual RendererType getType() = 0;
+		RendererType getType();
+	protected:
+		RendererType m_type;
 	};
 }

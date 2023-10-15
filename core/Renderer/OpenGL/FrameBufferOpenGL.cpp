@@ -11,7 +11,7 @@ namespace Tengine
 		glGenFramebuffers(1, &m_id);
 		bind();
 		m_colorTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(nullptr, size, TextureType::RGBA8, TextureFilter::None));
-		m_depthTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(nullptr, size, TextureType::DEPTH32, TextureFilter::None));
+		m_depthTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(nullptr, size, TextureType::DEPTH32F, TextureFilter::None));
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture->m_id, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->m_id, 0);
