@@ -27,7 +27,7 @@ namespace Tengine
 	VertexArrayOpenGL::VertexArrayOpenGL() :
 		m_elementCount(0)
 	{
-		glCreateVertexArrays(1, &m_id);
+		glGenVertexArrays(1, &m_id);
 	}
 
 	VertexArrayOpenGL::~VertexArrayOpenGL()

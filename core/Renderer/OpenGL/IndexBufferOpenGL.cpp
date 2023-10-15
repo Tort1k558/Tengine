@@ -6,9 +6,9 @@ namespace Tengine
 	IndexBufferOpenGL::IndexBufferOpenGL(GLuint* indices, unsigned int count) :
 		m_count(count)
 	{
-		glCreateBuffers(1, &m_id);
-		glBindBuffer(GL_ARRAY_BUFFER, m_id);
-		glBufferData(GL_ARRAY_BUFFER, m_count * sizeof(GLuint), indices, GL_STATIC_DRAW);
+		glGenBuffers(1, &m_id);
+		bind();
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof(GLuint), indices, GL_STATIC_DRAW);
 		unbind();
 	}
 
@@ -21,7 +21,7 @@ namespace Tengine
 	{
 		m_id = buffer.m_id;
 		m_count = buffer.m_count;
-
+		
 		buffer.m_id = 0;
 		buffer.m_count = 0;
 	}

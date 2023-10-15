@@ -3,7 +3,6 @@
 #include<memory>
 #include<nlohmann/json.hpp>
 
-#include"ECS/Object.h"
 #include"ComponentInfo.h"
 
 #define SERIALIZABLE ComponentInfo getInfo() override;

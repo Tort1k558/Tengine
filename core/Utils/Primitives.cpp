@@ -41,7 +41,7 @@ namespace Tengine
                 Vertex vertex;
                 vertex.position = { x,y,z };
                 vertex.texCoords = { u,v };
-                vertex.normal = Normalize(Vec3(x, y, z));
+                vertex.normal = Math::Normalize(Vec3(x, y, z));
 
                 vertices.push_back(vertex);
             }

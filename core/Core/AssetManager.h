@@ -7,12 +7,6 @@
 
 #include"Core/Core.h"
 
-struct aiMesh;
-struct aiScene;
-struct aiNode;
-struct aiMaterial;
-enum aiTextureType;
-
 namespace Tengine
 {
 	class Texture;
@@ -44,22 +38,18 @@ namespace Tengine
 		template<typename T>
 		static std::shared_ptr<T> GetResource(std::string_view name);
 	private:
-		static std::string ReadFile(std::filesystem::path path);
-		static std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory);
-		static void ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::filesystem::path directory);
-		static std::shared_ptr<Texture> LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory);
 
-		static std::unordered_map<std::filesystem::path, std::shared_ptr<Resource>> m_resources;
+		static std::unordered_map<std::string, std::shared_ptr<Resource>> m_resources;
 	};
 
 	template<typename T>
 	inline std::shared_ptr<T> AssetManager::GetResource(std::string_view name)
 	{
-		if (m_resources.find(name) == m_resources.end())
+		if (m_resources.find(name.data()) == m_resources.end())
 		{
 			return nullptr;
 		}
-		return std::dynamic_pointer_cast<T>(m_resources.at(name));
+		return std::dynamic_pointer_cast<T>(m_resources.at(name.data()));
 	}
 
 }

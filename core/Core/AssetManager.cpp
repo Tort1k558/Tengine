@@ -16,97 +16,7 @@
 
 namespace Tengine
 {
-    std::unordered_map<std::filesystem::path, std::shared_ptr<Resource>> AssetManager::m_resources;
-
-    std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
-    {
-        std::shared_ptr<Shader> shader = GetResource<Shader>(pathToVertexShader.string() + pathToFragmentShader.string());
-        if (shader)
-        {
-            return shader;
-        }
-        shader = Shader::Create();
-        shader->addShader(ReadFile(pathToVertexShader), ShaderType::Vertex);
-        shader->addShader(ReadFile(pathToFragmentShader), ShaderType::Fragment);
-        shader->compile();
-        m_resources[pathToVertexShader.string() + pathToFragmentShader.string()] = shader;
-
-        return shader;
-    }
-
-    std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
-    {
-        std::shared_ptr<Texture> texture = GetResource<Texture>(path.string());
-        if (texture)
-        {
-            return texture;
-        }
-        stbi_set_flip_vertically_on_load(true);
-        int width, height, channels;
-
-        unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
-        if (data == nullptr)
-        {
-            Logger::Critical("ERROR::Failed to load the texture: {0}", path.string().c_str());
-            return nullptr;
-        }
-        TextureType type = TextureType::RGB8;
-        switch (channels)
-        {
-        case 1:
-            type = TextureType::R8;
-            break;
-        case 2:
-            type = TextureType::RG8;
-            break;
-        case 3:
-            type = TextureType::RGB8;
-            break;
-        case 4:
-            type = TextureType::RGBA8;
-            break;
-        }
-        texture = Texture::Create(data, { width,height }, type);
-        texture->setPath(path);
-        stbi_image_free(data);
-
-        m_resources[path] = texture;
-        return texture;
-    }
-
-    std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
-    {
-        std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path.string());
-        if (mesh)
-        {
-            return mesh;
-        }
-        mesh = Component::Create<Mesh>();
-        mesh->setPath(path);
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
-            return nullptr;
-        }
-        ProcessNode(mesh, scene->mRootNode, scene, path.parent_path());
-        m_resources[path] = std::dynamic_pointer_cast<Resource>(std::make_shared<Mesh>(*mesh));
-        return mesh;
-    }
-
-    std::shared_ptr<Shader> AssetManager::AddShader(std::string_view name,std::string_view vertexSource, std::string_view fragmentSource)
-    {
-        std::shared_ptr<Shader> shader = Shader::Create();
-        shader->addShader(vertexSource, ShaderType::Vertex);
-        shader->addShader(fragmentSource, ShaderType::Fragment);
-        shader->compile();
-        m_resources[name] = shader;
-
-        return shader;
-    }
-
-    std::string AssetManager::ReadFile(std::filesystem::path path)
+    std::string ReadFile(std::filesystem::path path)
     {
         std::ifstream file(path);
         if (file.is_open())
@@ -122,7 +32,18 @@ namespace Tengine
         return "";
     }
 
-    std::shared_ptr<SubMesh> AssetManager::ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory)
+    std::shared_ptr<Texture> LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory)
+    {
+        if (material->GetTextureCount(type) > 0)
+        {
+            aiString pathToTexture;
+            material->GetTexture(type, 0, &pathToTexture);
+            return AssetManager::LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
+        }
+        return nullptr;
+    }
+
+    std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::filesystem::path directory)
     {
         std::vector<Vertex> vertices;
         for (size_t i = 0; i < mesh->mNumVertices; i++)
@@ -191,7 +112,7 @@ namespace Tengine
         return submesh;
     }
 
-    void AssetManager::ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::filesystem::path directory)
+    void ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::filesystem::path directory)
     {
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
@@ -205,15 +126,94 @@ namespace Tengine
         }
     }
 
-    std::shared_ptr<Texture> AssetManager::LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory)
+    std::unordered_map<std::string, std::shared_ptr<Resource>> AssetManager::m_resources;
+
+    std::shared_ptr<Shader> AssetManager::LoadShader(std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader)
     {
-        if (material->GetTextureCount(type) > 0)
+        std::shared_ptr<Shader> shader = GetResource<Shader>(pathToVertexShader.string() + pathToFragmentShader.string());
+        if (shader)
         {
-            aiString pathToTexture;
-            material->GetTexture(type, 0, &pathToTexture);
-            return LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
+            return shader;
         }
-        return nullptr;
+        shader = Shader::Create();
+        shader->addShader(ReadFile(pathToVertexShader), ShaderType::Vertex);
+        shader->addShader(ReadFile(pathToFragmentShader), ShaderType::Fragment);
+        shader->compile();
+        m_resources[pathToVertexShader.string() + pathToFragmentShader.string()] = shader;
+
+        return shader;
+    }
+
+    std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
+    {
+        std::shared_ptr<Texture> texture = GetResource<Texture>(path.string());
+        if (texture)
+        {
+            return texture;
+        }
+        stbi_set_flip_vertically_on_load(true);
+        int width, height, channels;
+
+        unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+        if (data == nullptr)
+        {
+            Logger::Critical("ERROR::Failed to load the texture: {0}", path.string().c_str());
+            return nullptr;
+        }
+        TextureType type = TextureType::RGB8;
+        switch (channels)
+        {
+        case 1:
+            type = TextureType::R8;
+            break;
+        case 2:
+            type = TextureType::RG8;
+            break;
+        case 3:
+            type = TextureType::RGB8;
+            break;
+        case 4:
+            type = TextureType::RGBA8;
+            break;
+        }
+        texture = Texture::Create(data, { width,height }, type);
+        texture->setPath(path);
+        stbi_image_free(data);
+
+        m_resources[path.string()] = texture;
+        return texture;
+    }
+
+    std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
+    {
+        std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path.string());
+        if (mesh)
+        {
+            return mesh;
+        }
+        mesh = Component::Create<Mesh>();
+        mesh->setPath(path);
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
+            return nullptr;
+        }
+        ProcessNode(mesh, scene->mRootNode, scene, path.parent_path());
+        m_resources[path.string()] = std::dynamic_pointer_cast<Resource>(std::make_shared<Mesh>(*mesh));
+        return mesh;
+    }
+
+    std::shared_ptr<Shader> AssetManager::AddShader(std::string_view name,std::string_view vertexSource, std::string_view fragmentSource)
+    {
+        std::shared_ptr<Shader> shader = Shader::Create();
+        shader->addShader(vertexSource, ShaderType::Vertex);
+        shader->addShader(fragmentSource, ShaderType::Fragment);
+        shader->compile();
+        m_resources[name.data()] = shader;
+
+        return shader;
     }
 
     std::filesystem::path Resource::getPath() const

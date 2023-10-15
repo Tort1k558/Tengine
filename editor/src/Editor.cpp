@@ -34,13 +34,14 @@ namespace TengineEditor
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
         EditorScriptSystem::GetInstance();
+        RendererSystem::GetInstance()->getRendererContext()->enableDebugInfo();
 
 #ifdef NDEBUG
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Release);
 #else
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Debug);
 #endif
-
+        RendererSystem f;
         RendererSystem::GetInstance()->disableRenderToDefaultFramebuffer();
         ProjectManager::Create("ExampleProject");
         std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();

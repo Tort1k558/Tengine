@@ -72,7 +72,8 @@ namespace Tengine
 					{
 						if (it.key() == "name")
 						{
-							object->setName(it.value());
+							std::string name = it.value();
+							object->setName(name);
 						}
 						else if (it.key() == "Transform")
 						{

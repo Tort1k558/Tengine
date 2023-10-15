@@ -1,4 +1,5 @@
 #pragma once
+
 #include<array>
 #include<vector>
 #include<functional>
@@ -58,7 +59,7 @@ namespace Tengine
 	{
 	public:
 		EventKeyPressed(KeyCode code, bool repeat = false);
-		static const EventType type = EventType::KeyPressed;
+		static const EventType type;
 		KeyCode code;
 		bool repeat;
 	};
@@ -67,7 +68,7 @@ namespace Tengine
 	{
 	public:
 		EventKeyReleased(KeyCode code);
-		static const EventType type = EventType::KeyReleased;
+		static const EventType type;
 		KeyCode code;
 	};
 
@@ -75,7 +76,7 @@ namespace Tengine
 	{
 	public:
 		EventMouseMoved(double x, double y);
-		static const EventType type = EventType::MouseMoved;
+		static const EventType type;
 		double x;
 		double y;
 	};
@@ -87,7 +88,7 @@ namespace Tengine
 		MouseButton code;
 		double x;
 		double y;
-		static const EventType type = EventType::MouseButtonPressed;
+		static const EventType type;
 	};
 
 	class EventMouseButtonReleased : public Event
@@ -98,14 +99,14 @@ namespace Tengine
 		MouseButton code;
 		double x;
 		double y;
-		static const EventType type = EventType::MouseButtonReleased;
+		static const EventType type;
 	};
 
 	class EventWindowClose : public Event
 	{
 	public:
 		EventWindowClose();
-		static const EventType type = EventType::WindowClose;
+		static const EventType type;
 	};
 
 	class EventWindowResize : public Event
@@ -114,6 +115,6 @@ namespace Tengine
 		EventWindowResize(unsigned int x, unsigned int y);
 		unsigned int x;
 		unsigned int y;
-		static const EventType type = EventType::WindowResize;
+		static const EventType type;
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 #include<vector>
 #include<memory>
 #include<string>
@@ -23,6 +24,7 @@ namespace Tengine
 		virtual ~Object() = default;
 
 		void addComponent(std::shared_ptr<Component> component);
+
 		template<typename T>
 		void removeComponent();
 
@@ -58,7 +60,7 @@ namespace Tengine
 			if (std::dynamic_pointer_cast<T>(m_components[i]))
 			{
 				m_components[i]->setParent(nullptr);
-				m_components.erase(i);
+				m_components.erase(m_components.begin() + i);
 			}
 		}
 	}

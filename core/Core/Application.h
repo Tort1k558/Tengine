@@ -32,7 +32,8 @@ namespace Tengine
 		void unlockFps();
 		void setMaxFps(size_t fps);
 		void destroy();
-		
+		void tick();
+
 		size_t getMaxFps() const;
 		std::shared_ptr<Window> getWindow() const;
 	private:

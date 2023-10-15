@@ -1,4 +1,5 @@
 #pragma once
+
 #include<memory>
 
 #include"VertexArray.h"
@@ -10,7 +11,8 @@ namespace Tengine
 	enum class RendererType
 	{
 		None = 0,
-		OpenGL
+		OpenGL,
+		OpenGLES
 	};
 
 	class RendererContext
@@ -25,6 +27,7 @@ namespace Tengine
 		virtual void clearColor(Vec4 color) = 0;
 		virtual void enableDepthTest() = 0;
 		virtual void disableDepthTest() = 0;
+		virtual void enableDebugInfo() = 0;
 		virtual RendererType getType() = 0;
 	};
 }

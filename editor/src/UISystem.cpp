@@ -146,12 +146,12 @@ namespace TengineEditor
             }
             if (Input::IsKeyPressed(KeyCode::A))
             {
-                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Normalize(Cross(sceneCamera->getDirection(), sceneCamera->getUp()))
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Math::Normalize(Math::Cross(sceneCamera->getDirection(), sceneCamera->getUp()))
                     * Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
             }
             if (Input::IsKeyPressed(KeyCode::D))
             {
-                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Normalize(Cross(sceneCamera->getDirection(), sceneCamera->getUp()))
+                sceneCameraTransform->setPosition(sceneCameraTransform->getPosition() + Math::Normalize(Math::Cross(sceneCamera->getDirection(), sceneCamera->getUp()))
                     * Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
             }
             if (Input::IsKeyPressed(KeyCode::LEFT_SHIFT))
@@ -499,6 +499,7 @@ namespace TengineEditor
                     {
                         ProjectManager::GetInstance()->addScene(newString.data());
                     }
+
                     static BuildConfiguration buildConfiguration = BuildConfiguration::Debug;
                     const char* buildConfigurations[] = { "Debug","Release" };
                     if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildConfiguration)]))
@@ -510,6 +511,27 @@ namespace TengineEditor
                             {
                                 buildConfiguration = static_cast<BuildConfiguration>(i);
                                 ProjectBuilder::SetBuildConfiguration(buildConfiguration);
+                            }
+
+                            if (isSelected)
+                            {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    static BuildPlatform buildPlatform = BuildPlatform::Windows;
+                    const char* buildPlatforms[] = { "Windows", "HTML5" };
+                    if (ImGui::BeginCombo("BuildPlatform", buildPlatforms[static_cast<int>(buildPlatform)]))
+                    {
+                        for (int i = 0; i < 2; i++)
+                        {
+                            const bool isSelected = (static_cast<int>(buildPlatform) == i);
+                            if (ImGui::Selectable(buildPlatforms[i], isSelected))
+                            {
+                                buildPlatform = static_cast<BuildPlatform>(i);
+                                ProjectBuilder::SetBuildPlatform(buildPlatform);
                             }
 
                             if (isSelected)

@@ -6,16 +6,16 @@ namespace Tengine
     ShaderSource ShaderCode::GetDefaultShader()
     {
         ShaderSource source;
-        source.addSourceShader(ShaderType::Vertex, GLSL::defaultShaderVertex);
-        source.addSourceShader(ShaderType::Fragment, GLSL::defaultShaderFragment);
+        source.addSourceShader(ShaderType::Vertex, ESSL::defaultShaderVertex);
+        source.addSourceShader(ShaderType::Fragment, ESSL::defaultShaderFragment);
         return source;
     }
 
     ShaderSource ShaderCode::GetFramebufferShader()
     {
         ShaderSource source;
-        source.addSourceShader(ShaderType::Vertex, GLSL::framebufferShaderVertex);
-        source.addSourceShader(ShaderType::Fragment, GLSL::framebufferShaderFragment);
+        source.addSourceShader(ShaderType::Vertex, ESSL::framebufferShaderVertex);
+        source.addSourceShader(ShaderType::Fragment, ESSL::framebufferShaderFragment);
         return source;
     }
 

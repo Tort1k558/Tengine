@@ -21,7 +21,7 @@ namespace Tengine
 
 	VertexBufferOpenGL::VertexBufferOpenGL(float* vertices, unsigned int size, BufferUsage usage)
 	{
-		glCreateBuffers(1, &m_id);
+		glGenBuffers(1, &m_id);
 		bind();
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, bufferUsageToOpenGL(usage));
 		unbind();

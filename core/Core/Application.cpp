@@ -10,6 +10,7 @@
 #include"ECS/SystemManager.h"
 #include"Systems/RendererSystem.h"
 #include"Scene/SceneManager.h"
+
 namespace Tengine
 {
     Application::Application(unsigned int width, unsigned int height, std::string title)
@@ -22,7 +23,7 @@ namespace Tengine
         m_window->init();
 
         RendererSystem::GetInstance()->setRendererType(RendererType::OpenGL);
-        RendererSystem::GetInstance()->setTextureFilter(TextureFilter::Anisotropic16);
+        RendererSystem::GetInstance()->setTextureFilter(TextureFilter::Bilinear);
         RendererSystem::GetInstance()->updateViewport(m_window->getSize());
         RendererSystem::GetInstance()->init();
 
@@ -75,24 +76,13 @@ namespace Tengine
                 Timer::SetDeltaTime(maxDelta);
             }
 
-            Timer::Start();
-
-            Input::Update();
-            m_window->update();
-            RendererSystem::GetInstance()->update();
-            SystemManager::UpdateSystems();
-
-            update();
-            Timer::End();
+            tick();
 
             if (m_lockFps)
             {
                 nextFrame += std::chrono::duration<double>(maxDelta);
             }
-        }
-        close();
-        SystemManager::DestroySystems();
-        RendererSystem::GetInstance()->destroy();
+        }   
     }
 
     void Application::lockFps()
@@ -113,6 +103,23 @@ namespace Tengine
     void Application::destroy()
     {
         m_isRunning = false;
+
+        close();
+        SystemManager::DestroySystems();
+        RendererSystem::GetInstance()->destroy();
+    }
+
+    void Application::tick()
+    {
+        Timer::Start();
+
+        Input::Update();
+        m_window->update();
+        RendererSystem::GetInstance()->update();
+        SystemManager::UpdateSystems();
+        update();
+
+        Timer::End();
     }
     size_t Application::getMaxFps() const
     {

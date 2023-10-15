@@ -1,5 +1,7 @@
 #include"Transform.h"
 
+#include"Core/Math.h"
+
 namespace Tengine
 {
 	Transform::Transform()
@@ -94,12 +96,13 @@ namespace Tengine
 
 	Mat4 Transform::getMatrix() const
 	{
-		Mat4 translateMatrix = TranslateMatrix(Mat4(1.0f), m_position);
+		Mat4 translateMatrix = Mat4(1.0f);
+		translateMatrix = Math::TranslateMatrix(translateMatrix, m_position);
 		Mat4 rotateMatrix(1.0f);
-		rotateMatrix = RotateMatrix(rotateMatrix, Vec3(1.0f, 0.0f, 0.0f), m_rotation.x);
-		rotateMatrix = RotateMatrix(rotateMatrix, Vec3(0.0f, 1.0f, 0.0f), m_rotation.y);
-		rotateMatrix = RotateMatrix(rotateMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
-		Mat4 scaleMatrix = GetScaleMatrix(m_scale);
+		rotateMatrix = Math::RotateMatrix(rotateMatrix, Vec3(1.0f, 0.0f, 0.0f), m_rotation.x);
+		rotateMatrix = Math::RotateMatrix(rotateMatrix, Vec3(0.0f, 1.0f, 0.0f), m_rotation.y);
+		rotateMatrix = Math::RotateMatrix(rotateMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
+		Mat4 scaleMatrix = Math::GetScaleMatrix(m_scale);
 		return translateMatrix * rotateMatrix * scaleMatrix;
 	}
 

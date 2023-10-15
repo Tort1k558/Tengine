@@ -18,6 +18,14 @@ namespace Tengine
 		}
 	}
 
+	const EventType EventMouseMoved::type = EventType::MouseMoved;
+	const EventType EventKeyPressed::type = EventType::KeyPressed;
+	const EventType EventKeyReleased::type = EventType::KeyReleased;
+	const EventType EventMouseButtonPressed::type = EventType::MouseButtonPressed;
+	const EventType EventMouseButtonReleased::type = EventType::MouseButtonReleased;
+	const EventType EventWindowClose::type = EventType::WindowClose;
+	const EventType EventWindowResize::type = EventType::WindowResize;
+
 	EventMouseMoved::EventMouseMoved(double x, double y) :
 		Event(type), x(x), y(y)
 	{

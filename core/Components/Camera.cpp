@@ -29,7 +29,7 @@ namespace Tengine
 		Mat4 rotateMatrix = getRotationMatrix(rotation);
 		Vec3 up = rotateMatrix * Vec4(m_up, 1.0f);
 		Vec3 direction = rotateMatrix * Vec4(m_direction, 1.0f);
-		return GetLookAtMatrix(transform->getPosition(), direction, up);
+		return Math::GetLookAtMatrix(transform->getPosition(), direction, up);
 	}
 
 	Vec3 Camera::getDirection() const
@@ -179,17 +179,17 @@ namespace Tengine
 		switch (m_rotationOrder)
 		{
 		case RotationOrder::XYZ:
-			return GetEulerMatrixXYZ(rotation);
+			return Math::GetEulerMatrixXYZ(rotation);
 		case RotationOrder::XZY:
-			return GetEulerMatrixXZY(rotation);
+			return Math::GetEulerMatrixXZY(rotation);
 		case RotationOrder::YXZ:
-			return GetEulerMatrixYXZ(rotation);
+			return Math::GetEulerMatrixYXZ(rotation);
 		case RotationOrder::YZX:
-			return GetEulerMatrixYZX(rotation);
+			return Math::GetEulerMatrixYZX(rotation);
 		case RotationOrder::ZXY:
-			return GetEulerMatrixZXY(rotation);
+			return Math::GetEulerMatrixZXY(rotation);
 		case RotationOrder::ZYX:
-			return GetEulerMatrixZYX(rotation);
+			return Math::GetEulerMatrixZYX(rotation);
 		}
 		return Mat4(1.0f);
 	}
@@ -230,7 +230,7 @@ namespace Tengine
 
 	void PerspectiveProjection::updateProjection()
 	{
-		m_projection = GetPerspectiveMatrix(m_fov, m_aspectRatio, m_zNear, m_zFar);
+		m_projection = Math::GetPerspectiveMatrix(m_fov, m_aspectRatio, m_zNear, m_zFar);
 	}
 
 	float PerspectiveProjection::getFov() const
@@ -353,6 +353,6 @@ namespace Tengine
 
 	void OrthographicalProjection::updateProjection()
 	{
-		m_projection = GetOrthographicMatrix(m_left, m_right, m_bottom, m_top, m_zNear, m_zFar);
+		m_projection = Math::GetOrthographicMatrix(m_left, m_right, m_bottom, m_top, m_zNear, m_zFar);
 	}
 }

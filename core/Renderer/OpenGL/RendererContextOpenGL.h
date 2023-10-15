@@ -2,7 +2,6 @@
 #include"../RendererContext.h"
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
-
 #include<memory>
 
 namespace Tengine
@@ -18,6 +17,7 @@ namespace Tengine
 		void clearColor(Vec4 color) final;
 		void enableDepthTest() final;
 		void disableDepthTest() final;
+		void enableDebugInfo() final;
 		RendererType getType() final;
 	};
 }
