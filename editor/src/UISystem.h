@@ -27,6 +27,8 @@ namespace TengineEditor
 		void renderWindowObjects();
 		void renderWindowComponents();
 		void renderWindowInfo();
+		void renderFileBrowser();
+
 		std::shared_ptr<Window> m_window;
 		std::string m_nameOfSelectedObject;
 		std::shared_ptr<Object> m_sceneCamera;

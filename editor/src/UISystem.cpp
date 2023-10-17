@@ -22,6 +22,7 @@
 #include"Project.h"
 #include"ProjectManager.h"
 #include"ProjectBuilder.h"
+#include"FileManager.h"
 
 namespace TengineEditor
 {
@@ -56,7 +57,7 @@ namespace TengineEditor
 
         colors[ImGuiCol_Text] = { 0.80f, 0.80f, 0.83f, 1.00f };
         colors[ImGuiCol_TextDisabled] = { 0.24f, 0.23f, 0.29f, 1.00f };
-        colors[ImGuiCol_WindowBg] = { 0.06f, 0.05f, 0.07f, 1.00f };
+        colors[ImGuiCol_WindowBg] = { 0.1f, 0.1f, 0.1f, 1.00f };
         colors[ImGuiCol_ChildBg] = { 0.07f, 0.07f, 0.09f, 1.00f };
         colors[ImGuiCol_PopupBg] = { 0.07f, 0.07f, 0.09f, 1.00f };
         colors[ImGuiCol_Border] = { 0.80f, 0.80f, 0.83f, 0.88f };
@@ -127,6 +128,9 @@ namespace TengineEditor
         renderWindowInfo();
         renderWindowObjects();
         renderWindowComponents();
+        renderFileBrowser();
+        
+        
         //Scene
         ImGui::Begin("Scene", nullptr);
 
@@ -437,138 +441,144 @@ namespace TengineEditor
             {
                 float windowWidth = ImGui::GetWindowWidth();
 
-                ImGui::Columns(2);
-                ImGui::SetColumnWidth(0, windowWidth * 0.3f);
-                static std::string selectedMenu;
-                if (ImGui::BeginListBox("##List", ImVec2(-1, -1)))
+                if (ImGui::BeginTable("##ProjectSettigns", 2, ImGuiTableFlags_Resizable))
                 {
-                    if (ImGui::Selectable("Build", true))
-                    {
-                        selectedMenu = "Build";
-                    }
-                    
-                    if (ImGui::Selectable("Render", false))
-                    {
-                        selectedMenu = "Render";
-                    }
+                    ImGui::TableSetupColumn("##ListOfSettings", ImGuiTableColumnFlags_WidthFixed, windowWidth * 0.3f);
 
-                    if (ImGui::Selectable("Scripts", false))
+                    ImGui::TableNextColumn();
+                    static std::string selectedMenu;
+                    if (ImGui::BeginListBox("##List", ImVec2(-1, -1)))
                     {
-                        selectedMenu = "Scripts";
-                    }
-                    ImGui::EndListBox();
-                }
-                
-                ImGui::NextColumn();
-                
-                if (selectedMenu == "Build")
-                {
-                    std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
-                    static int draggedStringIndex = -1;
-                    for (int i = 0; i < pathToScenes.size(); ++i) {
-                        ImGui::Button(pathToScenes[i].string().c_str());
-
-                        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                            ImGui::SetDragDropPayload("DNDString", &i, sizeof(int));
-                            ImGui::Text("%s", pathToScenes[i].string().c_str());
-                            ImGui::EndDragDropSource();
+                        if (ImGui::Selectable("Build", true))
+                        {
+                            selectedMenu = "Build";
                         }
-                        if (ImGui::BeginDragDropTarget()) {
-                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DNDString")) {
-                                IM_ASSERT(payload->DataSize == sizeof(int));
-                                int dropped_idx = *(const int*)payload->Data;
-                                if (dropped_idx != i)
+
+                        if (ImGui::Selectable("Render", false))
+                        {
+                            selectedMenu = "Render";
+                        }
+
+                        if (ImGui::Selectable("Scripts", false))
+                        {
+                            selectedMenu = "Scripts";
+                        }
+                        ImGui::EndListBox();
+                    }
+
+                    ImGui::TableNextColumn();
+
+                    if (selectedMenu == "Build")
+                    {
+                        std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
+                        static int draggedStringIndex = -1;
+                        for (int i = 0; i < pathToScenes.size(); ++i) {
+                            ImGui::Button(pathToScenes[i].string().c_str());
+
+                            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                                ImGui::SetDragDropPayload("swapIndex", &i, sizeof(int));
+                                ImGui::Text("%s", pathToScenes[i].string().c_str());
+                                ImGui::EndDragDropSource();
+                            }
+
+                            if (ImGui::BeginDragDropTarget()) {
+                                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("swapIndex")) {
+                                    IM_ASSERT(payload->DataSize == sizeof(int));
+                                    int dropped_idx = *(const int*)payload->Data;
+                                    if (dropped_idx != i)
+                                    {
+                                        ProjectManager::GetInstance()->swapScenes(i, dropped_idx);
+                                    }
+                                }
+                                ImGui::EndDragDropTarget();
+                            }
+
+                            ImGui::SameLine();
+                            ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Delete").x - 5.0f);
+                            if (ImGui::Button("Delete##"))
+                            {
+                                ProjectManager::GetInstance()->removeScene(pathToScenes[i].string());
+                                --i;
+                            }
+                        }
+
+                        static std::string newString;
+                        if (ImGui::InputText("New Scene", newString.data(), 1024, ImGuiInputTextFlags_EnterReturnsTrue))
+                        {
+                            ProjectManager::GetInstance()->addScene(newString.data());
+                        }
+
+                        static BuildConfiguration buildConfiguration = BuildConfiguration::Debug;
+                        const char* buildConfigurations[] = { "Debug","Release" };
+                        if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildConfiguration)]))
+                        {
+                            for (int i = 0; i < 2; i++)
+                            {
+                                const bool isSelected = (static_cast<int>(buildConfiguration) == i);
+                                if (ImGui::Selectable(buildConfigurations[i], isSelected))
                                 {
-                                    ProjectManager::GetInstance()->swapScenes(i, dropped_idx);
+                                    buildConfiguration = static_cast<BuildConfiguration>(i);
+                                    ProjectBuilder::SetBuildConfiguration(buildConfiguration);
+                                }
+
+                                if (isSelected)
+                                {
+                                    ImGui::SetItemDefaultFocus();
                                 }
                             }
-                            ImGui::EndDragDropTarget();
+                            ImGui::EndCombo();
                         }
 
-                        ImGui::SameLine();
-                        ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Delete").x);
-                        if (ImGui::Button("Delete##"))
+                        static BuildPlatform buildPlatform = BuildPlatform::Windows;
+                        const char* buildPlatforms[] = { "Windows", "HTML5" };
+                        if (ImGui::BeginCombo("BuildPlatform", buildPlatforms[static_cast<int>(buildPlatform)]))
                         {
-                            ProjectManager::GetInstance()->removeScene(pathToScenes[i].string());
-                            --i;
+                            for (int i = 0; i < 2; i++)
+                            {
+                                const bool isSelected = (static_cast<int>(buildPlatform) == i);
+                                if (ImGui::Selectable(buildPlatforms[i], isSelected))
+                                {
+                                    buildPlatform = static_cast<BuildPlatform>(i);
+                                    ProjectBuilder::SetBuildPlatform(buildPlatform);
+                                }
+
+                                if (isSelected)
+                                {
+                                    ImGui::SetItemDefaultFocus();
+                                }
+                            }
+                            ImGui::EndCombo();
                         }
-                    }
 
-                    static std::string newString;
-                    if (ImGui::InputText("New Scene", newString.data(), 1024, ImGuiInputTextFlags_EnterReturnsTrue))
-                    {
-                        ProjectManager::GetInstance()->addScene(newString.data());
                     }
-
-                    static BuildConfiguration buildConfiguration = BuildConfiguration::Debug;
-                    const char* buildConfigurations[] = { "Debug","Release" };
-                    if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildConfiguration)]))
+                    else if (selectedMenu == "Render")
                     {
-                        for (int i = 0; i < 2; i++)
+
+                    }
+                    else if (selectedMenu == "Scripts")
+                    {
+                        static BuildConfiguration buildScriptConfiguration = BuildConfiguration::Debug;
+                        const char* buildConfigurations[] = { "Debug","Release" };
+                        if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildScriptConfiguration)]))
                         {
-                            const bool isSelected = (static_cast<int>(buildConfiguration) == i);
-                            if (ImGui::Selectable(buildConfigurations[i], isSelected))
+                            for (int i = 0; i < 2; i++)
                             {
-                                buildConfiguration = static_cast<BuildConfiguration>(i);
-                                ProjectBuilder::SetBuildConfiguration(buildConfiguration);
-                            }
+                                const bool isSelected = (static_cast<int>(buildScriptConfiguration) == i);
+                                if (ImGui::Selectable(buildConfigurations[i], isSelected))
+                                {
+                                    buildScriptConfiguration = static_cast<BuildConfiguration>(i);
+                                    ScriptCompiler::SetScriptBuildConfiguration(buildScriptConfiguration);
+                                }
 
-                            if (isSelected)
-                            {
-                                ImGui::SetItemDefaultFocus();
+                                if (isSelected)
+                                {
+                                    ImGui::SetItemDefaultFocus();
+                                }
                             }
+                            ImGui::EndCombo();
                         }
-                        ImGui::EndCombo();
                     }
-
-                    static BuildPlatform buildPlatform = BuildPlatform::Windows;
-                    const char* buildPlatforms[] = { "Windows", "HTML5" };
-                    if (ImGui::BeginCombo("BuildPlatform", buildPlatforms[static_cast<int>(buildPlatform)]))
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-                            const bool isSelected = (static_cast<int>(buildPlatform) == i);
-                            if (ImGui::Selectable(buildPlatforms[i], isSelected))
-                            {
-                                buildPlatform = static_cast<BuildPlatform>(i);
-                                ProjectBuilder::SetBuildPlatform(buildPlatform);
-                            }
-
-                            if (isSelected)
-                            {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
-
-                }
-                else if (selectedMenu == "Render")
-                {
-
-                }
-                else if (selectedMenu == "Scripts")
-                {
-                    static BuildConfiguration buildScriptConfiguration = BuildConfiguration::Debug;
-                    const char* buildConfigurations[] = { "Debug","Release" };
-                    if (ImGui::BeginCombo("BuildConfiguration", buildConfigurations[static_cast<int>(buildScriptConfiguration)]))
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-                            const bool isSelected = (static_cast<int>(buildScriptConfiguration) == i);
-                            if (ImGui::Selectable(buildConfigurations[i], isSelected))
-                            {
-                                buildScriptConfiguration = static_cast<BuildConfiguration>(i);
-                                ScriptCompiler::SetScriptBuildConfiguration(buildScriptConfiguration);
-                            }
-
-                            if (isSelected)
-                            {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
+                    ImGui::EndTable();
                 }
                 ImGui::End();
             }
@@ -724,4 +734,83 @@ namespace TengineEditor
         ImGui::End();
     }
 
+    void UISystem::renderFileBrowser()
+    {
+        ImGui::Begin("File Browser", nullptr);
+        static int selectedFileIndex = -1;
+        std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFileFromCurrentPath();
+        float windowWidth = ImGui::GetContentRegionAvail().x;
+        float cellSize = 64.0f;
+        float cellSizeWithPadding = cellSize + 16.0f;
+        int columnCount = static_cast<int>(windowWidth / cellSizeWithPadding);
+        if (columnCount < 1)
+        {
+            columnCount = 1;
+        }
+        if (ImGui::BeginTable("", columnCount))
+        {
+            ImGui::TableNextColumn();
+            for (int i = 0; i < pathToProjectFiles.size(); i++)
+            {
+                if (std::filesystem::is_directory(pathToProjectFiles[i]))
+                {
+                    ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                }
+                else
+                {
+                    ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                }
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                    ImGui::SetDragDropPayload("path", pathToProjectFiles[i].string().c_str(), sizeof(pathToProjectFiles[i].string().size()));
+                    ImGui::Text(pathToProjectFiles[i].filename().string().c_str());
+                    ImGui::EndDragDropSource();
+                }
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+                {
+                    selectedFileIndex = i;
+                    ImGui::OpenPopup("FileContextMenu");
+                }
+                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered() && !std::filesystem::is_directory(pathToProjectFiles[i]))
+                {
+                    std::string command = "start " + pathToProjectFiles[i].string();
+                    std::system(command.c_str());
+                }
+                else if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered() && std::filesystem::is_directory(pathToProjectFiles[i]))
+                {
+                    FileManager::SetRelativePath(FileManager::GetRelativePath().string() + "/" + pathToProjectFiles[i].filename().string());
+                }
+                ImGui::TextWrapped(pathToProjectFiles[i].filename().string().c_str());
+                ImGui::TableNextColumn();
+            }
+            ImGui::EndTable();
+        }
+
+        if (ImGui::BeginPopupContextItem("FileContextMenu")) {
+            if (ImGui::MenuItem("Remove File")) {
+                if (selectedFileIndex >= 0 && selectedFileIndex < pathToProjectFiles.size()) {
+                    FileManager::RemoveFile(pathToProjectFiles[selectedFileIndex].filename().string());
+                    selectedFileIndex = -1;
+                }
+            }
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
+        {
+            ImGui::OpenPopup("FileBrowserContextMenu");
+        }
+
+        if (ImGui::BeginPopupContextItem("FileBrowserContextMenu")) {
+            if (ImGui::MenuItem("Create File"))
+            {
+                FileManager::NewFile("NewFile");
+            }
+            if (ImGui::MenuItem("Create Folder"))
+            {
+                FileManager::NewFolder("NewFolder");
+            }
+            ImGui::EndPopup();
+        }
+        ImGui::End();
+    }
 }

@@ -6,6 +6,7 @@
 #include<filesystem>
 
 #include<Scene/Scene.h>
+
 namespace TengineEditor
 {
 	using namespace Tengine;
@@ -14,12 +15,13 @@ namespace TengineEditor
 	{
 	public:
 		void setName(const std::string& name);
+		std::string getName();
 		void addScene(std::filesystem::path path);
 		std::filesystem::path getPath();
-		std::string getName();
 		void removeScene(std::shared_ptr<Scene> scene);
 		void removeScene(const std::string& nameScene);
 		void swapScenes(size_t index1, size_t index2);
+
 		std::vector<std::filesystem::path> getPathToScenes();
 	private:
 		void setPath(std::filesystem::path path);
@@ -28,7 +30,7 @@ namespace TengineEditor
 		Project& operator=(const Project&) = delete;
 		
 		std::filesystem::path m_path;
-		std::vector<std::filesystem::path> m_scenes;
+		std::vector<std::filesystem::path> m_pathToScenes;
 		std::string m_name;
 
 		friend class ProjectManager;

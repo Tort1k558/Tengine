@@ -19,7 +19,6 @@
 #include"UISystem.h"
 #include"ProjectManager.h"
 
-
 namespace TengineEditor
 {
     Editor::Editor(unsigned int width, unsigned int height, const std::string& title) :
@@ -30,7 +29,6 @@ namespace TengineEditor
 
     void Editor::create()
     {
-
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
         EditorScriptSystem::GetInstance();
@@ -41,8 +39,8 @@ namespace TengineEditor
 #else
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Debug);
 #endif
-        RendererSystem f;
         RendererSystem::GetInstance()->disableRenderToDefaultFramebuffer();
+
         ProjectManager::Create("ExampleProject");
         std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
         

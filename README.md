@@ -10,7 +10,7 @@ You can also just use the kernel itself without using editor, the kernel does no
 ## Editor
 ![It looks like this](/images/editor.png)
 
-## What platforms are being built for.
+## Supports builds for these platforms
 - Windows
 - HTML5(built with emscripten)
 
