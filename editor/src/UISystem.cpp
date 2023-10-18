@@ -1,5 +1,7 @@
 #include "UISystem.h"
 
+#include<functional>
+
 #include<imgui/imgui.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
@@ -23,6 +25,7 @@
 #include"ProjectManager.h"
 #include"ProjectBuilder.h"
 #include"FileManager.h"
+
 
 namespace TengineEditor
 {
@@ -738,69 +741,113 @@ namespace TengineEditor
     {
         ImGui::Begin("File Browser", nullptr);
         static int selectedFileIndex = -1;
-        std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFileFromCurrentPath();
+        std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFiles();
+        std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetAllFileFromCurrentPath();
         float windowWidth = ImGui::GetContentRegionAvail().x;
-        float cellSize = 64.0f;
-        float cellSizeWithPadding = cellSize + 16.0f;
-        int columnCount = static_cast<int>(windowWidth / cellSizeWithPadding);
-        if (columnCount < 1)
+        if (ImGui::BeginTable("TreeOfFiles", 2, ImGuiTableFlags_Resizable))
         {
-            columnCount = 1;
-        }
-        if (ImGui::BeginTable("", columnCount))
-        {
+            ImGui::TableSetupColumn("##ListOfSettings", ImGuiTableColumnFlags_WidthFixed, windowWidth * 0.3f);
+
             ImGui::TableNextColumn();
-            for (int i = 0; i < pathToProjectFiles.size(); i++)
+
+            if (ImGui::TreeNode("Assets"))
             {
-                if (std::filesystem::is_directory(pathToProjectFiles[i]))
+                if (ImGui::IsItemClicked())
                 {
-                    ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                    FileManager::SetRelativePath("");
                 }
-                else
+                std::function<void(std::filesystem::path)> renderFileTree = [&renderFileTree](std::filesystem::path path)
                 {
-                    ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
-                }
-                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                    ImGui::SetDragDropPayload("path", pathToProjectFiles[i].string().c_str(), sizeof(pathToProjectFiles[i].string().size()));
-                    ImGui::Text(pathToProjectFiles[i].filename().string().c_str());
-                    ImGui::EndDragDropSource();
-                }
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+                    if (std::filesystem::is_directory(FileManager::GetPathToAssets().string() + "/" + path.string()))
+                    {
+                        if (ImGui::TreeNode(path.filename().string().c_str())) {
+                            if (ImGui::IsItemClicked())
+                            {
+                                FileManager::SetRelativePath(path);
+                            }
+                            for (const auto& child : std::filesystem::directory_iterator(FileManager::GetPathToAssets().string() + "/" + path.string()))
+                            {
+                                renderFileTree(child.path());
+                            }
+                            ImGui::TreePop();
+                        }
+                    }
+                    else
+                    {
+                        ImGui::Button(path.filename().string().c_str());
+                    }
+                };
+                for (int i = 0; i < pathToProjectFiles.size(); i++)
                 {
-                    selectedFileIndex = i;
-                    ImGui::OpenPopup("FileContextMenu");
+                    renderFileTree(pathToProjectFiles[i]);
                 }
-                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered() && !std::filesystem::is_directory(pathToProjectFiles[i]))
-                {
-                    std::string command = "start " + pathToProjectFiles[i].string();
-                    std::system(command.c_str());
-                }
-                else if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered() && std::filesystem::is_directory(pathToProjectFiles[i]))
-                {
-                    FileManager::SetRelativePath(FileManager::GetRelativePath().string() + "/" + pathToProjectFiles[i].filename().string());
-                }
-                ImGui::TextWrapped(pathToProjectFiles[i].filename().string().c_str());
+                ImGui::TreePop();
+            }
+            ImGui::TableNextColumn();
+            float cellSize = 64.0f;
+            float cellSizeWithPadding = cellSize + 16.0f;
+            int columnCount = static_cast<int>(windowWidth / cellSizeWithPadding);
+            if (columnCount < 1)
+            {
+                columnCount = 1;
+            }
+            if (ImGui::BeginTable("Files", columnCount))
+            {
                 ImGui::TableNextColumn();
+                for (int i = 0; i < pathToCurrentProjectFiles.size(); i++)
+                {
+                    if (std::filesystem::is_directory(FileManager::GetPathToAssets().string() + "/" + pathToCurrentProjectFiles[i].string()))
+                    {
+                        ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
+                        {
+                            FileManager::SetRelativePath(pathToCurrentProjectFiles[i].string());
+                        }
+                    }
+                    else
+                    {
+                        ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
+                        {
+                            std::string command = "start " + FileManager::GetPathToAssets().string() + "/" + pathToCurrentProjectFiles[i].string();
+                            std::system(command.c_str());
+                        }
+                    }
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        ImGui::SetDragDropPayload("path", pathToCurrentProjectFiles[i].string().c_str(), sizeof(pathToCurrentProjectFiles[i].string().size()));
+                        ImGui::Text(pathToCurrentProjectFiles[i].filename().string().c_str());
+                        ImGui::EndDragDropSource();
+                    }
+                    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+                    {
+                        selectedFileIndex = i;
+                        ImGui::OpenPopup("FileContextMenu");
+                    }
+
+                    ImGui::TextWrapped(pathToCurrentProjectFiles[i].filename().string().c_str());
+                    ImGui::TableNextColumn();
+                }
+                if (ImGui::BeginPopup("FileContextMenu"))
+                {
+                    if (ImGui::MenuItem("Remove File")) {
+                        if (selectedFileIndex >= 0 && selectedFileIndex < pathToCurrentProjectFiles.size()) {
+                            FileManager::RemoveFile(pathToCurrentProjectFiles[selectedFileIndex].filename().string());
+                            selectedFileIndex = -1;
+                        }
+                    }
+                    ImGui::EndPopup();
+                }
+                ImGui::EndTable();
             }
             ImGui::EndTable();
         }
-
-        if (ImGui::BeginPopupContextItem("FileContextMenu")) {
-            if (ImGui::MenuItem("Remove File")) {
-                if (selectedFileIndex >= 0 && selectedFileIndex < pathToProjectFiles.size()) {
-                    FileManager::RemoveFile(pathToProjectFiles[selectedFileIndex].filename().string());
-                    selectedFileIndex = -1;
-                }
-            }
-            ImGui::EndPopup();
-        }
-
         if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
         {
             ImGui::OpenPopup("FileBrowserContextMenu");
         }
 
-        if (ImGui::BeginPopupContextItem("FileBrowserContextMenu")) {
+        if (ImGui::BeginPopup("FileBrowserContextMenu")) 
+        {
             if (ImGui::MenuItem("Create File"))
             {
                 FileManager::NewFile("NewFile");
