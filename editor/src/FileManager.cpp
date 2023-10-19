@@ -11,7 +11,7 @@ namespace TengineEditor
 	void FileManager::NewFolder(std::filesystem::path path)
 	{
 		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
-		for (size_t i = 0; std::filesystem::exists(path); i++)
+		for (size_t i = 0; std::filesystem::exists(pathToFile); i++)
 		{
 			pathToFile = GetPathToAssets().string() + "/" + path.string() + std::to_string(i);
 		}
@@ -41,7 +41,13 @@ namespace TengineEditor
 	void FileManager::RemoveFile(std::filesystem::path path)
 	{
 		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
-		std::filesystem::remove(pathToFile);
+		std::filesystem::remove_all(pathToFile);
+	}
+
+	void FileManager::RenameFile(std::filesystem::path path, std::string_view name)
+	{
+		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
+		std::filesystem::rename(pathToFile, pathToFile.parent_path().string() + "/" + name.data());
 	}
 	
 	void FileManager::SetRelativePath(std::filesystem::path path)
@@ -74,23 +80,29 @@ namespace TengineEditor
 
 	std::vector<std::filesystem::path> FileManager::GetAllProjectFiles()
 	{
-		std::vector<std::filesystem::path> allProjectFilePaths;
+		std::vector<std::filesystem::path> filePaths;
 		if (ProjectManager::GetInstance())
 		{
 			for (const auto& entry : std::filesystem::directory_iterator(GetPathToAssets())) 
 			{
-				allProjectFilePaths.push_back(entry.path().filename());
+				filePaths.push_back(entry.path().filename());
 			}
 		}
-		return allProjectFilePaths;
+		return filePaths;
 	}
-	std::vector<std::filesystem::path> FileManager::GetAllFileFromCurrentPath()
+	
+	std::vector<std::filesystem::path> FileManager::GetFilesFromCurrentDirectory(std::filesystem::path path)
 	{
-		std::vector<std::filesystem::path> allProjectFilePaths;
-		for (const auto& entry : std::filesystem::directory_iterator(GetCurrentPath()))
+		std::vector<std::filesystem::path> filePaths;
+		if (ProjectManager::GetInstance())
 		{
-			allProjectFilePaths.push_back(std::filesystem::relative(entry.path(),GetPathToAssets()));
+			for (const auto& entry : std::filesystem::directory_iterator(GetPathToAssets().string() + "/" + path.string()))
+			{
+				std::string strPath = std::filesystem::relative(entry.path(), GetPathToAssets().string()).string();
+				std::replace(strPath.begin(), strPath.end(), '\\', '/');
+				filePaths.push_back(strPath);
+			}
 		}
-		return allProjectFilePaths;
+		return filePaths;
 	}
 }

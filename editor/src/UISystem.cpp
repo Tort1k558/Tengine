@@ -5,8 +5,9 @@
 #include<imgui/imgui.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
-#include<nfd.h>
+#include<imgui/misc/cpp/imgui_stdlib.h>
 
+#include<nfd.h>
 #include<Core/Timer.h>
 #include<Core/Logger.h>
 #include<Core/Input.h>
@@ -255,7 +256,7 @@ namespace TengineEditor
         return m_instance;
     }
 
-    void UISystem::displayElement(std::shared_ptr<FieldInfo> element)
+    void UISystem::showField(std::shared_ptr<FieldInfo> element)
     {
         switch (element->type)
         {
@@ -335,7 +336,7 @@ namespace TengineEditor
             {
                 for (size_t i = 0; i < header->elements.size(); i++)
                 {
-                    displayElement(header->elements[i]);
+                    showField(header->elements[i]);
                 }
             };
             break;
@@ -353,14 +354,21 @@ namespace TengineEditor
         {
             std::shared_ptr<FieldFile> fileDialog = std::dynamic_pointer_cast<FieldFile>(element);
 
-            if (ImGui::Button(fileDialog->name.c_str()))
+            if (ImGui::InputText("##empty", &fileDialog->path.string(), ImGuiInputTextFlags_EnterReturnsTrue))
             {
-                nfdchar_t* outPath = nullptr;
-                nfdresult_t result = NFD_OpenDialog(nullptr, nullptr, &outPath);
-                if (result == NFD_OKAY) {
-                    fileDialog->callback(outPath);
+
+            }
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("path")) {
+                    std::string path(static_cast<const char*>(payload->Data),payload->DataSize);
+                    if (path != "")
+                    {
+                        fileDialog->path = FileManager::GetPathToAssets().string() + "/" + path;
+                        fileDialog->callback(fileDialog->path.string());
+                    }
                 }
-            };
+                ImGui::EndDragDropTarget();
+            }
             break;
         }
         default:
@@ -601,7 +609,7 @@ namespace TengineEditor
         }
         std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
 
-        if (ImGui::ListBox("##", &currentItem, [](void* data, int idx, const char** out_text) {
+        if (ImGui::ListBox("##empty", &currentItem, [](void* data, int idx, const char** out_text) {
             auto& items = *static_cast<std::vector<std::string>*>(data);
             if (idx < 0 || idx >= static_cast<int>(items.size())) {
                 *out_text = nullptr;
@@ -648,7 +656,7 @@ namespace TengineEditor
                     {
                         for (const auto& element : info.getElements())
                         {
-                            displayElement(element);
+                            showField(element);
                         }
                     }
                     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1))
@@ -739,18 +747,22 @@ namespace TengineEditor
 
     void UISystem::renderFileBrowser()
     {
-        ImGui::Begin("File Browser", nullptr);
+        ImGui::Begin("File Browser", nullptr, ImGuiWindowFlags_NoScrollbar);
+
         static int selectedFileIndex = -1;
-        std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFiles();
-        std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetAllFileFromCurrentPath();
         float windowWidth = ImGui::GetContentRegionAvail().x;
         if (ImGui::BeginTable("TreeOfFiles", 2, ImGuiTableFlags_Resizable))
         {
-            ImGui::TableSetupColumn("##ListOfSettings", ImGuiTableColumnFlags_WidthFixed, windowWidth * 0.3f);
+            ImGui::TableSetupColumn("Path:");
+            ImGui::TableSetupColumn(FileManager::GetRelativePath().string().c_str(), ImGuiTableColumnFlags_WidthFixed, windowWidth * 0.3f);
+            ImGui::TableHeadersRow();
 
+            //Tree
+            ImGui::TableNextRow();
             ImGui::TableNextColumn();
+            ImGui::BeginListBox("##empty", ImVec2(-FLT_MIN, -FLT_MIN));
 
-            if (ImGui::TreeNode("Assets"))
+            if (ImGui::TreeNodeEx("Assets",ImGuiTreeNodeFlags_OpenOnDoubleClick))
             {
                 if (ImGui::IsItemClicked())
                 {
@@ -760,14 +772,17 @@ namespace TengineEditor
                 {
                     if (std::filesystem::is_directory(FileManager::GetPathToAssets().string() + "/" + path.string()))
                     {
-                        if (ImGui::TreeNode(path.filename().string().c_str())) {
-                            if (ImGui::IsItemClicked())
+                        bool treeIsOpened = ImGui::TreeNodeEx(path.filename().string().c_str(), ImGuiTreeNodeFlags_OpenOnDoubleClick);
+                        if (ImGui::IsItemClicked())
+                        {
+                            FileManager::SetRelativePath(path);
+                        }
+                        if (treeIsOpened)
+                        {
+                            std::vector<std::filesystem::path> directoryFiles = FileManager::GetFilesFromCurrentDirectory(path);
+                            for (const auto& childPath : directoryFiles)
                             {
-                                FileManager::SetRelativePath(path);
-                            }
-                            for (const auto& child : std::filesystem::directory_iterator(FileManager::GetPathToAssets().string() + "/" + path.string()))
-                            {
-                                renderFileTree(child.path());
+                                renderFileTree(childPath);
                             }
                             ImGui::TreePop();
                         }
@@ -777,28 +792,59 @@ namespace TengineEditor
                         ImGui::Button(path.filename().string().c_str());
                     }
                 };
+                std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFiles();
                 for (int i = 0; i < pathToProjectFiles.size(); i++)
                 {
                     renderFileTree(pathToProjectFiles[i]);
                 }
                 ImGui::TreePop();
             }
+            ImGui::EndListBox();
+
+
+            //Files
             ImGui::TableNextColumn();
+
+            ImGui::BeginListBox("##empty2",ImVec2(-FLT_MIN,-FLT_MIN));
+            
+            if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsWindowHovered())
+            {
+                ImGui::OpenPopup("FileBrowserContextMenu");
+            }
+
+            if (ImGui::BeginPopup("FileBrowserContextMenu"))
+            {
+                if (ImGui::MenuItem("Create File"))
+                {
+                    FileManager::NewFile(FileManager::GetRelativePath().string() + "/NewFile");
+                }
+                if (ImGui::MenuItem("Create Folder"))
+                {
+                    FileManager::NewFolder(FileManager::GetRelativePath().string() + "/NewFolder");
+                }
+                ImGui::EndPopup();
+            }
+
+            float tableFilesWidth = ImGui::GetContentRegionAvail().x;
             float cellSize = 64.0f;
             float cellSizeWithPadding = cellSize + 16.0f;
-            int columnCount = static_cast<int>(windowWidth / cellSizeWithPadding);
+            int columnCount = static_cast<int>(tableFilesWidth / cellSizeWithPadding);
             if (columnCount < 1)
             {
                 columnCount = 1;
             }
             if (ImGui::BeginTable("Files", columnCount))
             {
+                std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetFilesFromCurrentDirectory(FileManager::GetRelativePath());
                 ImGui::TableNextColumn();
                 for (int i = 0; i < pathToCurrentProjectFiles.size(); i++)
                 {
+                    ImGui::PushID(pathToCurrentProjectFiles[i].string().c_str());
+
                     if (std::filesystem::is_directory(FileManager::GetPathToAssets().string() + "/" + pathToCurrentProjectFiles[i].string()))
                     {
                         ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+
                         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                         {
                             FileManager::SetRelativePath(pathToCurrentProjectFiles[i].string());
@@ -807,56 +853,69 @@ namespace TengineEditor
                     else
                     {
                         ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+
                         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                         {
                             std::string command = "start " + FileManager::GetPathToAssets().string() + "/" + pathToCurrentProjectFiles[i].string();
                             std::system(command.c_str());
                         }
                     }
-                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                        ImGui::SetDragDropPayload("path", pathToCurrentProjectFiles[i].string().c_str(), sizeof(pathToCurrentProjectFiles[i].string().size()));
-                        ImGui::Text(pathToCurrentProjectFiles[i].filename().string().c_str());
-                        ImGui::EndDragDropSource();
+                    
+                    if (ImGui::BeginDragDropSource()) 
+                    {
+                        ImGui::SetDragDropPayload("path", pathToCurrentProjectFiles[i].string().c_str(), pathToCurrentProjectFiles[i].string().size() * sizeof(std::string::value_type));
+                        ImGui::Text(pathToCurrentProjectFiles[i].string().c_str());
+                        ImGui::EndDragDropSource(); 
                     }
+                    ImGui::PopID();
+                    
                     if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
                     {
                         selectedFileIndex = i;
                         ImGui::OpenPopup("FileContextMenu");
                     }
 
-                    ImGui::TextWrapped(pathToCurrentProjectFiles[i].filename().string().c_str());
+                    static bool isEditName = false;
+                    static std::string newName;
+                    if (ImGui::IsKeyPressed(ImGuiKey_F2) && ImGui::IsItemHovered())
+                    {
+                        newName = pathToCurrentProjectFiles[i].filename().string();
+                        selectedFileIndex = i;
+                        isEditName = true;
+                    }
+                    if (isEditName && selectedFileIndex == i)
+                    {
+                        if (ImGui::InputText("", &newName, ImGuiInputTextFlags_EnterReturnsTrue))
+                        {
+                            isEditName = false;
+                            FileManager::RenameFile(pathToCurrentProjectFiles[i].string(), newName);
+                        }
+                    }
+                    else
+                    {
+                        ImGui::TextWrapped(pathToCurrentProjectFiles[i].filename().string().c_str());
+                    }
                     ImGui::TableNextColumn();
                 }
+                
                 if (ImGui::BeginPopup("FileContextMenu"))
                 {
-                    if (ImGui::MenuItem("Remove File")) {
-                        if (selectedFileIndex >= 0 && selectedFileIndex < pathToCurrentProjectFiles.size()) {
-                            FileManager::RemoveFile(pathToCurrentProjectFiles[selectedFileIndex].filename().string());
+                    if (ImGui::MenuItem("Remove File"))
+                    {
+                        if (selectedFileIndex >= 0 && selectedFileIndex < pathToCurrentProjectFiles.size()) 
+                        {
+                            FileManager::RemoveFile(pathToCurrentProjectFiles[selectedFileIndex].string());
                             selectedFileIndex = -1;
                         }
                     }
                     ImGui::EndPopup();
                 }
+
                 ImGui::EndTable();
             }
-            ImGui::EndTable();
-        }
-        if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
-        {
-            ImGui::OpenPopup("FileBrowserContextMenu");
-        }
+            ImGui::EndListBox();
 
-        if (ImGui::BeginPopup("FileBrowserContextMenu")) 
-        {
-            if (ImGui::MenuItem("Create File"))
-            {
-                FileManager::NewFile("NewFile");
-            }
-            if (ImGui::MenuItem("Create Folder"))
-            {
-                FileManager::NewFolder("NewFolder");
-            }
-            ImGui::EndPopup();
+            ImGui::EndTable();
         }
         ImGui::End();
     }

@@ -22,7 +22,7 @@ namespace TengineEditor
 
 		static std::shared_ptr<UISystem> GetInstance();
 	private:
-		void displayElement(std::shared_ptr<FieldInfo> element);
+		void showField(std::shared_ptr<FieldInfo> element);
 		void renderMenuBar();
 		void renderWindowObjects();
 		void renderWindowComponents();

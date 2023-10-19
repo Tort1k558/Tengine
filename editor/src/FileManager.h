@@ -12,12 +12,13 @@ namespace TengineEditor
 		static void NewFolder(std::filesystem::path name);
 		static void NewFile(std::filesystem::path path, std::string_view data = "");
 		static void RemoveFile(std::filesystem::path path);
+		static void RenameFile(std::filesystem::path path, std::string_view name);
 		static void SetRelativePath(std::filesystem::path path);
 		static std::filesystem::path GetCurrentPath();
 		static std::filesystem::path GetPathToAssets();
 		static std::filesystem::path GetRelativePath();
 		static std::vector<std::filesystem::path> GetAllProjectFiles();
-		static std::vector<std::filesystem::path> GetAllFileFromCurrentPath();
+		static std::vector<std::filesystem::path> GetFilesFromCurrentDirectory(std::filesystem::path path);
 	private:
 		static std::filesystem::path m_relativePath;
 	};

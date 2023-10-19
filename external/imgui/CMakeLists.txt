@@ -6,6 +6,7 @@ set(IMGUI_INCLUDES
 	imgui/imgui.h
 	imgui/backends/imgui_impl_glfw.h
 	imgui/backends/imgui_impl_opengl3.h
+	imgui/misc/cpp/imgui_stdlib.h
 )
 set(IMGUI_SRC
 	imgui/imgui.cpp
@@ -15,6 +16,7 @@ set(IMGUI_SRC
 	imgui/imgui_draw.cpp
 	imgui/backends/imgui_impl_glfw.cpp
 	imgui/backends/imgui_impl_opengl3.cpp
+	imgui/misc/cpp/imgui_stdlib.cpp
 )
 add_library(imgui STATIC ${IMGUI_INCLUDES} ${IMGUI_SRC})
 

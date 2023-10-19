@@ -118,6 +118,7 @@ namespace Tengine
 		FieldFile()
 		{
 			type = FieldType::File;
+			path = "Null";
 		}
 		std::filesystem::path path;
 		std::function<void(const std::string& path)> callback;

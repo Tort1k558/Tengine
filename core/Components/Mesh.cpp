@@ -79,7 +79,10 @@ namespace Tengine
 		displayInfo.setComponentName("Mesh");
 		std::shared_ptr<FieldFile> loadMeshButton = std::make_shared<FieldFile>();
 		loadMeshButton->name = "Load Mesh";
-		loadMeshButton->path = m_path;
+		if (!m_path.empty())
+		{
+			loadMeshButton->path = m_path;
+		}
 		loadMeshButton->callback = [this](const std::string& path)
 		{
 			std::shared_ptr<Object> previousParent = this->getParent();
