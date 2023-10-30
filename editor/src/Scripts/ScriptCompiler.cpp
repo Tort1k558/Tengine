@@ -7,6 +7,7 @@
 #include<Systems/ScriptSystem.h>
 #include"ProjectManager.h"
 #include"EditorScriptSystem.h"
+#include"FileManager.h"
 
 namespace TengineEditor
 {
@@ -76,7 +77,7 @@ namespace TengineEditor
     std::vector<ScriptInfo> ScriptCompiler::GetScriptInfo()
     {
         std::vector<ScriptInfo> scriptinfo;
-        for (const auto& entry : std::filesystem::directory_iterator(ProjectManager::GetInstance()->getPath().string() + "/Scripts")) {
+        for (const auto& entry : std::filesystem::directory_iterator("Scripts")) {
             if (entry.is_regular_file() && entry.path().extension() == ".h")
             {
                 ScriptInfo info;
@@ -201,7 +202,7 @@ namespace TengineEditor
         std::vector<ScriptInfo> scriptInfo = GetScriptInfo();
 
         //Header file
-        std::ofstream initHeaderFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/SystemModule.h");
+        std::ofstream initHeaderFile("build/ScriptModule/SystemModule.h");
         if (initHeaderFile.is_open())
         {
             initHeaderFile << \
@@ -232,7 +233,7 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
         }
 
         //Source file
-        std::ofstream initSourceFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/SystemModule.cpp");
+        std::ofstream initSourceFile("build/ScriptModule/SystemModule.cpp");
         if (initSourceFile.is_open())
         {
             initSourceFile << \
@@ -326,12 +327,11 @@ std::vector<std::string> GetScriptNames()
     
     void ScriptCompiler::GenerateCmake()
 	{
-		std::ofstream cmakeFile(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule/CMakeLists.txt");
+		std::ofstream cmakeFile("build/ScriptModule/CMakeLists.txt");
         if (cmakeFile.is_open()) 
         {
-            std::string pathToEditor = std::filesystem::current_path().string();
+            std::string pathToEditor = FileManager::GetPathToEditor().string();
             std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
-            std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             std::string compilerOptions;
             std::string nameLib;
@@ -396,7 +396,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 )";
             cmakeFile.close();
-            std::string cmakeCommand = "cmake -S " + pathToProject + "/build/ScriptModule" + " -B " + pathToProject + "/build/ScriptModule";
+            std::string cmakeCommand = "cmake -S build/ScriptModule -B build/ScriptModule";
             std::system(cmakeCommand.c_str());
         }
         else {
@@ -409,11 +409,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         std::string cmakeBuildCommand;
         if (m_scriptBuildConfiguration == BuildConfiguration::Debug)
         {
-            cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule --config Debug";
+            cmakeBuildCommand = "cmake --build build/ScriptModule --config Debug";
         }
         else if (m_scriptBuildConfiguration == BuildConfiguration::Release)
         {
-            cmakeBuildCommand = "cmake --build " + ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule --config Release";
+            cmakeBuildCommand = "cmake --build build/ScriptModule --config Release";
         }
         std::system(cmakeBuildCommand.c_str());
     }

@@ -7,6 +7,12 @@
 namespace TengineEditor
 {
 	std::filesystem::path FileManager::m_relativePath;
+	std::filesystem::path FileManager::m_pathToEditor;
+
+	void FileManager::Init()
+	{
+		m_pathToEditor = std::filesystem::current_path();
+	}
 
 	void FileManager::NewFolder(std::filesystem::path path)
 	{
@@ -59,7 +65,7 @@ namespace TengineEditor
 	{
 		if (ProjectManager::GetInstance())
 		{
-			return ProjectManager::GetInstance()->getPath().string() + "/Assets/" + m_relativePath.string();
+			return m_relativePath.string();
 		}
 		return "";
 	}
@@ -68,7 +74,7 @@ namespace TengineEditor
 	{
 		if (ProjectManager::GetInstance())
 		{
-			return ProjectManager::GetInstance()->getPath().string() + "/Assets";
+			return "Assets";
 		}
 		return "";
 	}
@@ -78,6 +84,13 @@ namespace TengineEditor
 		return m_relativePath;
 	}
 
+	std::filesystem::path FileManager::GetPathToEditor()
+	{
+		std::string pathToEditor = m_pathToEditor.string();
+		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
+		return pathToEditor;
+	}
+
 	std::vector<std::filesystem::path> FileManager::GetAllProjectFiles()
 	{
 		std::vector<std::filesystem::path> filePaths;
@@ -85,7 +98,7 @@ namespace TengineEditor
 		{
 			for (const auto& entry : std::filesystem::directory_iterator(GetPathToAssets())) 
 			{
-				filePaths.push_back(entry.path().filename());
+				filePaths.push_back(entry.path());
 			}
 		}
 		return filePaths;
@@ -96,9 +109,13 @@ namespace TengineEditor
 		std::vector<std::filesystem::path> filePaths;
 		if (ProjectManager::GetInstance())
 		{
-			for (const auto& entry : std::filesystem::directory_iterator(GetPathToAssets().string() + "/" + path.string()))
+			if (path.empty())
 			{
-				std::string strPath = std::filesystem::relative(entry.path(), GetPathToAssets().string()).string();
+				path = "Assets";
+			}
+			for (const auto& entry : std::filesystem::directory_iterator(path.string()))
+			{
+				std::string strPath = entry.path().string();
 				std::replace(strPath.begin(), strPath.end(), '\\', '/');
 				filePaths.push_back(strPath);
 			}

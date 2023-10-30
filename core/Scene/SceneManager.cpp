@@ -40,7 +40,6 @@ namespace Tengine
 		}
 
 		//Write data to file
-		scene->setPath(scene->getPath().parent_path().string() + "/" + scene->getName() + scene->getPath().extension().string());
 		std::ofstream file(scene->getPath().string(),std::ios_base::out);
 		if (file.is_open()) {
 			file << data.dump(4);

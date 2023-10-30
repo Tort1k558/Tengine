@@ -25,6 +25,7 @@ namespace TengineEditor
     {
 		m_instance = std::shared_ptr<Project>(new Project());
 		m_instance->setPath(path.parent_path());
+		std::filesystem::current_path(path);
 		std::ifstream file(path);
 		nlohmann::json data = nlohmann::json::parse(file);
 		m_instance->m_name = data["name"];
@@ -47,15 +48,16 @@ namespace TengineEditor
 		m_instance = std::shared_ptr<Project>(new Project());
 		m_instance->m_name = path.filename().string();
 		m_instance->setPath(path);
-		std::filesystem::create_directory(path.string() + "/Assets");
+		std::filesystem::current_path(path);
+		std::filesystem::create_directory("Assets");
 		std::shared_ptr<Scene> defaultScene = Scene::Create();
 		defaultScene->setName("DefaultScene");
-		defaultScene->setPath(m_instance->getPath().string() + "/DefaultScene.scene");
-		m_instance->addScene("DefaultScene.scene");
+		defaultScene->setPath("Assets/DefaultScene.scene");
+		m_instance->addScene(defaultScene->getPath());
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
-		EditorScriptSystem::GetInstance()->setPathToDll(m_instance->getPath().string() + "/build/ScriptModule/ScriptModule.dll");
+		EditorScriptSystem::GetInstance()->setPathToDll("build/ScriptModule/ScriptModule.dll");
 		EditorScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
@@ -66,7 +68,7 @@ namespace TengineEditor
 		nlohmann::json data;
 		data["name"] = m_instance->getName();
 		data["scenes"] = m_instance->getPathToScenes();
-		std::ofstream file(m_instance->getPath().string() + "/ProjectData.project");
+		std::ofstream file("ProjectData.project");
 		if (file.is_open()) {
 			file << data.dump(4);
 			file.close();

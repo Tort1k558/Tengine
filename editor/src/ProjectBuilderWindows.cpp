@@ -7,16 +7,17 @@
 #include"ProjectManager.h"
 #include"ProjectManager.h"
 #include"Scripts/ScriptCompiler.h"
+#include"FileManager.h"
+
 namespace TengineEditor
 {
 	std::filesystem::path ProjectBuilderWindows::m_pathToBuildDirectory;
 
 	void ProjectBuilderWindows::Build()
 	{
-		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
-		std::filesystem::create_directory(pathToProject + "/build");
-		std::filesystem::create_directory(pathToProject + "/build/Windows");
-		m_pathToBuildDirectory = pathToProject + "/build/Windows";
+		std::filesystem::create_directory("build");
+		std::filesystem::create_directory("build/Windows");
+		m_pathToBuildDirectory = "build/Windows";
 		GenerateInitFiles();
 		GenerateCMake();
 		BuildSolution();
@@ -324,10 +325,14 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 		std::string cmakeBuildCommand;
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
+			std::filesystem::copy(FileManager::GetPathToEditor().string() + "/TengineCored.lib", m_pathToBuildDirectory.string() + "/TengineCored.lib", 
+				std::filesystem::copy_options::overwrite_existing);
 			cmakeBuildCommand = "cmake --build " + m_pathToBuildDirectory.string() + " --config Debug";
 		}
 		else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
 		{
+			std::filesystem::copy(FileManager::GetPathToEditor().string() + "/TengineCore.lib", m_pathToBuildDirectory.string() + "/TengineCore.lib",
+				std::filesystem::copy_options::overwrite_existing);
 			cmakeBuildCommand = "cmake --build " + m_pathToBuildDirectory.string() + " --config Release";
 		}
 		std::system(cmakeBuildCommand.c_str());
@@ -350,17 +355,24 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 			std::filesystem::copy(m_pathToBuildDirectory.string() + "/Release/" + projectName + ".exe", m_pathToBuildDirectory.string() + "/bin/" + projectName + ".exe",
 				std::filesystem::copy_options::overwrite_existing);
 		}
+
+
+		//Copy assets
+		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/bin/" + FileManager::GetPathToAssets().string(),
+			std::filesystem::copy_options::recursive);
+
+
 		//Copy all scenes;
 		std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
 		for (const auto& scene : pathToScenes)
 		{
-			std::filesystem::copy(ProjectManager::GetInstance()->getPath().string() + "/" + scene.string(), m_pathToBuildDirectory.string() + "/bin/" + scene.string(),
+			std::filesystem::copy(scene.string(), m_pathToBuildDirectory.string() + "/bin/" + scene.string(),
 				std::filesystem::copy_options::overwrite_existing);
 		}
 
+
 		//Copy Core Shared Library
-		std::string pathToEditor = std::filesystem::current_path().string();
-		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
+		std::string pathToEditor = FileManager::GetPathToEditor().string();
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
 			std::filesystem::copy(pathToEditor + "/TengineCored.dll", m_pathToBuildDirectory.string() + "/bin/TengineCored.dll",

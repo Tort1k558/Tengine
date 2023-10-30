@@ -18,6 +18,7 @@
 #include"Scripts/EditorScriptSystem.h"
 #include"UISystem.h"
 #include"ProjectManager.h"
+#include"FileManager.h"
 
 namespace TengineEditor
 {
@@ -40,6 +41,8 @@ namespace TengineEditor
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Debug);
 #endif
         RendererSystem::GetInstance()->disableRenderToDefaultFramebuffer();
+        
+        FileManager::Init();
 
         ProjectManager::Create("ExampleProject");
         std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
@@ -63,7 +66,7 @@ namespace TengineEditor
         std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
         transform3->setPositionY(2.0f);
         
-        object3->addComponent(AssetManager::LoadMesh("data/Meshes/backpack/backpack.obj"));
+        object3->addComponent(AssetManager::LoadMesh("Assets/data/Meshes/backpack/backpack.obj"));
     }
 
     void Editor::update()

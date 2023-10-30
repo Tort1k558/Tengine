@@ -59,6 +59,6 @@ namespace TengineEditor
 	void Project::addScene(std::filesystem::path path)
 	{
 		m_pathToScenes.push_back(path);
-		SceneManager::AddScene(path.filename().string(),getPath().string() + path.string());
+		SceneManager::AddScene(path.filename().string(), getPath().string() + path.string());
 	}
 }

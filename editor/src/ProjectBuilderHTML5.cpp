@@ -7,6 +7,7 @@
 #include"ProjectManager.h"
 #include"ProjectManager.h"
 #include"Scripts/ScriptCompiler.h"
+#include"FileManager.h"
 
 namespace TengineEditor
 {
@@ -14,14 +15,13 @@ namespace TengineEditor
 
 	void ProjectBuilderHTML5::Build()
 	{
-		std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
-		std::filesystem::create_directory(pathToProject + "/build");
-		std::filesystem::create_directory(pathToProject + "/build/HTML5");
-		m_pathToBuildDirectory = pathToProject + "/build/HTML5";
+		std::filesystem::create_directory("build");
+		std::filesystem::create_directory("build/HTML5");
+		m_pathToBuildDirectory = "build/HTML5";
 		GenerateInitFiles();
 		GenerateCMake();
-		BuildSolution();
 		CollectFiles();
+		BuildSolution();
 	}
 
 	void ProjectBuilderHTML5::GenerateInitFiles()
@@ -275,9 +275,8 @@ int main(int argc, char** argv)
 		std::ofstream cmakeFile(m_pathToBuildDirectory.string() + "/CMakeLists.txt");
 		if (cmakeFile.is_open())
 		{
-			std::string pathToEditor = std::filesystem::current_path().string();
+			std::string pathToEditor = FileManager::GetPathToEditor().string();
 			std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
-			std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
 			std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
 			cmakeFile <<
 				R"(cmake_minimum_required(VERSION 3.2)
@@ -347,7 +346,7 @@ target_compile_options(glad PUBLIC "-pthread")
 target_compile_options(assimp PUBLIC "-pthread")
 target_compile_options(${PROJECT_NAME} PUBLIC "-pthread")
 
-target_link_options(${PROJECT_NAME} PUBLIC -std=c++17 -pthread --embed-file=data --embed-file=DefaultScene.scene -sUSE_WEBGL2=1 -sUSE_GLFW=3 -sWASM=1 -sDEMANGLE_SUPPORT=1 -sFULL_ES3=1 -sTOTAL_MEMORY=2gb -sALLOW_MEMORY_GROWTH=1 -sUSE_PTHREADS=1 -sSHARED_MEMORY=1 -sPTHREAD_POOL_SIZE=4 -sPTHREAD_POOL_SIZE_STRICT=0)
+target_link_options(${PROJECT_NAME} PUBLIC -std=c++17 -pthread --embed-file=Assets -sUSE_WEBGL2=1 -sUSE_GLFW=3 -sWASM=1 -sDEMANGLE_SUPPORT=1 -sFULL_ES3=1 -sTOTAL_MEMORY=2gb -sALLOW_MEMORY_GROWTH=1 -sUSE_PTHREADS=1 -sSHARED_MEMORY=1 -sPTHREAD_POOL_SIZE=4 -sPTHREAD_POOL_SIZE_STRICT=0)
 )";
 			cmakeFile.close();
 
@@ -373,6 +372,8 @@ target_link_options(${PROJECT_NAME} PUBLIC -std=c++17 -pthread --embed-file=data
 
 	void ProjectBuilderHTML5::CollectFiles()
 	{
-
+		//Copy assets
+		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/" + FileManager::GetPathToAssets().string(),
+			std::filesystem::copy_options::recursive);
 	}
 }

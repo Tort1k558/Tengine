@@ -363,7 +363,7 @@ namespace TengineEditor
                     std::string path(static_cast<const char*>(payload->Data),payload->DataSize);
                     if (path != "")
                     {
-                        fileDialog->path = FileManager::GetPathToAssets().string() + "/" + path;
+                        fileDialog->path = path;
                         fileDialog->callback(fileDialog->path.string());
                     }
                 }
@@ -766,11 +766,11 @@ namespace TengineEditor
             {
                 if (ImGui::IsItemClicked())
                 {
-                    FileManager::SetRelativePath("");
+                    FileManager::SetRelativePath("Assets");
                 }
                 std::function<void(std::filesystem::path)> renderFileTree = [&renderFileTree](std::filesystem::path path)
                 {
-                    if (std::filesystem::is_directory(FileManager::GetPathToAssets().string() + "/" + path.string()))
+                    if (std::filesystem::is_directory(path.string()))
                     {
                         bool treeIsOpened = ImGui::TreeNodeEx(path.filename().string().c_str(), ImGuiTreeNodeFlags_OpenOnDoubleClick);
                         if (ImGui::IsItemClicked())
@@ -824,7 +824,7 @@ namespace TengineEditor
                 }
                 ImGui::EndPopup();
             }
-
+            
             float tableFilesWidth = ImGui::GetContentRegionAvail().x;
             float cellSize = 64.0f;
             float cellSizeWithPadding = cellSize + 16.0f;
@@ -841,9 +841,9 @@ namespace TengineEditor
                 {
                     ImGui::PushID(pathToCurrentProjectFiles[i].string().c_str());
 
-                    if (std::filesystem::is_directory(FileManager::GetPathToAssets().string() + "/" + pathToCurrentProjectFiles[i].string()))
+                    if (std::filesystem::is_directory(pathToCurrentProjectFiles[i].string()))
                     {
-                        ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                        ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/folder.png")->getId()), ImVec2(cellSize, cellSize), {0,1}, {1,0});
 
                         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                         {
@@ -852,11 +852,11 @@ namespace TengineEditor
                     }
                     else
                     {
-                        ImGui::ImageButton((void*)(AssetManager::LoadTexture("data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                        ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
 
                         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                         {
-                            std::string command = "start " + FileManager::GetPathToAssets().string() + "/" + pathToCurrentProjectFiles[i].string();
+                            std::string command = "start " + pathToCurrentProjectFiles[i].string();
                             std::system(command.c_str());
                         }
                     }
