@@ -15,13 +15,14 @@ namespace TengineEditor
 
 	void ProjectBuilderHTML5::Build()
 	{
-		std::filesystem::create_directory("build");
-		std::filesystem::create_directory("build/HTML5");
-		m_pathToBuildDirectory = "build/HTML5";
+		std::filesystem::create_directory("builds");
+		std::filesystem::create_directory("builds/HTML5");
+		std::filesystem::create_directory("builds/HTML5/build");
+		m_pathToBuildDirectory = "builds/HTML5";
 		GenerateInitFiles();
 		GenerateCMake();
-		CollectFiles();
 		BuildSolution();
+		CollectFiles();
 	}
 
 	void ProjectBuilderHTML5::GenerateInitFiles()
@@ -366,14 +367,26 @@ target_link_options(${PROJECT_NAME} PUBLIC -std=c++17 -pthread --embed-file=Asse
 
 	void ProjectBuilderHTML5::BuildSolution()
 	{
+		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/" + FileManager::GetPathToAssets().string(),
+			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+
 		std::string buildCommand = "emmake make -C " + m_pathToBuildDirectory.string() + " -j 4";
 		std::system(buildCommand.c_str());
 	}
 
 	void ProjectBuilderHTML5::CollectFiles()
 	{
-		//Copy assets
-		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/" + FileManager::GetPathToAssets().string(),
-			std::filesystem::copy_options::recursive);
+		std::filesystem::copy(m_pathToBuildDirectory.string() + "/" + ProjectManager::GetInstance()->getName() + ".html",
+			m_pathToBuildDirectory.string() + "/build/" + ProjectManager::GetInstance()->getName() + ".html",
+			std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::copy(m_pathToBuildDirectory.string() + "/" + ProjectManager::GetInstance()->getName() + ".js",
+			m_pathToBuildDirectory.string() + "/build/" + ProjectManager::GetInstance()->getName() + ".js",
+			std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::copy(m_pathToBuildDirectory.string() + "/" + ProjectManager::GetInstance()->getName() + ".wasm",
+			m_pathToBuildDirectory.string() + "/build/" + ProjectManager::GetInstance()->getName() + ".wasm",
+			std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::copy(m_pathToBuildDirectory.string() + "/" + ProjectManager::GetInstance()->getName() + ".worker.js",
+			m_pathToBuildDirectory.string() + "/build/" + ProjectManager::GetInstance()->getName() + ".worker.js",
+			std::filesystem::copy_options::overwrite_existing);
 	}
 }

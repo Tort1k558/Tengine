@@ -57,7 +57,7 @@ namespace TengineEditor
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
-		EditorScriptSystem::GetInstance()->setPathToDll("build/ScriptModule/ScriptModule.dll");
+		EditorScriptSystem::GetInstance()->setPathToDll("builds/ScriptModule/ScriptModule.dll");
 		EditorScriptSystem::GetInstance()->reload();
 		return m_instance;
     }

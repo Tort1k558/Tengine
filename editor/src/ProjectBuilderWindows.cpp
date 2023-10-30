@@ -15,9 +15,10 @@ namespace TengineEditor
 
 	void ProjectBuilderWindows::Build()
 	{
-		std::filesystem::create_directory("build");
-		std::filesystem::create_directory("build/Windows");
-		m_pathToBuildDirectory = "build/Windows";
+		std::filesystem::create_directory("builds");
+		std::filesystem::create_directory("builds/Windows");
+		std::filesystem::create_directory("builds/Windows/build");
+		m_pathToBuildDirectory = "builds/Windows";
 		GenerateInitFiles();
 		GenerateCMake();
 		BuildSolution();
@@ -347,26 +348,26 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 		//Copy executable file
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
-			std::filesystem::copy(m_pathToBuildDirectory.string() + "/Debug/" + projectName + ".exe", m_pathToBuildDirectory.string() + "/bin/" + projectName + ".exe",
+			std::filesystem::copy(m_pathToBuildDirectory.string() + "/Debug/" + projectName + ".exe", m_pathToBuildDirectory.string() + "/build/" + projectName + ".exe",
 				std::filesystem::copy_options::overwrite_existing);
 		}
 		else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
 		{
-			std::filesystem::copy(m_pathToBuildDirectory.string() + "/Release/" + projectName + ".exe", m_pathToBuildDirectory.string() + "/bin/" + projectName + ".exe",
+			std::filesystem::copy(m_pathToBuildDirectory.string() + "/Release/" + projectName + ".exe", m_pathToBuildDirectory.string() + "/build/" + projectName + ".exe",
 				std::filesystem::copy_options::overwrite_existing);
 		}
 
 
 		//Copy assets
-		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/bin/" + FileManager::GetPathToAssets().string(),
-			std::filesystem::copy_options::recursive);
+		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/build/" + FileManager::GetPathToAssets().string(),
+			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 
 
 		//Copy all scenes;
 		std::vector<std::filesystem::path> pathToScenes = ProjectManager::GetInstance()->getPathToScenes();
 		for (const auto& scene : pathToScenes)
 		{
-			std::filesystem::copy(scene.string(), m_pathToBuildDirectory.string() + "/bin/" + scene.string(),
+			std::filesystem::copy(scene.string(), m_pathToBuildDirectory.string() + "/build/" + scene.string(),
 				std::filesystem::copy_options::overwrite_existing);
 		}
 
@@ -375,12 +376,12 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 		std::string pathToEditor = FileManager::GetPathToEditor().string();
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
-			std::filesystem::copy(pathToEditor + "/TengineCored.dll", m_pathToBuildDirectory.string() + "/bin/TengineCored.dll",
+			std::filesystem::copy(pathToEditor + "/TengineCored.dll", m_pathToBuildDirectory.string() + "/build/TengineCored.dll",
 				std::filesystem::copy_options::overwrite_existing);
 		}
 		else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
 		{
-			std::filesystem::copy(pathToEditor + "/TengineCore.dll", m_pathToBuildDirectory.string() + "/bin/TengineCore.dll",
+			std::filesystem::copy(pathToEditor + "/TengineCore.dll", m_pathToBuildDirectory.string() + "/build/TengineCore.dll",
 				std::filesystem::copy_options::overwrite_existing);
 		}
 	}

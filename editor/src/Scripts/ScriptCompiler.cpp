@@ -50,9 +50,9 @@ namespace TengineEditor
     void ScriptCompiler::Compile()
     {
         EditorScriptSystem::GetInstance()->freeModule();
-        std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/Scripts");
-        std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build");
-        std::filesystem::create_directory(ProjectManager::GetInstance()->getPath().string() + "/build/ScriptModule");
+        std::filesystem::create_directory("Scripts");
+        std::filesystem::create_directory("builds");
+        std::filesystem::create_directory("builds/ScriptModule");
         GenerateInitFiles();
         GenerateCmake();
         BuildDll();
@@ -202,7 +202,7 @@ namespace TengineEditor
         std::vector<ScriptInfo> scriptInfo = GetScriptInfo();
 
         //Header file
-        std::ofstream initHeaderFile("build/ScriptModule/SystemModule.h");
+        std::ofstream initHeaderFile("builds/ScriptModule/SystemModule.h");
         if (initHeaderFile.is_open())
         {
             initHeaderFile << \
@@ -233,7 +233,7 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
         }
 
         //Source file
-        std::ofstream initSourceFile("build/ScriptModule/SystemModule.cpp");
+        std::ofstream initSourceFile("builds/ScriptModule/SystemModule.cpp");
         if (initSourceFile.is_open())
         {
             initSourceFile << \
@@ -327,7 +327,7 @@ std::vector<std::string> GetScriptNames()
     
     void ScriptCompiler::GenerateCmake()
 	{
-		std::ofstream cmakeFile("build/ScriptModule/CMakeLists.txt");
+		std::ofstream cmakeFile("builds/ScriptModule/CMakeLists.txt");
         if (cmakeFile.is_open()) 
         {
             std::string pathToEditor = FileManager::GetPathToEditor().string();
@@ -396,7 +396,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 )
 )";
             cmakeFile.close();
-            std::string cmakeCommand = "cmake -S build/ScriptModule -B build/ScriptModule";
+            std::string cmakeCommand = "cmake -S builds/ScriptModule -B builds/ScriptModule";
             std::system(cmakeCommand.c_str());
         }
         else {
@@ -409,11 +409,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         std::string cmakeBuildCommand;
         if (m_scriptBuildConfiguration == BuildConfiguration::Debug)
         {
-            cmakeBuildCommand = "cmake --build build/ScriptModule --config Debug";
+            cmakeBuildCommand = "cmake --build builds/ScriptModule --config Debug";
         }
         else if (m_scriptBuildConfiguration == BuildConfiguration::Release)
         {
-            cmakeBuildCommand = "cmake --build build/ScriptModule --config Release";
+            cmakeBuildCommand = "cmake --build builds/ScriptModule --config Release";
         }
         std::system(cmakeBuildCommand.c_str());
     }
