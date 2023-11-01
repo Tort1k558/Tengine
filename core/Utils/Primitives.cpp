@@ -12,7 +12,8 @@ namespace Tengine
         vertices.push_back({ Vec3(1.0f, -1.0f, 0.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 0.0f) });
         std::vector<unsigned int> indices = { 0,1,2,
                                               0,1,3 };
-        std::shared_ptr<Mesh> mesh = Component::Create<Mesh>(vertices, indices);
+        std::shared_ptr<Mesh> mesh = Component::Create<Mesh>();
+        mesh->addSubmesh(std::make_shared<SubMesh>(vertices, indices));
         mesh->setPath("Primitive::Quad");
         return mesh;
     }
@@ -65,7 +66,8 @@ namespace Tengine
                 }
             }
         }
-        std::shared_ptr<Mesh> mesh = Component::Create<Mesh>(vertices, indices);
+        std::shared_ptr<Mesh> mesh = Component::Create<Mesh>();
+        mesh->addSubmesh(std::make_shared<SubMesh>(vertices, indices));
         mesh->setPath("Primitive::Sphere::Sectors::" + std::to_string(sectors) + "::Stacks::" + std::to_string(stacks));
         return mesh;
     }
@@ -115,7 +117,8 @@ namespace Tengine
           16,17,18, 16,17,19,
             // Bottom
           20,21,22, 20,21,23 };
-        std::shared_ptr<Mesh> mesh = Component::Create<Mesh>(vertices, indices);
+        std::shared_ptr<Mesh> mesh = Component::Create<Mesh>();
+        mesh->addSubmesh(std::make_shared<SubMesh>(vertices, indices));
         mesh->setPath("Primitive::Cube");
         return mesh;
     }

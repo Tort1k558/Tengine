@@ -131,28 +131,44 @@ namespace Tengine
 	void RendererSystem::renderCamera(std::shared_ptr<Camera> camera)
 	{
 		std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
-		std::vector<std::shared_ptr<Mesh>> meshes = scene->getComponents<Mesh>();
-		std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("DefaultShader");
-		defaultShader->bind();
-		defaultShader->setUniformMat4("u_view", camera->getViewMatrix());
-		defaultShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
-		for (auto& mesh : meshes)
+		if (scene)
 		{
-			std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
-			defaultShader->setUniformMat4("u_model", transform->getMatrix());
-
-			std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
-			for (auto& submesh : submeshes)
+			std::vector<std::shared_ptr<Mesh>> meshes = scene->getComponents<Mesh>();
+			std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("DefaultShader");
+			defaultShader->bind();
+			defaultShader->setUniformMat4("u_view", camera->getViewMatrix());
+			defaultShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
+			for (auto& mesh : meshes)
 			{
-				if (submesh->hasMaterial())
+				std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
+				defaultShader->setUniformMat4("u_model", transform->getMatrix());
+				defaultShader->setUniformVec3("u_viewPos", camera->getParent()->getComponent<Transform>()->getPosition());
+
+				std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
+				for (auto& submesh : submeshes)
 				{
-					std::shared_ptr<Material> material = submesh->getMaterial();
-					if (material->hasTexture(MaterialTexture::Diffuse))
+					if (submesh->hasMaterial())
 					{
-						material->getTexture(MaterialTexture::Diffuse)->bind(0);
+						std::shared_ptr<Material> material = submesh->getMaterial();
+						if (material->hasTexture(MaterialTexture::Diffuse))
+						{
+							material->getTexture(MaterialTexture::Diffuse)->bind(0);
+						}
+						if (material->hasTexture(MaterialTexture::Normal))
+						{
+							material->getTexture(MaterialTexture::Normal)->bind(1);
+						}
+						if (material->hasTexture(MaterialTexture::Specular))
+						{
+							material->getTexture(MaterialTexture::Specular)->bind(2);
+						}
+						if (material->hasTexture(MaterialTexture::Roughness))
+						{
+							material->getTexture(MaterialTexture::Roughness)->bind(3);
+						}
 					}
+					m_context->drawIndexed(submesh->getVertexArray());
 				}
-				m_context->drawIndexed(submesh->getVertexArray());
 			}
 		}
 	}

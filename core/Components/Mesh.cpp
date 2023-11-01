@@ -1,8 +1,10 @@
 #include "Mesh.h"
 
-#include"Core/AssetManager.h"
-#include"Utils/Primitives.h"
+#include<fstream>
 
+#include"Core/AssetManager.h"
+#include"Core/Logger.h"
+#include"Utils/Primitives.h"
 namespace Tengine
 {
 
@@ -47,19 +49,10 @@ namespace Tengine
 		return false;
 	}
 
-	Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
-	{
-		m_submeshes.push_back(std::make_shared<SubMesh>(vertices, indices));
-	}
-
-	Mesh::Mesh(std::shared_ptr<SubMesh> submesh)
-	{
-		m_submeshes.push_back(submesh);
-	}
-
 	void Mesh::addSubmesh(std::shared_ptr<SubMesh> submesh)
 	{
 		m_submeshes.push_back(submesh);
+		save();
 	}
 
 	bool Mesh::hasSubmeshes() const
@@ -72,18 +65,28 @@ namespace Tengine
 		return m_submeshes;
 	}
 
+	std::filesystem::path Mesh::getPathToMesh()
+	{
+		return m_pathToMesh;
+	}
+
+	void Mesh::setPathToMesh(std::filesystem::path path)
+	{
+		m_path = path;
+	}
+
 	ComponentInfo Mesh::getInfo()
 	{
 		ComponentInfo displayInfo;
 
 		displayInfo.setComponentName("Mesh");
-		std::shared_ptr<FieldFile> loadMeshButton = std::make_shared<FieldFile>();
-		loadMeshButton->name = "Load Mesh";
+		std::shared_ptr<FieldFile> loadMeshFile = std::make_shared<FieldFile>();
+		loadMeshFile->name = "Load Mesh";
 		if (!m_path.empty())
 		{
-			loadMeshButton->path = m_path;
+			loadMeshFile->path = m_path;
 		}
-		loadMeshButton->callback = [this](const std::string& path)
+		loadMeshFile->callback = [this](const std::string& path)
 		{
 			std::shared_ptr<Object> previousParent = this->getParent();
 			if (path == "Primitive::Quad")
@@ -113,40 +116,89 @@ namespace Tengine
 			}
 			else
 			{
-				*this = *AssetManager::LoadMesh(path);
+				*this = *AssetManager::LoadMesh(path, false);
 			}
 			this->setParent(previousParent);
 		};
-		displayInfo.addElement(loadMeshButton);
-		std::shared_ptr<FiledCollapsingHeader> submeshesHeader = std::make_shared<FiledCollapsingHeader>();
+		displayInfo.addElement(loadMeshFile);
+		std::shared_ptr<FieldCollapsingHeader> submeshesHeader = std::make_shared<FieldCollapsingHeader>();
 		submeshesHeader->name = "Submeshes";
 		for (size_t i = 0; i < m_submeshes.size(); i++)
 		{
-			std::shared_ptr<FiledCollapsingHeader> submeshHeader = std::make_shared<FiledCollapsingHeader>();
+			std::shared_ptr<FieldCollapsingHeader> submeshHeader = std::make_shared<FieldCollapsingHeader>();
 			submeshHeader->name = "Submesh" + std::to_string(i);
 			std::shared_ptr<Material> material = m_submeshes[i]->getMaterial();
-			std::shared_ptr<FieldImage> diffuse = std::make_shared<FieldImage>();
-			diffuse->name = "Diffuse Texture";
-			diffuse->size = { 75,75 };
-			std::shared_ptr<FieldImage> specular = std::make_shared<FieldImage>();
-			specular->name = "Specular Texture";
-			specular->size = { 75,75 };
-			std::shared_ptr<FieldImage> normals = std::make_shared<FieldImage>();
-			normals->name = "Normal Texture";
-			normals->size = { 75,75 };
 			if (material)
 			{
-				diffuse->texture = material->getTexture(MaterialTexture::Diffuse);
-				specular->texture = material->getTexture(MaterialTexture::Specular);
-				normals->texture = material->getTexture(MaterialTexture::Normal);
+				std::shared_ptr<FieldFile> materialFile = std::make_shared<FieldFile>();
+				materialFile->name = "Material";
+				materialFile->path = material->getPath();
+				materialFile->callback = [this,i](const std::string& path)
+				{
+					this->m_submeshes[i]->setMaterial(AssetManager::LoadMaterial(path));
+				};
+				//std::shared_ptr<FieldImage> albedo = std::make_shared<FieldImage>();
+				//albedo->name = "Albedo Texture";
+				//albedo->size = { 75,75 };
+				//std::shared_ptr<FieldImage> specular = std::make_shared<FieldImage>();
+				//specular->name = "Specular Texture";
+				//specular->size = { 75,75 };
+				//std::shared_ptr<FieldImage> normals = std::make_shared<FieldImage>();
+				//normals->name = "Normal Texture";
+				//normals->size = { 75,75 };
+				//std::shared_ptr<FieldImage> height = std::make_shared<FieldImage>();
+				//height->name = "Height Texture";
+				//height->size = { 75,75 };
+				//std::shared_ptr<FieldImage> roughness = std::make_shared<FieldImage>();
+				//roughness->name = "Roughness Texture";
+				//roughness->size = { 75,75 };
+				//std::shared_ptr<FieldImage> metalness = std::make_shared<FieldImage>();
+				//metalness->name = "Metalness Texture";
+				//metalness->size = { 75,75 };
+				//if (material)
+				//{
+				//	albedo->texture = material->getTexture(MaterialTexture::Diffuse);
+				//	specular->texture = material->getTexture(MaterialTexture::Specular);
+				//	normals->texture = material->getTexture(MaterialTexture::Normal);
+				//	height->texture = material->getTexture(MaterialTexture::Height);
+				//	roughness->texture = material->getTexture(MaterialTexture::Roughness);
+				//	metalness->texture = material->getTexture(MaterialTexture::Metalness);
+				//}
+				//submeshHeader->elements.push_back(albedo);
+				//submeshHeader->elements.push_back(specular);
+				//submeshHeader->elements.push_back(normals);
+				//submeshHeader->elements.push_back(height);
+				//submeshHeader->elements.push_back(roughness);
+				//submeshHeader->elements.push_back(metalness);
+				submeshHeader->elements.push_back(materialFile);
 			}
-			submeshHeader->elements.push_back(diffuse);
-			submeshHeader->elements.push_back(specular);
-			submeshHeader->elements.push_back(normals);
 			submeshesHeader->elements.push_back(submeshHeader);
 		}
 		displayInfo.addElement(submeshesHeader);
 
 		return displayInfo;
+	}
+	void Mesh::save()
+	{
+		nlohmann::json data;
+		data["PathToMesh"] = getPath();
+		std::vector<std::shared_ptr<SubMesh>> submeshes = getSubmeshes();
+		for (size_t i = 0; i < submeshes.size(); i++)
+		{
+			if (submeshes[i]->hasMaterial())
+			{
+				data["PathToSubmeshMaterial" + std::to_string(i)] = submeshes[i]->getMaterial()->getPath();
+			}
+		}
+		std::ofstream file(getPath().parent_path().string() + "/" + getPath().stem().string() + ".model", std::ios_base::out);
+		if (file.is_open())
+		{
+			file << data.dump(4);
+			file.close();
+		}
+		else
+		{
+			Logger::Critical("ERROR::AssetManager::Failed to save the mesh file!");
+		}
 	}
 }

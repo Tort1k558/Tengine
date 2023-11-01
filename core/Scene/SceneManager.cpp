@@ -41,7 +41,8 @@ namespace Tengine
 
 		//Write data to file
 		std::ofstream file(scene->getPath().string(),std::ios_base::out);
-		if (file.is_open()) {
+		if (file.is_open()) 
+		{
 			file << data.dump(4);
 			file.close();
 		}
@@ -59,10 +60,13 @@ namespace Tengine
 		{
 			nlohmann::json data = nlohmann::json::parse(file);
 			scene->setPath(path);
-			scene->setName(data["name"].get<std::string>());
 			for (const auto& item : data.items())
 			{
-				if (item.key() != "name")
+				if (item.key() == "name")
+				{
+					scene->setName(data["name"].get<std::string>());
+				}
+				else
 				{
 					std::string objectId = item.key();
 					std::shared_ptr<Object> object = Object::Create(UUID(objectId));
@@ -156,10 +160,12 @@ namespace Tengine
 
 		return scene;
 	}
+
 	void SceneManager::AddScene(std::string_view name, std::filesystem::path path)
 	{
 		m_sceneNames.insert({ name.data(), path});
 	}
+
 	void SceneManager::DeserializeField(nlohmann::json& data,std::shared_ptr<FieldInfo> element)
 	{
 		switch (element->type)
@@ -199,6 +205,15 @@ namespace Tengine
 		{
 			std::shared_ptr<FieldFile> field = std::dynamic_pointer_cast<FieldFile>(element);
 			field->callback(data);
+			break;
+		}
+		case FieldType::CollapsingHeader:
+		{
+			std::shared_ptr<FieldCollapsingHeader> field = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
+			for (const auto& el : field->elements)
+			{
+				DeserializeField(data[el->name], el);
+			}
 			break;
 		}
 		default:
@@ -244,6 +259,15 @@ namespace Tengine
 		{
 			std::shared_ptr<FieldFile> field = std::dynamic_pointer_cast<FieldFile>(element);
 			data = field->path;
+			break;
+		}
+		case FieldType::CollapsingHeader:
+		{
+			std::shared_ptr<FieldCollapsingHeader> field = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
+			for (const auto& el : field->elements)
+			{
+				SerializeField(data[el->name], el);
+			}
 			break;
 		}
 		default:

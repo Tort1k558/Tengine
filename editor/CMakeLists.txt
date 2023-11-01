@@ -22,6 +22,7 @@ include_directories(../external/glm)
 
 add_subdirectory(../external/nfd ${CMAKE_CURRENT_BINARY_DIR}/bin/nfd)
 add_subdirectory(../external/imgui ${CMAKE_CURRENT_BINARY_DIR}/bin/imgui)
+add_subdirectory(../core ${CMAKE_CURRENT_BINARY_DIR}/bin/core)
 
 add_executable(${PROJECT_NAME} ${TARGET_SRC_EDITOR} main.cpp)
 

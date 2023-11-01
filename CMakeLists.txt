@@ -7,5 +7,4 @@ set(PROJECT_NAME Tengine)
 
 project(${PROJECT_NAME})
 
-add_subdirectory(core)
 add_subdirectory(editor)

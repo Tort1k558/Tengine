@@ -95,9 +95,9 @@ namespace Tengine
 		Vec2 size;
 	};
 
-	struct TENGINE FiledCollapsingHeader : public FieldInfo
+	struct TENGINE FieldCollapsingHeader : public FieldInfo
 	{
-		FiledCollapsingHeader()
+		FieldCollapsingHeader()
 		{
 			type = FieldType::CollapsingHeader;
 		}

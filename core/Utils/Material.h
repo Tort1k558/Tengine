@@ -3,6 +3,7 @@
 #include<unordered_map>
 
 #include"Renderer/Texture.h"
+#include"Core/AssetManager.h"
 
 namespace Tengine
 {
@@ -14,10 +15,11 @@ namespace Tengine
 		Height,
 		Normal,
 		Roughness,
-		Occlusion
+		Occlusion,
+		Metalness
 	};
 
-	class Material
+	class Material : public Resource
 	{
 	public:
 		Material() = default;
@@ -27,6 +29,7 @@ namespace Tengine
 		std::shared_ptr<Texture> getTexture(MaterialTexture type);
 		bool hasTexture(MaterialTexture type);
 	private:
+		void save();
 		std::unordered_map<MaterialTexture, std::shared_ptr<Texture>> m_textures;
 	};
 }

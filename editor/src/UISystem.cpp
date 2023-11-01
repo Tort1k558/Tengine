@@ -331,7 +331,7 @@ namespace TengineEditor
         }
         case FieldType::CollapsingHeader:
         {
-            std::shared_ptr<FiledCollapsingHeader> header = std::dynamic_pointer_cast<FiledCollapsingHeader>(element);
+            std::shared_ptr<FieldCollapsingHeader> header = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
             if (ImGui::CollapsingHeader(header->name.c_str()))
             {
                 for (size_t i = 0; i < header->elements.size(); i++)
@@ -352,9 +352,9 @@ namespace TengineEditor
         }
         case FieldType::File:
         {
-            std::shared_ptr<FieldFile> fileDialog = std::dynamic_pointer_cast<FieldFile>(element);
+            std::shared_ptr<FieldFile> file = std::dynamic_pointer_cast<FieldFile>(element);
 
-            if (ImGui::InputText("##empty", &fileDialog->path.string(), ImGuiInputTextFlags_EnterReturnsTrue))
+            if (ImGui::InputText("##empty", &file->path.string(), ImGuiInputTextFlags_EnterReturnsTrue))
             {
 
             }
@@ -363,8 +363,8 @@ namespace TengineEditor
                     std::string path(static_cast<const char*>(payload->Data),payload->DataSize);
                     if (path != "")
                     {
-                        fileDialog->path = path;
-                        fileDialog->callback(fileDialog->path.string());
+                        file->path = path;
+                        file->callback(file->path.string());
                     }
                 }
                 ImGui::EndDragDropTarget();
@@ -600,40 +600,42 @@ namespace TengineEditor
     {
 
         static int currentItem = 0;
-        std::vector<std::shared_ptr<Object>> objects = SceneManager::GetCurrentScene()->getAllObjects();
         ImGui::Begin("Objects", nullptr);
-        std::vector<std::string> objectNames;
-        for (const auto& object : objects)
+        if (SceneManager::GetCurrentScene())
         {
-            objectNames.push_back(object->getName());
-        }
-        std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
-
-        if (ImGui::ListBox("##empty", &currentItem, [](void* data, int idx, const char** out_text) {
-            auto& items = *static_cast<std::vector<std::string>*>(data);
-            if (idx < 0 || idx >= static_cast<int>(items.size())) {
-                *out_text = nullptr;
+            std::vector<std::shared_ptr<Object>> objects = SceneManager::GetCurrentScene()->getAllObjects();
+            std::vector<std::string> objectNames;
+            for (const auto& object : objects)
+            {
+                objectNames.push_back(object->getName());
             }
-            else {
-                *out_text = items[idx].c_str();
+            std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
+
+            if (ImGui::ListBox("##empty", &currentItem, [](void* data, int idx, const char** out_text) {
+                auto& items = *static_cast<std::vector<std::string>*>(data);
+                if (idx < 0 || idx >= static_cast<int>(items.size())) {
+                    *out_text = nullptr;
+                }
+                else {
+                    *out_text = items[idx].c_str();
+                }
+                return true;
+                }, static_cast<void*>(&objectNames), static_cast<int>(objectNames.size())))
+            {
+                m_nameOfSelectedObject = objectNames[currentItem];
             }
-            return true;
-            }, static_cast<void*>(&objectNames), static_cast<int>(objectNames.size())))
-        {
-            m_nameOfSelectedObject = objectNames[currentItem];
-        }
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y - 25.0f);
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y - 25.0f);
 
-
-        if (ImGui::Button("Create object"))
-        {
-            Object::Create();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Delete object") && !m_nameOfSelectedObject.empty())
-        {
-            SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject)->getName());
-            m_nameOfSelectedObject.clear();
+            if (ImGui::Button("Create object"))
+            {
+                Object::Create();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Delete object") && !m_nameOfSelectedObject.empty())
+            {
+                SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject)->getName());
+                m_nameOfSelectedObject.clear();
+            }
         }
         ImGui::End();
     }

@@ -41,13 +41,15 @@ namespace Tengine
 	{
 	public:
 		Mesh() = default;
-		Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
-		Mesh(std::shared_ptr<SubMesh> submesh);
 		void addSubmesh(std::shared_ptr<SubMesh> submesh);
 		bool hasSubmeshes() const;
 		std::vector<std::shared_ptr<SubMesh>> getSubmeshes() const;
-		ComponentInfo getInfo() override;
+		std::filesystem::path getPathToMesh();
+		void setPathToMesh(std::filesystem::path path);
+		ComponentInfo getInfo() final;
 	private:
+		void save();
+		std::filesystem::path m_pathToMesh;
 		std::vector<std::shared_ptr<SubMesh>> m_submeshes;
 	};
 }
