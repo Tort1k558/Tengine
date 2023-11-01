@@ -25,31 +25,24 @@ namespace Tengine
 	public:
 		SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 		std::shared_ptr<VertexArray> getVertexArray() const;
-		std::shared_ptr<Material> getMaterial() const;
-		void setMaterial(std::shared_ptr<Material> material);
-		bool hasMaterial() const;
-
+		size_t getMaterialIndex();
+		void setMaterialIndex(size_t index);
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<unsigned int> m_indices;
 		std::shared_ptr<VertexArray> m_vertexArray;
 		std::shared_ptr<IndexBuffer> m_indexBuffer;
-		std::shared_ptr<Material> m_material;
+		size_t m_materialIndex;
 	};
 
-	class TENGINE Mesh : public Component, public Resource
+	class TENGINE Mesh : public Resource
 	{
 	public:
 		Mesh() = default;
 		void addSubmesh(std::shared_ptr<SubMesh> submesh);
 		bool hasSubmeshes() const;
 		std::vector<std::shared_ptr<SubMesh>> getSubmeshes() const;
-		std::filesystem::path getPathToMesh();
-		void setPathToMesh(std::filesystem::path path);
-		ComponentInfo getInfo() final;
 	private:
-		void save();
-		std::filesystem::path m_pathToMesh;
 		std::vector<std::shared_ptr<SubMesh>> m_submeshes;
 	};
 }

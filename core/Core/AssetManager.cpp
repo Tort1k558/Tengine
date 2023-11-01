@@ -10,9 +10,10 @@
 #include<assimp/postprocess.h>
 
 #include"Core/Logger.h"
+#include"Components/Model.h"
 #include"Renderer/Shader.h"
 #include"Renderer/Texture.h"
-#include"Components/Mesh.h"
+#include"Utils/Mesh.h"
 
 namespace Tengine
 {
@@ -43,7 +44,7 @@ namespace Tengine
         return nullptr;
     }
 
-    std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene, std::vector<std::shared_ptr<Material>> materials)
+    std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene)
     {
         std::vector<Vertex> vertices;
         for (size_t i = 0; i < mesh->mNumVertices; i++)
@@ -78,24 +79,24 @@ namespace Tengine
             }
         }
         std::shared_ptr<SubMesh> submesh = std::make_shared<SubMesh>(vertices, indices);
-        if (mesh->mMaterialIndex >= 0 && mesh->mMaterialIndex < materials.size())
+        if (mesh->mMaterialIndex >= 0)
         {
-            submesh->setMaterial(materials[mesh->mMaterialIndex]);
+            submesh->setMaterialIndex(mesh->mMaterialIndex);
         }
         return submesh;
     }
 
-    void ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene, std::vector<std::shared_ptr<Material>> materials)
+    void ProcessNode(std::shared_ptr<Mesh> mesh, aiNode* node, const aiScene* scene)
     {
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* aimesh = scene->mMeshes[node->mMeshes[i]];
-            mesh->addSubmesh(ProcessSubMesh(aimesh, scene, materials));
+            mesh->addSubmesh(ProcessSubMesh(aimesh, scene));
         }
 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
-            ProcessNode(mesh, node->mChildren[i], scene, materials);
+            ProcessNode(mesh, node->mChildren[i], scene);
         }
     }
 
@@ -195,7 +196,7 @@ namespace Tengine
         return material;
     }
 
-    std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path, bool generateMaterial)
+    std::shared_ptr<Mesh> AssetManager::LoadMesh(std::filesystem::path path)
     {
         std::shared_ptr<Mesh> mesh = GetResource<Mesh>(path.string());
         if (mesh)
@@ -205,88 +206,15 @@ namespace Tengine
 
         mesh = Component::Create<Mesh>();
         mesh->setPath(path);
-        if (path.extension() == ".model")
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
-            std::ifstream file(path.string());
-            if (file.is_open())
-            {
-                nlohmann::json data = nlohmann::json::parse(file);
-                std::string pathToMesh = data["PathToMesh"].get<std::string>();
-                mesh = LoadMesh(pathToMesh, false);
-                std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
-                for (const auto& item : data.items())
-                {
-                    if (item.key().find("PathToSubmeshMaterial") != std::string::npos)
-                    {
-                        int submeshNumber = std::stoi(item.key().substr(item.key().find_last_of("PathToSubmeshMaterial") + 1,
-                            item.key().size() - item.key().find_last_of("PathToSubmeshMaterial")));
-                        submeshes[submeshNumber]->setMaterial(LoadMaterial(item.value().get<std::string>()));
-                    }
-                }
-            }
+            Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
+            return nullptr;
         }
-        else
-        {
-            mesh->setPathToMesh(path);
-            Assimp::Importer importer;
-            const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
-            if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-            {
-                Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
-                return nullptr;
-            }
 
-            std::filesystem::path parentPath = path.parent_path();
-            std::vector<std::shared_ptr<Material>> materials;
-            if (generateMaterial)
-            {
-                for (size_t i = 0; i < scene->mNumMaterials; i++)
-                {
-                    std::shared_ptr<Material> material = std::make_shared<Material>();
-                    for (size_t i = 0; true; i++)
-                    {
-                        if (!std::filesystem::exists(parentPath.string() + "/Material" + std::to_string(i)))
-                        {
-                            material->setPath(parentPath.string() + "/Material" + std::to_string(i));
-                            break;
-                        }
-                    }
-                    aiMaterial* aimaterial = scene->mMaterials[i]; std::shared_ptr<Texture> diffuse = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE, parentPath);
-                    if (diffuse)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Diffuse, diffuse);
-                    }
-                    std::shared_ptr<Texture> specular = LoadMaterialTexture(aimaterial, aiTextureType_SPECULAR, parentPath);
-                    if (specular)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Specular, specular);
-                    }
-
-                    std::shared_ptr<Texture> normals = LoadMaterialTexture(aimaterial, aiTextureType_NORMALS, parentPath);
-                    if (normals)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Normal, normals);
-                    }
-                    std::shared_ptr<Texture> roughness = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE_ROUGHNESS, parentPath);
-                    if (roughness)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Roughness, roughness);
-                    }
-                    std::shared_ptr<Texture> occlusion = LoadMaterialTexture(aimaterial, aiTextureType_AMBIENT_OCCLUSION, parentPath);
-                    if (occlusion)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Occlusion, occlusion);
-                    }
-                    std::shared_ptr<Texture> metalness = LoadMaterialTexture(aimaterial, aiTextureType_METALNESS, parentPath);
-                    if (metalness)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Metalness, metalness);
-                    }
-                    materials.push_back(material);
-                }
-            }
-            ProcessNode(mesh, scene->mRootNode, scene, materials);
-        }
+        ProcessNode(mesh, scene->mRootNode, scene);
         m_resources[path.string()] = std::dynamic_pointer_cast<Resource>(std::make_shared<Mesh>(*mesh));
         return mesh;
     }
@@ -300,6 +228,100 @@ namespace Tengine
         m_resources[name.data()] = shader;
 
         return shader;
+    }
+
+    std::shared_ptr<Model> AssetManager::LoadModel(std::filesystem::path path)
+    {
+        std::shared_ptr<Model> model = Component::Create<Model>();
+
+        std::ifstream file(path.string());
+        if (file.is_open())
+        {
+            nlohmann::json data = nlohmann::json::parse(file);
+            std::string pathToMesh = data["PathToMesh"].get<std::string>();
+            model->setMesh(LoadMesh(pathToMesh));
+            std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+            for (const auto& item : data.items())
+            {
+                if (item.key().find("PathToSubmeshMaterial") != std::string::npos)
+                {
+                    int submeshNumber = std::stoi(item.key().substr(item.key().find_last_of("PathToSubmeshMaterial") + 1,
+                        item.key().size() - item.key().find_last_of("PathToSubmeshMaterial")));
+                    model->setSubmeshMaterial(submeshNumber, LoadMaterial(item.value().get<std::string>()));
+                }
+            }
+        }
+
+        return model;
+    }
+
+    std::shared_ptr<Model> AssetManager::CreateModel(std::filesystem::path pathToMesh)
+    {
+        std::shared_ptr<Model> model = Component::Create<Model>();
+
+        std::shared_ptr<Mesh> mesh = LoadMesh(pathToMesh);
+        model->setMesh(mesh);
+
+        Assimp::Importer importer;
+        const aiScene* scene = importer.ReadFile(pathToMesh.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
+            return nullptr;
+        }
+        std::filesystem::path parentPath = pathToMesh.parent_path();
+        std::vector<std::shared_ptr<Material>> materials;
+        for (size_t i = 0; i < scene->mNumMaterials; i++)
+        {
+            std::shared_ptr<Material> material = std::make_shared<Material>();
+            for (size_t i = 0; true; i++)
+            {
+                if (!std::filesystem::exists(parentPath.string() + "/Material" + std::to_string(i)))
+                {
+                    material->setPath(parentPath.string() + "/Material" + std::to_string(i));
+                    break;
+                }
+            }
+            aiMaterial* aimaterial = scene->mMaterials[i]; std::shared_ptr<Texture> diffuse = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE, parentPath);
+            if (diffuse)
+            {
+                material->setTextureMaterial(MaterialTexture::Diffuse, diffuse);
+            }
+            std::shared_ptr<Texture> specular = LoadMaterialTexture(aimaterial, aiTextureType_SPECULAR, parentPath);
+            if (specular)
+            {
+                material->setTextureMaterial(MaterialTexture::Specular, specular);
+            }
+
+            std::shared_ptr<Texture> normals = LoadMaterialTexture(aimaterial, aiTextureType_NORMALS, parentPath);
+            if (normals)
+            {
+                material->setTextureMaterial(MaterialTexture::Normal, normals);
+            }
+            std::shared_ptr<Texture> roughness = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE_ROUGHNESS, parentPath);
+            if (roughness)
+            {
+                material->setTextureMaterial(MaterialTexture::Roughness, roughness);
+            }
+            std::shared_ptr<Texture> occlusion = LoadMaterialTexture(aimaterial, aiTextureType_AMBIENT_OCCLUSION, parentPath);
+            if (occlusion)
+            {
+                material->setTextureMaterial(MaterialTexture::Occlusion, occlusion);
+            }
+            std::shared_ptr<Texture> metalness = LoadMaterialTexture(aimaterial, aiTextureType_METALNESS, parentPath);
+            if (metalness)
+            {
+                material->setTextureMaterial(MaterialTexture::Metalness, metalness);
+            }
+            materials.push_back(material);
+        }
+        std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
+        for (size_t i = 0; i < submeshes.size(); i++)
+        {
+            model->setSubmeshMaterial(i, materials[submeshes[i]->getMaterialIndex()]);
+        }
+
+        return model;
     }
 
     std::filesystem::path Resource::getPath() const

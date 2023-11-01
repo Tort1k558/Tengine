@@ -3,12 +3,13 @@
 #include<ECS/SystemManager.h>
 #include<Components/Transform.h>
 #include<Components/Camera.h>
-#include<Components/Mesh.h>
+#include<Components/Model.h>
 #include<Core/Timer.h>
 #include<Core/Logger.h>
 #include<Core/Input.h>
 #include<Scene/SceneManager.h>
 #include<Utils/Primitives.h>
+#include<Utils/Mesh.h>
 #include<Core/AssetManager.h>
 #include<Scene/SceneManager.h>
 #include<Systems/ScriptSystem.h>
@@ -52,7 +53,7 @@ namespace TengineEditor
         transform->setScale({ 10.0f,10.0f,1.0f });
         transform->setPositionY(-1.0f);
         transform->setRotationX(-90.0f);
-        object->addComponent(Primitives::CreateSphere(50, 50));
+        object->addComponent(Component::Create<Model>(Primitives::CreateSphere(50, 50)));
         
         std::shared_ptr<Object> object2 = Object::Create();
         std::shared_ptr<Camera> camera = Component::Create<Camera>(ProjectionType::Perspective);
@@ -66,7 +67,7 @@ namespace TengineEditor
         std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
         transform3->setPositionY(2.0f);
         
-        object3->addComponent(AssetManager::LoadMesh("Assets/Meshes/backpack/backpack.obj"));
+        object3->addComponent(AssetManager::CreateModel("Assets/Meshes/backpack/backpack.obj"));
     }
 
     void Editor::update()

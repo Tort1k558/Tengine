@@ -2,7 +2,7 @@
 
 #include"Renderer/OpenGL/RendererContextOpenGL.h"
 #include"Components/Transform.h"
-#include"Components/Mesh.h"
+#include"Utils/Mesh.h"
 #include"Core/Logger.h"
 #include"Core/Timer.h"
 #include"Core/AssetManager.h"
@@ -13,6 +13,7 @@
 #include"Scene/Scene.h"
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
+#include"Components/Model.h"
 #include"Renderer/Shaders/ShaderCode.h"
 namespace Tengine
 {
@@ -133,23 +134,23 @@ namespace Tengine
 		std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
 		if (scene)
 		{
-			std::vector<std::shared_ptr<Mesh>> meshes = scene->getComponents<Mesh>();
+			std::vector<std::shared_ptr<Model>> models = scene->getComponents<Model>();
 			std::shared_ptr<Shader> defaultShader = AssetManager::GetResource<Shader>("DefaultShader");
 			defaultShader->bind();
 			defaultShader->setUniformMat4("u_view", camera->getViewMatrix());
 			defaultShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
-			for (auto& mesh : meshes)
+			for (auto& model : models)
 			{
-				std::shared_ptr<Transform> transform = mesh->getParent()->getComponent<Transform>();
+				std::shared_ptr<Transform> transform = model->getParent()->getComponent<Transform>();
 				defaultShader->setUniformMat4("u_model", transform->getMatrix());
 				defaultShader->setUniformVec3("u_viewPos", camera->getParent()->getComponent<Transform>()->getPosition());
 
-				std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
-				for (auto& submesh : submeshes)
+				std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+				for (size_t i = 0; i < submeshes.size(); i++)
 				{
-					if (submesh->hasMaterial())
+					if (model->hasSubmeshMaterial(i))
 					{
-						std::shared_ptr<Material> material = submesh->getMaterial();
+						std::shared_ptr<Material> material = model->getSubmeshMaterial(i);
 						if (material->hasTexture(MaterialTexture::Diffuse))
 						{
 							material->getTexture(MaterialTexture::Diffuse)->bind(0);
@@ -167,7 +168,7 @@ namespace Tengine
 							material->getTexture(MaterialTexture::Roughness)->bind(3);
 						}
 					}
-					m_context->drawIndexed(submesh->getVertexArray());
+					m_context->drawIndexed(submeshes[i]->getVertexArray());
 				}
 			}
 		}

@@ -14,6 +14,7 @@ namespace Tengine
 	class Mesh;
 	class SubMesh;
 	class Material;
+	class Model;
 
 	class TENGINE Resource
 	{
@@ -33,9 +34,10 @@ namespace Tengine
 		static std::shared_ptr<Shader> LoadShader(std::string_view name, std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader);
 		static std::shared_ptr<Texture> LoadTexture(std::filesystem::path path);
 		static std::shared_ptr<Material> LoadMaterial(std::filesystem::path path);
-		static std::shared_ptr<Mesh> LoadMesh(std::filesystem::path path, bool generateMaterial = true);
+		static std::shared_ptr<Mesh> LoadMesh(std::filesystem::path path);
 		static std::shared_ptr<Shader> AddShader(std::string_view name, std::string_view vertexSource, std::string_view fragmentSource);
-
+		static std::shared_ptr<Model> LoadModel(std::filesystem::path path);
+		static std::shared_ptr<Model> CreateModel(std::filesystem::path pathToMesh);
 		template<typename T>
 		static std::shared_ptr<T> GetResource(std::string_view name);
 	private:

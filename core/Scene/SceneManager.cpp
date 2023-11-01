@@ -3,7 +3,7 @@
 #include<fstream>
 #include<nlohmann/json.hpp>
 #include"Components/Camera.h"
-#include"Components/Mesh.h"
+#include"Components/Model.h"
 #include"Components/Transform.h"
 #include"Utils/Primitives.h"
 #include"Systems/ScriptSystem.h"
@@ -102,17 +102,17 @@ namespace Tengine
 							}
 							object->addComponent(camera);
 						}
-						else if (it.key() == "Mesh")
+						else if (it.key() == "Model")
 						{
-							std::shared_ptr<Mesh> mesh = Component::Create<Mesh>();
-							ComponentInfo info = mesh->getInfo();
+							std::shared_ptr<Model> model = Component::Create<Model>();
+							ComponentInfo info = model->getInfo();
 							auto elements = info.getElements();
 							auto& componentData = dataObject[info.getComponentName()];
 							for (size_t i = 0; i < elements.size(); i++)
 							{
 								DeserializeField(componentData[elements[i]->name], elements[i]);
 							}
-							object->addComponent(mesh);
+							object->addComponent(model);
 						}
 						else
 						{

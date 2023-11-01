@@ -11,9 +11,9 @@
 #include<Core/Timer.h>
 #include<Core/Logger.h>
 #include<Core/Input.h>
-#include<Components/Mesh.h>
 #include<Components/Camera.h>
 #include<Components/Script.h>
+#include<Components/Model.h>
 #include<ECS/Object.h>
 #include<ECS/SystemManager.h>
 #include<Scene/SceneManager.h>
@@ -694,7 +694,7 @@ namespace TengineEditor
             if (ImGui::BeginPopup("Select Component"))
             {
                 static int selectedItem = 0;
-                std::vector<std::string> items = { "Mesh", "Camera" };
+                std::vector<std::string> items = { "Model", "Camera" };
                 for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
                 {
                     items.push_back(scriptName);
@@ -721,7 +721,7 @@ namespace TengineEditor
                 {
                     if (selectedItem == 0)
                     {
-                        object->addComponent(Component::Create<Mesh>());
+                        object->addComponent(Component::Create<Model>());
                     }
                     if (selectedItem == 1)
                     {
