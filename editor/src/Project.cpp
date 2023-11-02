@@ -19,14 +19,14 @@ namespace TengineEditor
 
 	void Project::removeScene(std::shared_ptr<Scene> scene)
 	{
-		removeScene(scene->getName());
+		removeSceneByName(scene->getName());
 	}
 
-	void Project::removeScene(const std::string& nameScene)
+	void Project::removeSceneByName(std::string_view nameScene)
 	{
 		for (size_t i = 0; i < m_pathToScenes.size(); i++)
 		{
-			if (m_pathToScenes[i].filename() == nameScene)
+			if (m_pathToScenes[i].stem() == nameScene)
 			{
 				m_pathToScenes.erase(m_pathToScenes.begin() + i);
 				return;
@@ -34,6 +34,17 @@ namespace TengineEditor
 		}
 	}
 
+	void Project::removeSceneByPath(std::filesystem::path path)
+	{
+		for (size_t i = 0; i < m_pathToScenes.size(); i++)
+		{
+			if (m_pathToScenes[i] == path)
+			{
+				m_pathToScenes.erase(m_pathToScenes.begin() + i);
+				return;
+			}
+		}
+	}
 	void Project::swapScenes(size_t index1, size_t index2)
 	{
 		std::iter_swap(m_pathToScenes.begin() + index1, m_pathToScenes.begin() + index2);
@@ -51,14 +62,17 @@ namespace TengineEditor
 		m_path = sPath;
 	}
 
-	void Project::setName(const std::string& name)
+	void Project::setName(std::string_view name)
 	{
 		m_name = name;
 	}
 
 	void Project::addScene(std::filesystem::path path)
 	{
-		m_pathToScenes.push_back(path);
-		SceneManager::AddScene(path.filename().string(), getPath().string() + path.string());
+		if (std::filesystem::exists(path) && std::find(m_pathToScenes.begin(), m_pathToScenes.end(), path) == m_pathToScenes.end())
+		{
+			m_pathToScenes.push_back(path);
+			SceneManager::AddScene(path.stem().string(), getPath().string() + path.string());
+		}
 	}
 }

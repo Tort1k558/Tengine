@@ -117,6 +117,8 @@ namespace TengineEditor
             break;
         }
         case MonitoringType::File:
+            ImGui::Text(m_pathToMonitoringFile.string().c_str());
+            ImGui::Separator();
             if (m_formatHandlers.find(m_pathToMonitoringFile.extension().string()) != m_formatHandlers.end())
             {
                 m_formatHandlers[m_pathToMonitoringFile.extension().string()](m_pathToMonitoringFile);

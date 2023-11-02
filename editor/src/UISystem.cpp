@@ -9,6 +9,7 @@
 #include<nfd.h>
 
 #include<Components/Camera.h>
+#include<Components/Model.h>
 #include<Core/AssetManager.h>
 #include<Core/Input.h>
 #include<Core/Timer.h>
@@ -205,6 +206,44 @@ namespace TengineEditor
                 WindowMonitor::ShowField(metalnessFile);
                 WindowMonitor::ShowField(metalness);
             }
+            });
+
+        WindowMonitor::AddFormatHandler(".model", [](std::filesystem::path path) 
+            {
+                std::shared_ptr<Model> model = AssetManager::LoadModel(path);
+                std::shared_ptr<FieldFile> meshFile = std::make_shared<FieldFile>();
+                meshFile->name = "PathToMesh";
+                if (model->getMesh())
+                {
+                    meshFile->path = model->getMesh()->getPath();
+                }
+                meshFile->callback = [&model](const std::string& path)
+                    {
+                        model->setMesh(AssetManager::LoadMesh(path));
+                    };
+                WindowMonitor::ShowField(meshFile);
+
+                if (model->getMesh())
+                {
+                    std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+                    for (size_t i = 0; i < submeshes.size(); i++)
+                    {
+                        std::shared_ptr<FieldCollapsingHeader> submeshData = std::make_shared<FieldCollapsingHeader>();
+                        submeshData->name = "SubMesh" + std::to_string(i);
+                        std::shared_ptr<FieldFile> submeshMaterial = std::make_shared<FieldFile>();
+                        submeshMaterial->name = "SubMesh Material" + std::to_string(i);
+                        if (model->hasSubmeshMaterial(i))
+                        {
+                            submeshMaterial->path = model->getSubmeshMaterial(i)->getPath();
+                        }
+                        submeshMaterial->callback = [&model,i](const std::string& path)
+                            {
+                                model->setSubmeshMaterial(i, AssetManager::LoadMaterial(path));
+                            };
+                        submeshData->elements.push_back(submeshMaterial);
+                        WindowMonitor::ShowField(submeshData);
+                    }
+                }
             });
     }
 
@@ -469,14 +508,16 @@ namespace TengineEditor
                         for (int i = 0; i < pathToScenes.size(); ++i) {
                             ImGui::Button(pathToScenes[i].string().c_str());
 
-                            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) 
+                            {
                                 ImGui::SetDragDropPayload("swapIndex", &i, sizeof(int));
                                 ImGui::Text("%s", pathToScenes[i].string().c_str());
                                 ImGui::EndDragDropSource();
                             }
 
                             if (ImGui::BeginDragDropTarget()) {
-                                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("swapIndex")) {
+                                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("swapIndex")) 
+                                {
                                     IM_ASSERT(payload->DataSize == sizeof(int));
                                     int dropped_idx = *(const int*)payload->Data;
                                     if (dropped_idx != i)
@@ -491,7 +532,7 @@ namespace TengineEditor
                             ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ImGui::CalcTextSize("Delete").x - 5.0f);
                             if (ImGui::Button("Delete##"))
                             {
-                                ProjectManager::GetInstance()->removeScene(pathToScenes[i].string());
+                                ProjectManager::GetInstance()->removeSceneByPath(pathToScenes[i]);
                                 --i;
                             }
                         }
@@ -500,6 +541,20 @@ namespace TengineEditor
                         if (ImGui::InputText("New Scene", newString.data(), 1024, ImGuiInputTextFlags_EnterReturnsTrue))
                         {
                             ProjectManager::GetInstance()->addScene(newString.data());
+                            newString = "";
+                        }
+
+                        if (ImGui::BeginDragDropTarget()) 
+                        {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("path")) 
+                            {
+                                std::string path(static_cast<const char*>(payload->Data), payload->DataSize);
+                                if (path != "")
+                                {
+                                    ProjectManager::GetInstance()->addScene(path);
+                                }
+                            }
+                            ImGui::EndDragDropTarget();
                         }
 
                         static BuildConfiguration buildConfiguration = BuildConfiguration::Debug;
@@ -647,168 +702,176 @@ namespace TengineEditor
             //Tree
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
-            ImGui::BeginListBox("##empty", ImVec2(-FLT_MIN, -FLT_MIN));
-
-            if (ImGui::TreeNodeEx("Assets",ImGuiTreeNodeFlags_OpenOnDoubleClick))
+            if (ImGui::BeginListBox("##empty", ImVec2(-FLT_MIN, -FLT_MIN)))
             {
-                if (ImGui::IsItemClicked())
-                {
-                    FileManager::SetRelativePath("Assets");
-                }
-                std::function<void(std::filesystem::path)> renderFileTree = [&renderFileTree](std::filesystem::path path)
-                {
-                    if (std::filesystem::is_directory(path.string()))
-                    {
-                        bool treeIsOpened = ImGui::TreeNodeEx(path.filename().string().c_str(), ImGuiTreeNodeFlags_OpenOnDoubleClick);
-                        if (ImGui::IsItemClicked())
-                        {
-                            FileManager::SetRelativePath(path);
-                        }
-                        if (treeIsOpened)
-                        {
-                            std::vector<std::filesystem::path> directoryFiles = FileManager::GetFilesFromCurrentDirectory(path);
-                            for (const auto& childPath : directoryFiles)
-                            {
-                                renderFileTree(childPath);
-                            }
-                            ImGui::TreePop();
-                        }
-                    }
-                    else
-                    {
-                        ImGui::Button(path.filename().string().c_str());
-                    }
-                };
-                std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFiles();
-                for (int i = 0; i < pathToProjectFiles.size(); i++)
-                {
-                    renderFileTree(pathToProjectFiles[i]);
-                }
-                ImGui::TreePop();
-            }
-            ImGui::EndListBox();
 
+                if (ImGui::TreeNodeEx("Assets", ImGuiTreeNodeFlags_OpenOnDoubleClick))
+                {
+                    if (ImGui::IsItemClicked())
+                    {
+                        FileManager::SetRelativePath("Assets");
+                    }
+                    std::function<void(std::filesystem::path)> renderFileTree = [&renderFileTree](std::filesystem::path path)
+                        {
+                            if (std::filesystem::is_directory(path.string()))
+                            {
+                                bool treeIsOpened = ImGui::TreeNodeEx(path.filename().string().c_str(), ImGuiTreeNodeFlags_OpenOnDoubleClick);
+                                if (ImGui::IsItemClicked())
+                                {
+                                    FileManager::SetRelativePath(path);
+                                }
+                                if (treeIsOpened)
+                                {
+                                    std::vector<std::filesystem::path> directoryFiles = FileManager::GetFilesFromCurrentDirectory(path);
+                                    for (const auto& childPath : directoryFiles)
+                                    {
+                                        renderFileTree(childPath);
+                                    }
+                                    ImGui::TreePop();
+                                }
+                            }
+                            else
+                            {
+                                ImGui::Button(path.filename().string().c_str());
+                            }
+                        };
+                    std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFiles();
+                    for (int i = 0; i < pathToProjectFiles.size(); i++)
+                    {
+                        renderFileTree(pathToProjectFiles[i]);
+                    }
+                    ImGui::TreePop();
+                }
+                ImGui::EndListBox();
+            }
 
             //Files
             ImGui::TableNextColumn();
 
-            ImGui::BeginListBox("##empty2",ImVec2(-FLT_MIN,-FLT_MIN));
-            
-            if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsWindowHovered())
+            if (ImGui::BeginListBox("##empty2", ImVec2(-FLT_MIN, -FLT_MIN)))
             {
-                ImGui::OpenPopup("FileBrowserContextMenu");
-            }
-
-            if (ImGui::BeginPopup("FileBrowserContextMenu"))
-            {
-                if (ImGui::MenuItem("Create File"))
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsWindowHovered())
                 {
-                    FileManager::NewFile(FileManager::GetRelativePath().string() + "/NewFile");
+                    ImGui::OpenPopup("FileBrowserContextMenu");
                 }
-                if (ImGui::MenuItem("Create Folder"))
+
+                if (ImGui::BeginPopup("FileBrowserContextMenu"))
                 {
-                    FileManager::NewFolder(FileManager::GetRelativePath().string() + "/NewFolder");
-                }
-                ImGui::EndPopup();
-            }
-            
-            float tableFilesWidth = ImGui::GetContentRegionAvail().x;
-            float cellSize = 64.0f;
-            float cellSizeWithPadding = cellSize + 16.0f;
-            int columnCount = static_cast<int>(tableFilesWidth / cellSizeWithPadding);
-            if (columnCount < 1)
-            {
-                columnCount = 1;
-            }
-            if (ImGui::BeginTable("Files", columnCount))
-            {
-                std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetFilesFromCurrentDirectory(FileManager::GetRelativePath());
-                ImGui::TableNextColumn();
-                for (int i = 0; i < pathToCurrentProjectFiles.size(); i++)
-                {
-                    ImGui::PushID(pathToCurrentProjectFiles[i].string().c_str());
-
-                    if (std::filesystem::is_directory(pathToCurrentProjectFiles[i].string()))
+                    if (ImGui::MenuItem("Create File"))
                     {
-                        ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/folder.png")->getId()), ImVec2(cellSize, cellSize), {0,1}, {1,0});
-
-                        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
-                        {
-                            FileManager::SetRelativePath(pathToCurrentProjectFiles[i].string());
-                        }
+                        FileManager::NewFile(FileManager::GetRelativePath().string() + "/NewFile");
                     }
-                    else
+                    if (ImGui::MenuItem("Create Folder"))
                     {
-                        ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
-
-                        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
-                        {
-                            WindowMonitor::SetPathMonitoringFile(pathToCurrentProjectFiles[i]);
-                        }
-                        if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
-                        {
-                            std::string command = "start " + pathToCurrentProjectFiles[i].string();
-                            std::system(command.c_str());
-                        }
-                    }
-                    
-                    if (ImGui::BeginDragDropSource()) 
-                    {
-                        ImGui::SetDragDropPayload("path", pathToCurrentProjectFiles[i].string().c_str(), pathToCurrentProjectFiles[i].string().size() * sizeof(std::string::value_type));
-                        ImGui::Text(pathToCurrentProjectFiles[i].string().c_str());
-                        ImGui::EndDragDropSource(); 
-                    }
-                    ImGui::PopID();
-                    
-                    if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
-                    {
-                        selectedFileIndex = i;
-                        ImGui::OpenPopup("FileContextMenu");
-                    }
-
-
-                    //Rename File
-                    static bool isEditName = false;
-                    static std::string newName;
-                    if (ImGui::IsKeyPressed(ImGuiKey_F2) && ImGui::IsItemHovered())
-                    {
-                        newName = pathToCurrentProjectFiles[i].filename().string();
-                        selectedFileIndex = i;
-                        isEditName = true;
-                    }
-                    if (isEditName && selectedFileIndex == i)
-                    {
-                        if (ImGui::InputText("", &newName, ImGuiInputTextFlags_EnterReturnsTrue))
-                        {
-                            isEditName = false;
-                            FileManager::RenameFile(pathToCurrentProjectFiles[i].string(), newName);
-                        }
-                    }
-                    else
-                    {
-                        ImGui::TextWrapped(pathToCurrentProjectFiles[i].filename().string().c_str());
-                    }
-
-                    ImGui::TableNextColumn();
-                }
-                
-                if (ImGui::BeginPopup("FileContextMenu"))
-                {
-                    if (ImGui::MenuItem("Remove File"))
-                    {
-                        if (selectedFileIndex >= 0 && selectedFileIndex < pathToCurrentProjectFiles.size()) 
-                        {
-                            FileManager::RemoveFile(pathToCurrentProjectFiles[selectedFileIndex].string());
-                            selectedFileIndex = -1;
-                        }
+                        FileManager::NewFolder(FileManager::GetRelativePath().string() + "/NewFolder");
                     }
                     ImGui::EndPopup();
                 }
 
-                ImGui::EndTable();
-            }
-            ImGui::EndListBox();
+                float tableFilesWidth = ImGui::GetContentRegionAvail().x;
+                float cellSize = 64.0f;
+                float cellSizeWithPadding = cellSize + 16.0f;
+                int columnCount = static_cast<int>(tableFilesWidth / cellSizeWithPadding);
+                if (columnCount < 1)
+                {
+                    columnCount = 1;
+                }
+                if (ImGui::BeginTable("Files", columnCount))
+                {
+                    std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetFilesFromCurrentDirectory(FileManager::GetRelativePath());
+                    ImGui::TableNextColumn();
+                    for (int i = 0; i < pathToCurrentProjectFiles.size(); i++)
+                    {
+                        ImGui::PushID(pathToCurrentProjectFiles[i].string().c_str());
 
+                        if (std::filesystem::is_directory(pathToCurrentProjectFiles[i].string()))
+                        {
+                            ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+
+                            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
+                            {
+                                FileManager::SetRelativePath(pathToCurrentProjectFiles[i].string());
+                            }
+                        }
+                        else
+                        {
+                            ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+
+                            if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
+                            {
+                                WindowMonitor::SetPathMonitoringFile(pathToCurrentProjectFiles[i]);
+                            }
+                            if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
+                            {
+                                if (pathToCurrentProjectFiles[i].extension() == ".scene")
+                                {
+                                    SceneManager::LoadByPath(pathToCurrentProjectFiles[i]);
+                                }
+                                else
+                                {
+                                    std::string command = "start " + pathToCurrentProjectFiles[i].string();
+                                    std::system(command.c_str());
+                                }
+                            }
+                        }
+
+                        if (ImGui::BeginDragDropSource())
+                        {
+                            ImGui::SetDragDropPayload("path", pathToCurrentProjectFiles[i].string().c_str(), pathToCurrentProjectFiles[i].string().size() * sizeof(std::string::value_type));
+                            ImGui::Text(pathToCurrentProjectFiles[i].string().c_str());
+                            ImGui::EndDragDropSource();
+                        }
+                        ImGui::PopID();
+
+                        if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+                        {
+                            selectedFileIndex = i;
+                            ImGui::OpenPopup("FileContextMenu");
+                        }
+
+
+                        //Rename File
+                        static bool isEditName = false;
+                        static std::string newName;
+                        if (ImGui::IsKeyPressed(ImGuiKey_F2) && ImGui::IsItemHovered())
+                        {
+                            newName = pathToCurrentProjectFiles[i].filename().string();
+                            selectedFileIndex = i;
+                            isEditName = true;
+                        }
+                        if (isEditName && selectedFileIndex == i)
+                        {
+                            if (ImGui::InputText("", &newName, ImGuiInputTextFlags_EnterReturnsTrue))
+                            {
+                                isEditName = false;
+                                FileManager::RenameFile(pathToCurrentProjectFiles[i].string(), newName);
+                            }
+                        }
+                        else
+                        {
+                            ImGui::TextWrapped(pathToCurrentProjectFiles[i].filename().string().c_str());
+                        }
+
+                        ImGui::TableNextColumn();
+                    }
+
+                    if (ImGui::BeginPopup("FileContextMenu"))
+                    {
+                        if (ImGui::MenuItem("Remove File"))
+                        {
+                            if (selectedFileIndex >= 0 && selectedFileIndex < pathToCurrentProjectFiles.size())
+                            {
+                                FileManager::RemoveFile(pathToCurrentProjectFiles[selectedFileIndex].string());
+                                selectedFileIndex = -1;
+                            }
+                        }
+                        ImGui::EndPopup();
+                    }
+
+                    ImGui::EndTable();
+                }
+                ImGui::EndListBox();
+            }
             ImGui::EndTable();
         }
         ImGui::End();

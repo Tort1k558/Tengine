@@ -264,8 +264,13 @@ namespace Tengine
 
     std::shared_ptr<Model> AssetManager::LoadModel(std::filesystem::path path)
     {
-        std::shared_ptr<Model> model = Component::Create<Model>();
+        std::shared_ptr<Model> model = GetResource<Model>(path.string());
+        if (model)
+        {
+            return model;
+        }
 
+        model = Component::Create<Model>();
         std::ifstream file(path.string());
         if (file.is_open())
         {
@@ -283,7 +288,7 @@ namespace Tengine
                 }
             }
         }
-
+        m_resources[path.string()] = model;
         return model;
     }
 

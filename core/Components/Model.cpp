@@ -80,39 +80,7 @@ namespace Tengine
 		//		{
 		//			this->setSubmeshMaterial(i,AssetManager::LoadMaterial(path));
 		//		};
-		//		//std::shared_ptr<FieldImage> albedo = std::make_shared<FieldImage>();
-		//		//albedo->name = "Albedo Texture";
-		//		//albedo->size = { 75,75 };
-		//		//std::shared_ptr<FieldImage> specular = std::make_shared<FieldImage>();
-		//		//specular->name = "Specular Texture";
-		//		//specular->size = { 75,75 };
-		//		//std::shared_ptr<FieldImage> normals = std::make_shared<FieldImage>();
-		//		//normals->name = "Normal Texture";
-		//		//normals->size = { 75,75 };
-		//		//std::shared_ptr<FieldImage> height = std::make_shared<FieldImage>();
-		//		//height->name = "Height Texture";
-		//		//height->size = { 75,75 };
-		//		//std::shared_ptr<FieldImage> roughness = std::make_shared<FieldImage>();
-		//		//roughness->name = "Roughness Texture";
-		//		//roughness->size = { 75,75 };
-		//		//std::shared_ptr<FieldImage> metalness = std::make_shared<FieldImage>();
-		//		//metalness->name = "Metalness Texture";
-		//		//metalness->size = { 75,75 };
-		//		//if (material)
-		//		//{
-		//		//	albedo->texture = material->getTexture(MaterialTexture::Diffuse);
-		//		//	specular->texture = material->getTexture(MaterialTexture::Specular);
-		//		//	normals->texture = material->getTexture(MaterialTexture::Normal);
-		//		//	height->texture = material->getTexture(MaterialTexture::Height);
-		//		//	roughness->texture = material->getTexture(MaterialTexture::Roughness);
-		//		//	metalness->texture = material->getTexture(MaterialTexture::Metalness);
-		//		//}
-		//		//submeshHeader->elements.push_back(albedo);
-		//		//submeshHeader->elements.push_back(specular);
-		//		//submeshHeader->elements.push_back(normals);
-		//		//submeshHeader->elements.push_back(height);
-		//		//submeshHeader->elements.push_back(roughness);
-		//		//submeshHeader->elements.push_back(metalness);
+		//		
 		//		submeshHeader->elements.push_back(materialFile);
 		//	}
 		//	submeshesHeader->elements.push_back(submeshHeader);

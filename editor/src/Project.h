@@ -14,12 +14,13 @@ namespace TengineEditor
 	class Project
 	{
 	public:
-		void setName(const std::string& name);
+		void setName(std::string_view name);
 		std::string getName();
 		void addScene(std::filesystem::path path);
 		std::filesystem::path getPath();
 		void removeScene(std::shared_ptr<Scene> scene);
-		void removeScene(const std::string& nameScene);
+		void removeSceneByName(std::string_view nameScene);
+		void removeSceneByPath(std::filesystem::path path);
 		void swapScenes(size_t index1, size_t index2);
 
 		std::vector<std::filesystem::path> getPathToScenes();
