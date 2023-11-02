@@ -19,7 +19,7 @@ namespace Tengine
 		Metalness
 	};
 
-	class Material : public Resource
+	class TENGINE Material : public Resource
 	{
 	public:
 		Material() = default;

@@ -1,8 +1,7 @@
 {
-    "T11364313136827335114": {
-        "Mesh": {
-            "Load Mesh": "Assets/data/Meshes/backpack/backpack.obj",
-            "Submeshes": null
+    "T15473736026908341920": {
+        "Model": {
+            "PathToModelFile": "Assets/Meshes/backpack/backpack.model"
         },
         "Transform": {
             "Position": [
@@ -23,7 +22,7 @@
         },
         "name": "Object3"
     },
-    "T1309721442787645705": {
+    "T16406696667130754827": {
         "Camera": {
             "Aspect": [
                 1.7777777910232544
@@ -66,10 +65,9 @@
         },
         "name": "Camera"
     },
-    "T16886963366784755548": {
-        "Mesh": {
-            "Load Mesh": "Primitive::Sphere::Sectors::50::Stacks::50",
-            "Submeshes": null
+    "T17571765472046996676": {
+        "Model": {
+            "PathToModelFile": "Primitive24.model"
         },
         "Transform": {
             "Position": [

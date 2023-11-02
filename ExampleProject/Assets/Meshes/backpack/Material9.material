@@ -1,0 +1,5 @@
+{
+    "Diffuse": "Assets/Meshes/backpack/diffuse.jpg",
+    "Normal": "Assets/Meshes/backpack/normal.png",
+    "Specular": "Assets/Meshes/backpack/specular.jpg"
+}

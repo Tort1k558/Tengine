@@ -3,9 +3,8 @@
 #include<memory>
 
 #include<Core/Window.h>
-#include<ECS/System.h>
-#include<ECS/ComponentInfo.h>
 #include<ECS/Object.h>
+#include<ECS/System.h>
 #include<Renderer/FrameBuffer.h>
 
 namespace TengineEditor
@@ -22,7 +21,6 @@ namespace TengineEditor
 
 		static std::shared_ptr<UISystem> GetInstance();
 	private:
-		void showField(std::shared_ptr<FieldInfo> element);
 		void renderMenuBar();
 		void renderWindowObjects();
 		void renderWindowComponents();

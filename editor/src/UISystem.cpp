@@ -2,31 +2,28 @@
 
 #include<functional>
 
-#include<imgui/imgui.h>
-#include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/backends/imgui_impl_glfw.h>
+#include<imgui/backends/imgui_impl_opengl3.h>
+#include<imgui/imgui.h>
 #include<imgui/misc/cpp/imgui_stdlib.h>
-
 #include<nfd.h>
-#include<Core/Timer.h>
-#include<Core/Logger.h>
-#include<Core/Input.h>
+
 #include<Components/Camera.h>
-#include<Components/Script.h>
-#include<Components/Model.h>
+#include<Core/AssetManager.h>
+#include<Core/Input.h>
+#include<Core/Timer.h>
 #include<ECS/Object.h>
 #include<ECS/SystemManager.h>
 #include<Scene/SceneManager.h>
-#include<Core/AssetManager.h>
-#include<Systems/ScriptSystem.h>
 #include<Systems/RendererSystem.h>
+#include<Systems/ScriptSystem.h>
+#include<Utils/Material.h>
 
-#include"Scripts/ScriptCompiler.h"
-#include"Project.h"
-#include"ProjectManager.h"
-#include"ProjectBuilder.h"
 #include"FileManager.h"
-
+#include"ProjectBuilder.h"
+#include"ProjectManager.h"
+#include"Scripts/ScriptCompiler.h"
+#include"Windows/WindowMonitor.h"
 
 namespace TengineEditor
 {
@@ -103,6 +100,112 @@ namespace TengineEditor
         m_sceneCamera->setName("SceneCamera");
         m_sceneCamera->addComponent(Component::Create<Transform>());
         m_sceneCamera->addComponent(Component::Create<Camera>());
+
+        WindowMonitor::AddFormatHandler(".material",[](std::filesystem::path path) {
+            std::shared_ptr<Material> material = AssetManager::LoadMaterial(path);
+            if (material)
+            {
+
+                std::shared_ptr<FieldImage> albedo = std::make_shared<FieldImage>();
+                albedo->size = { 75,75 };
+                std::shared_ptr<FieldImage> specular = std::make_shared<FieldImage>();
+                specular->size = { 75,75 };
+                std::shared_ptr<FieldImage> normals = std::make_shared<FieldImage>();
+                normals->size = { 75,75 };
+                std::shared_ptr<FieldImage> height = std::make_shared<FieldImage>();
+                height->size = { 75,75 };
+                std::shared_ptr<FieldImage> roughness = std::make_shared<FieldImage>();
+                roughness->size = { 75,75 };
+                std::shared_ptr<FieldImage> metalness = std::make_shared<FieldImage>();
+                metalness->size = { 75,75 };
+                if (material)
+                {
+                	albedo->texture = material->getTexture(MaterialTexture::Diffuse);
+                	specular->texture = material->getTexture(MaterialTexture::Specular);
+                	normals->texture = material->getTexture(MaterialTexture::Normal);
+                	height->texture = material->getTexture(MaterialTexture::Height);
+                	roughness->texture = material->getTexture(MaterialTexture::Roughness);
+                	metalness->texture = material->getTexture(MaterialTexture::Metalness);
+                }
+                std::shared_ptr<FieldFile> albedoFile = std::make_shared<FieldFile>();
+                albedoFile->name = "Albedo Texture";
+                if (albedo->texture)
+                {
+                    albedoFile->path = albedo->texture->getPath();
+                }
+                albedoFile->callback = [&material](const std::string& path) 
+                    {
+                            material->setTextureMaterial(MaterialTexture::Diffuse, AssetManager::LoadTexture(path));
+                    };
+                WindowMonitor::ShowField(albedoFile);
+                WindowMonitor::ShowField(albedo);
+
+                std::shared_ptr<FieldFile> specularFile = std::make_shared<FieldFile>();
+                specularFile->name = "Specular Texture";
+                if (specular->texture)
+                {
+                    specularFile->path = specular->texture->getPath();
+                }
+                specularFile->callback = [&material](const std::string& path)
+                    {
+                        material->setTextureMaterial(MaterialTexture::Specular, AssetManager::LoadTexture(path));
+                    };
+                WindowMonitor::ShowField(specularFile);
+                WindowMonitor::ShowField(specular);
+
+                std::shared_ptr<FieldFile> normalFile = std::make_shared<FieldFile>();
+                normalFile->name = "Normal Texture";
+                if (normals->texture)
+                {
+                    normalFile->path = normals->texture->getPath();
+                }
+                normalFile->callback = [&material](const std::string& path)
+                    {
+                        material->setTextureMaterial(MaterialTexture::Normal, AssetManager::LoadTexture(path));
+                    };
+                WindowMonitor::ShowField(normalFile);
+                WindowMonitor::ShowField(normals);
+
+                std::shared_ptr<FieldFile> heightFile = std::make_shared<FieldFile>();
+                heightFile->name = "Height Texture";
+                if (height->texture)
+                {
+                    heightFile->path = height->texture->getPath();
+                }
+                heightFile->callback = [&material](const std::string& path)
+                    {
+                        material->setTextureMaterial(MaterialTexture::Height, AssetManager::LoadTexture(path));
+                    };
+                WindowMonitor::ShowField(heightFile);
+                WindowMonitor::ShowField(height);
+
+                std::shared_ptr<FieldFile> roughnessFile = std::make_shared<FieldFile>();
+                roughnessFile->name = "Roughness Texture";
+                if (roughness->texture)
+                {
+                    roughnessFile->path = roughness->texture->getPath();
+                }
+                roughnessFile->callback = [&material](const std::string& path)
+                    {
+                        material->setTextureMaterial(MaterialTexture::Roughness, AssetManager::LoadTexture(path));
+                    };
+                WindowMonitor::ShowField(roughnessFile);
+                WindowMonitor::ShowField(roughness);
+
+                std::shared_ptr<FieldFile> metalnessFile = std::make_shared<FieldFile>();
+                metalnessFile->name = "Metalness Texture";
+                if (metalness->texture)
+                {
+                    metalnessFile->path = metalness->texture->getPath();
+                }
+                metalnessFile->callback = [&material](const std::string& path)
+                    {
+                        material->setTextureMaterial(MaterialTexture::Metalness, AssetManager::LoadTexture(path));
+                    };
+                WindowMonitor::ShowField(metalnessFile);
+                WindowMonitor::ShowField(metalness);
+            }
+            });
     }
 
     void UISystem::update()
@@ -131,7 +234,7 @@ namespace TengineEditor
         renderMenuBar();
         renderWindowInfo();
         renderWindowObjects();
-        renderWindowComponents();
+        WindowMonitor::Render();
         renderFileBrowser();
         
         
@@ -254,126 +357,6 @@ namespace TengineEditor
             m_instance = std::make_shared<UISystem>();
         }
         return m_instance;
-    }
-
-    void UISystem::showField(std::shared_ptr<FieldInfo> element)
-    {
-        switch (element->type)
-        {
-        case FieldType::None:
-            break;
-        case FieldType::Float:
-        {
-            std::shared_ptr<FieldFloat> slider = std::dynamic_pointer_cast<FieldFloat>(element);
-            if (ImGui::DragFloat(slider->name.c_str(), static_cast<float*>(slider->data),0.0f ,slider->minValue, slider->maxValue))
-            {
-                if (slider->callback)
-                {
-                    slider->callback();
-                }
-            }
-            break;
-        }
-        case FieldType::Vec2:
-        {
-            std::shared_ptr<FieldVec2> slider = std::dynamic_pointer_cast<FieldVec2>(element);
-            ImGui::DragFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
-            break;
-        }
-        case FieldType::Vec3:
-        {
-            std::shared_ptr<FieldVec3> slider = std::dynamic_pointer_cast<FieldVec3>(element);
-            ImGui::DragFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
-            break;
-        }
-        case FieldType::Vec4:
-        {
-            std::shared_ptr<FieldVec4> slider = std::dynamic_pointer_cast<FieldVec4>(element);
-            ImGui::DragFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
-            break;
-        }
-        case FieldType::Enum:
-        {
-            std::shared_ptr<FieldEnum> combo = std::dynamic_pointer_cast<FieldEnum>(element);
-            if (ImGui::BeginCombo(combo->name.c_str(), combo->elements[*combo->currentElement].c_str()))
-            {
-                for (int i = 0; i < combo->elements.size(); ++i)
-                {
-                    const bool isSelected = (*combo->currentElement == i);
-                    if (ImGui::Selectable(combo->elements[i].c_str(), isSelected))
-                    {
-                        *combo->currentElement = i;
-                        combo->callback(i);
-                    }
-
-                    if (isSelected)
-                    {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            break;
-        }
-        case FieldType::Image:
-        {
-            std::shared_ptr<FieldImage> image = std::dynamic_pointer_cast<FieldImage>(element);
-            ImGui::Text(image->name.c_str());
-            if (image->texture)
-            {
-                ImGui::Image(reinterpret_cast<void*>(image->texture->getId()), { image->size.x,image->size.y });
-            }
-            else
-            {
-                ImGui::Text("No Texture");
-            }
-            break;
-        }
-        case FieldType::CollapsingHeader:
-        {
-            std::shared_ptr<FieldCollapsingHeader> header = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
-            if (ImGui::CollapsingHeader(header->name.c_str()))
-            {
-                for (size_t i = 0; i < header->elements.size(); i++)
-                {
-                    showField(header->elements[i]);
-                }
-            };
-            break;
-        }
-        case FieldType::Button:
-        {
-            std::shared_ptr<FieldButton> button = std::dynamic_pointer_cast<FieldButton>(element);
-            if (ImGui::Button(button->name.c_str()))
-            {
-                button->callback();
-            };
-            break;
-        }
-        case FieldType::File:
-        {
-            std::shared_ptr<FieldFile> file = std::dynamic_pointer_cast<FieldFile>(element);
-
-            if (ImGui::InputText("##empty", &file->path.string(), ImGuiInputTextFlags_EnterReturnsTrue))
-            {
-
-            }
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("path")) {
-                    std::string path(static_cast<const char*>(payload->Data),payload->DataSize);
-                    if (path != "")
-                    {
-                        file->path = path;
-                        file->callback(file->path.string());
-                    }
-                }
-                ImGui::EndDragDropTarget();
-            }
-            break;
-        }
-        default:
-            break;
-        }
     }
 
     void UISystem::renderMenuBar()
@@ -623,6 +606,7 @@ namespace TengineEditor
                 }, static_cast<void*>(&objectNames), static_cast<int>(objectNames.size())))
             {
                 m_nameOfSelectedObject = objectNames[currentItem];
+                WindowMonitor::SetMonitoringObject(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject));
             }
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y - 25.0f);
 
@@ -635,105 +619,6 @@ namespace TengineEditor
             {
                 SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject)->getName());
                 m_nameOfSelectedObject.clear();
-            }
-        }
-        ImGui::End();
-    }
-
-    void UISystem::renderWindowComponents()
-    {
-        ImGui::Begin("Components", nullptr);
-        if (!m_nameOfSelectedObject.empty())
-        {
-            bool contextMenuOpened = false;
-            static std::shared_ptr<Component> selectedComponent;
-            std::shared_ptr<Object> object = SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject);
-            std::vector<std::shared_ptr<Component>> components = object->getComponents();
-            for (const auto& component : components)
-            {
-                ComponentInfo info = component->getInfo();
-                if (!info.getComponentName().empty())
-                {
-                    if (ImGui::CollapsingHeader(info.getComponentName().c_str()))
-                    {
-                        for (const auto& element : info.getElements())
-                        {
-                            showField(element);
-                        }
-                    }
-                    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1))
-                    {
-                        contextMenuOpened = true;
-                        selectedComponent = component;
-                    }
-                }
-            }
-            if (contextMenuOpened)
-            {
-                ImGui::OpenPopup("Component Menu");
-                contextMenuOpened = false;
-            }
-
-            if (ImGui::BeginPopup("Component Menu"))
-            {
-                if (ImGui::MenuItem("Delete Component"))
-                {
-                    if (selectedComponent)
-                    {
-                        object->removeComponent(selectedComponent);
-                        selectedComponent.reset();
-                    }
-                }
-                ImGui::EndPopup();
-            }
-
-            if (ImGui::Button("Add component"))
-            {
-                ImGui::OpenPopup("Select Component");
-            }
-            if (ImGui::BeginPopup("Select Component"))
-            {
-                static int selectedItem = 0;
-                std::vector<std::string> items = { "Model", "Camera" };
-                for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
-                {
-                    items.push_back(scriptName);
-                }
-                if (ImGui::BeginCombo("##Components", items[selectedItem].c_str()))
-                {
-                    for (int i = 0; i < items.size(); ++i)
-                    {
-                        const bool isSelected = (selectedItem == i);
-                        if (ImGui::Selectable(items[i].c_str(), isSelected))
-                        {
-                            selectedItem = i;
-                        }
-
-                        if (isSelected)
-                        {
-                            ImGui::SetItemDefaultFocus();
-                        }
-                    }
-                    ImGui::EndCombo();
-                }
-
-                if (ImGui::Button("Add"))
-                {
-                    if (selectedItem == 0)
-                    {
-                        object->addComponent(Component::Create<Model>());
-                    }
-                    if (selectedItem == 1)
-                    {
-                        object->addComponent(Component::Create<Camera>());
-                    }
-                    if (selectedItem >= 2)
-                    {
-                        ScriptSystem::GetInstance()->addScript(object, items[selectedItem]);
-                    }
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
             }
         }
         ImGui::End();
@@ -856,6 +741,10 @@ namespace TengineEditor
                     {
                         ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
 
+                        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
+                        {
+                            WindowMonitor::SetPathMonitoringFile(pathToCurrentProjectFiles[i]);
+                        }
                         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                         {
                             std::string command = "start " + pathToCurrentProjectFiles[i].string();
@@ -877,6 +766,8 @@ namespace TengineEditor
                         ImGui::OpenPopup("FileContextMenu");
                     }
 
+
+                    //Rename File
                     static bool isEditName = false;
                     static std::string newName;
                     if (ImGui::IsKeyPressed(ImGuiKey_F2) && ImGui::IsItemHovered())
@@ -897,6 +788,7 @@ namespace TengineEditor
                     {
                         ImGui::TextWrapped(pathToCurrentProjectFiles[i].filename().string().c_str());
                     }
+
                     ImGui::TableNextColumn();
                 }
                 

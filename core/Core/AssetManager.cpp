@@ -6,14 +6,15 @@
 #include<stb_image.h>
 
 #include<assimp/Importer.hpp>
-#include<assimp/scene.h>
 #include<assimp/postprocess.h>
+#include<assimp/scene.h>
 
-#include"Core/Logger.h"
 #include"Components/Model.h"
+#include"Core/Logger.h"
 #include"Renderer/Shader.h"
 #include"Renderer/Texture.h"
 #include"Utils/Mesh.h"
+#include"Utils/Primitives.h"
 
 namespace Tengine
 {
@@ -206,15 +207,46 @@ namespace Tengine
 
         mesh = Component::Create<Mesh>();
         mesh->setPath(path);
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        if (path.string().find("Primitive") != std::string::npos)
         {
-            Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
-            return nullptr;
-        }
+            if (path == "Primitive::Quad")
+            {
+                mesh = Primitives::CreateQuad();
 
-        ProcessNode(mesh, scene->mRootNode, scene);
+            }
+            else if (path == "Primitive::Cube")
+            {
+                mesh = Primitives::CreateCube();
+            }
+            else if (path.string().find("Primitive::Sphere::") != std::string::npos)
+            {
+                size_t sectorsPos = path.string().find("::Sectors::");
+                size_t stacksPos = path.string().rfind("::Stacks::");
+
+                int sectors;
+                int stacks;
+
+                if (sectorsPos == std::string::npos || stacksPos == std::string::npos || sectorsPos == stacksPos) 
+                {
+                    sectors = 1;
+                    stacks = 1;
+                }
+                sectors = std::stoi(path.string().substr(sectorsPos + 11, stacksPos - sectorsPos - 11));
+                stacks = std::stoi(path.string().substr(stacksPos + 10));
+                mesh = Primitives::CreateSphere(sectors, stacks);
+            }
+        }
+        else
+        {
+            Assimp::Importer importer;
+            const aiScene* scene = importer.ReadFile(path.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
+            if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+            {
+                Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
+                return nullptr;
+            }
+            ProcessNode(mesh, scene->mRootNode, scene);
+        }
         m_resources[path.string()] = std::dynamic_pointer_cast<Resource>(std::make_shared<Mesh>(*mesh));
         return mesh;
     }
@@ -276,9 +308,9 @@ namespace Tengine
             std::shared_ptr<Material> material = std::make_shared<Material>();
             for (size_t i = 0; true; i++)
             {
-                if (!std::filesystem::exists(parentPath.string() + "/Material" + std::to_string(i)))
+                if (!std::filesystem::exists(parentPath.string() + "/Material" + std::to_string(i) + ".material"))
                 {
-                    material->setPath(parentPath.string() + "/Material" + std::to_string(i));
+                    material->setPath(parentPath.string() + "/Material" + std::to_string(i) + ".material");
                     break;
                 }
             }
@@ -313,6 +345,7 @@ namespace Tengine
             {
                 material->setTextureMaterial(MaterialTexture::Metalness, metalness);
             }
+            m_resources[material->getPath().string()] = material;
             materials.push_back(material);
         }
         std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();

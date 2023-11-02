@@ -53,44 +53,14 @@ namespace Tengine
 
 		displayInfo.setComponentName("Model");
 		std::shared_ptr<FieldFile> modelFile = std::make_shared<FieldFile>();
-		modelFile->name = "Model";
+		modelFile->name = "PathToModelFile";
 		if (!m_path.empty())
 		{
 			modelFile->path = m_path;
 		}
 		modelFile->callback = [this](const std::string& path)
 		{
-			std::shared_ptr<Object> previousParent = this->getParent();
-			if (path == "Primitive::Quad")
-			{
-				m_mesh = Primitives::CreateQuad();
-
-			}
-			else if (path == "Primitive::Cube")
-			{
-				m_mesh = Primitives::CreateCube();
-			}
-			else if (path.find("Primitive::Sphere::") != std::string::npos)
-			{
-				size_t sectorsPos = path.find("::Sectors::");
-				size_t stacksPos = path.rfind("::Stacks::");
-
-				int sectors;
-				int stacks;
-
-				if (sectorsPos == std::string::npos || stacksPos == std::string::npos || sectorsPos == stacksPos) {
-					sectors = 1;
-					stacks = 1;
-				}
-				sectors = std::stoi(path.substr(sectorsPos + 11, stacksPos - sectorsPos - 11));
-				stacks = std::stoi(path.substr(stacksPos + 10));
-				m_mesh = Primitives::CreateSphere(sectors, stacks);
-			}
-			else
-			{
-				m_mesh = AssetManager::LoadMesh(path);
-			}
-			this->setParent(previousParent);
+			*this = *AssetManager::LoadModel(path);
 		};
 		displayInfo.addElement(modelFile);
 		//std::shared_ptr<FieldCollapsingHeader> submeshesHeader = std::make_shared<FieldCollapsingHeader>();
@@ -166,16 +136,19 @@ namespace Tengine
 		std::string pathToModelFile;
 		if (getPath().empty())
 		{
-			pathToModelFile = m_mesh->getPath().parent_path().string() + "/" + m_mesh->getPath().stem().string() + ".model";
-		}
-		else if (m_mesh->getPath().string().find("Primitive::") != std::string::npos)
-		{
-			size_t i = 0;
-			while (std::filesystem::exists("Primitive" + std::to_string(i) + ".model"))
+			if (m_mesh->getPath().string().find("Primitive::") != std::string::npos)
 			{
-				i++;
+				size_t i = 0;
+				while (std::filesystem::exists("Primitive" + std::to_string(i) + ".model"))
+				{
+					i++;
+				}
+				pathToModelFile = "Primitive" + std::to_string(i) + ".model";
 			}
-			pathToModelFile = std::filesystem::exists("Primitive" + std::to_string(i) + ".model");
+			else
+			{
+				pathToModelFile = m_mesh->getPath().parent_path().string() + "/" + m_mesh->getPath().stem().string() + ".model";
+			}
 		}
 		else
 		{

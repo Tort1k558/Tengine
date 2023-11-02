@@ -38,7 +38,7 @@ file(GLOB TARGET_INCLUDES ${DIRS_INCLUDES})
 
 add_library(${PROJECT_NAME} SHARED ${TARGET_SRC} ${TARGET_INCLUDES})
 
-target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
+target_compile_options(${PROJECT_NAME} PRIVATE /wd4251 /wd4996)
 
 target_include_directories(${PROJECT_NAME} PUBLIC "../core")
 

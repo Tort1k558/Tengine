@@ -74,7 +74,7 @@ namespace Tengine
 					break;
 				}
 			}
-			std::ofstream file(m_path.string(), std::ios_base::out);
+			std::ofstream file(m_path.parent_path().string() + "/" + m_path.stem().string() + ".material", std::ios_base::out);
 			if (file.is_open()) {
 				file << data.dump(4);
 				file.close();

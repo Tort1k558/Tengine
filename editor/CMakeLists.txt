@@ -8,6 +8,7 @@ set(PROJECT_NAME TengineEditor)
 set(DIRS_SRC_EDITOR 
 	"src/*.h" "src/*.cpp" 
 	"src/Scripts/*.h" "src/Scripts/*.cpp"
+	"src/Windows/*.h" "src/Windows/*.cpp"
 	)
 file(GLOB TARGET_SRC_EDITOR ${DIRS_SRC_EDITOR})
 
@@ -26,6 +27,6 @@ add_subdirectory(../core ${CMAKE_CURRENT_BINARY_DIR}/bin/core)
 
 add_executable(${PROJECT_NAME} ${TARGET_SRC_EDITOR} main.cpp)
 
-target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
+target_compile_options(${PROJECT_NAME} PRIVATE /wd4251 /wd4996)
 
 target_link_libraries(${PROJECT_NAME} TengineCore imgui nfd)

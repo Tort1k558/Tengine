@@ -16,7 +16,7 @@ namespace TengineEditor
 
 	void FileManager::NewFolder(std::filesystem::path path)
 	{
-		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
+		std::filesystem::path pathToFile = path.string();
 		for (size_t i = 0; std::filesystem::exists(pathToFile); i++)
 		{
 			pathToFile = GetPathToAssets().string() + "/" + path.string() + std::to_string(i);
@@ -26,7 +26,7 @@ namespace TengineEditor
 
 	void FileManager::NewFile(std::filesystem::path path, std::string_view data)
 	{
-		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
+		std::filesystem::path pathToFile = path.string();
 		for (size_t i = 0; std::filesystem::exists(pathToFile); i++)
 		{
 			pathToFile = GetPathToAssets().string() + "/" + path.string() + std::to_string(i);
@@ -46,14 +46,12 @@ namespace TengineEditor
 	
 	void FileManager::RemoveFile(std::filesystem::path path)
 	{
-		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
-		std::filesystem::remove_all(pathToFile);
+		std::filesystem::remove_all(path);
 	}
 
 	void FileManager::RenameFile(std::filesystem::path path, std::string_view name)
 	{
-		std::filesystem::path pathToFile = GetPathToAssets().string() + "/" + path.string();
-		std::filesystem::rename(pathToFile, pathToFile.parent_path().string() + "/" + name.data());
+		std::filesystem::rename(path, path.parent_path().string() + "/" + name.data());
 	}
 	
 	void FileManager::SetRelativePath(std::filesystem::path path)

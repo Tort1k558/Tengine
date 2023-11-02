@@ -33,43 +33,44 @@ namespace Tengine
 	struct TENGINE FieldNumber
 	{
 		virtual ~FieldNumber() = default;
-		float minValue;
-		float maxValue;
+		float minValue = 0.0f;
+		float maxValue = 0.0f;
 		std::function<void()> callback;
 	};
 
 	struct TENGINE FieldFloat : public FieldInfo, FieldNumber
 	{
-		float* data;
 		FieldFloat()
 		{
 			type = FieldType::Float;
 		}
+		float* data = nullptr;
 	};
 
 	struct TENGINE FieldVec2 : public FieldInfo, FieldNumber
 	{
-		Vec2* data;
 		FieldVec2()
 		{
 			type = FieldType::Vec2;
 		}
+		Vec2* data = nullptr;
 	};
 	struct TENGINE FieldVec3 : public FieldInfo, FieldNumber
 	{
-		Vec3* data;
 		FieldVec3()
 		{
 			type = FieldType::Vec3;
 		}
+		Vec3* data = nullptr;
 	};
 	struct TENGINE FieldVec4 : public FieldInfo, FieldNumber
 	{
-		Vec4* data;
 		FieldVec4()
 		{
 			type = FieldType::Vec4;
 		}
+
+		Vec4* data = nullptr;
 	};
 
 	struct TENGINE FieldEnum : public FieldInfo
@@ -79,9 +80,9 @@ namespace Tengine
 			type = FieldType::Enum;
 		}
 		std::vector<std::string> elements;
-		int* currentElement;
-		float minValue;
-		float maxValue;
+		int* currentElement = nullptr;
+		float minValue = 0;
+		float maxValue = 0;
 		std::function<void(int element)> callback;
 	};
 
@@ -91,8 +92,8 @@ namespace Tengine
 		{
 			type = FieldType::Image;
 		}
-		std::shared_ptr<Texture> texture;
-		Vec2 size;
+		std::shared_ptr<Texture> texture = nullptr;
+		Vec2 size = { 0.0f,0.0f };
 	};
 
 	struct TENGINE FieldCollapsingHeader : public FieldInfo
