@@ -24,104 +24,110 @@ namespace TengineEditor
             break;
         case MonitoringType::Object:
         {
-            bool contextMenuOpened = false;
-            static std::shared_ptr<Component> selectedComponent;
-            std::shared_ptr<Object> object = m_monitoringObject;
-            std::vector<std::shared_ptr<Component>> components = object->getComponents();
-            for (const auto& component : components)
+            if (m_monitoringObject)
             {
-                ComponentInfo info = component->getInfo();
-                if (!info.getComponentName().empty())
+                bool contextMenuOpened = false;
+                static std::shared_ptr<Component> selectedComponent;
+                std::shared_ptr<Object> object = m_monitoringObject;
+                std::vector<std::shared_ptr<Component>> components = object->getComponents();
+                for (const auto& component : components)
                 {
-                    if (ImGui::CollapsingHeader(info.getComponentName().c_str()))
+                    ComponentInfo info = component->getInfo();
+                    if (!info.getComponentName().empty())
                     {
-                        for (const auto& element : info.getElements())
+                        if (ImGui::CollapsingHeader(info.getComponentName().c_str()))
                         {
-                            ShowField(element);
+                            for (const auto& element : info.getElements())
+                            {
+                                ShowField(element);
+                            }
+                        }
+                        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1))
+                        {
+                            contextMenuOpened = true;
+                            selectedComponent = component;
                         }
                     }
-                    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1))
-                    {
-                        contextMenuOpened = true;
-                        selectedComponent = component;
-                    }
                 }
-            }
-            if (contextMenuOpened)
-            {
-                ImGui::OpenPopup("Component Menu");
-                contextMenuOpened = false;
-            }
+                if (contextMenuOpened)
+                {
+                    ImGui::OpenPopup("Component Menu");
+                    contextMenuOpened = false;
+                }
 
-            if (ImGui::BeginPopup("Component Menu"))
-            {
-                if (ImGui::MenuItem("Delete Component"))
+                if (ImGui::BeginPopup("Component Menu"))
                 {
-                    if (selectedComponent)
+                    if (ImGui::MenuItem("Delete Component"))
                     {
-                        object->removeComponent(selectedComponent);
-                        selectedComponent.reset();
-                    }
-                }
-                ImGui::EndPopup();
-            }
-
-            if (ImGui::Button("Add component"))
-            {
-                ImGui::OpenPopup("Select Component");
-            }
-            if (ImGui::BeginPopup("Select Component"))
-            {
-                static int selectedItem = 0;
-                std::vector<std::string> items = { "Model", "Camera" };
-                for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
-                {
-                    items.push_back(scriptName);
-                }
-                if (ImGui::BeginCombo("##Components", items[selectedItem].c_str()))
-                {
-                    for (int i = 0; i < items.size(); ++i)
-                    {
-                        const bool isSelected = (selectedItem == i);
-                        if (ImGui::Selectable(items[i].c_str(), isSelected))
+                        if (selectedComponent)
                         {
-                            selectedItem = i;
-                        }
-
-                        if (isSelected)
-                        {
-                            ImGui::SetItemDefaultFocus();
+                            object->removeComponent(selectedComponent);
+                            selectedComponent.reset();
                         }
                     }
-                    ImGui::EndCombo();
+                    ImGui::EndPopup();
                 }
 
-                if (ImGui::Button("Add"))
+                if (ImGui::Button("Add component"))
                 {
-                    if (selectedItem == 0)
-                    {
-                        object->addComponent(Component::Create<Model>());
-                    }
-                    if (selectedItem == 1)
-                    {
-                        object->addComponent(Component::Create<Camera>());
-                    }
-                    if (selectedItem >= 2)
-                    {
-                        ScriptSystem::GetInstance()->addScript(object, items[selectedItem]);
-                    }
-                    ImGui::CloseCurrentPopup();
+                    ImGui::OpenPopup("Select Component");
                 }
-                ImGui::EndPopup();
+                if (ImGui::BeginPopup("Select Component"))
+                {
+                    static int selectedItem = 0;
+                    std::vector<std::string> items = { "Model", "Camera" };
+                    for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
+                    {
+                        items.push_back(scriptName);
+                    }
+                    if (ImGui::BeginCombo("##Components", items[selectedItem].c_str()))
+                    {
+                        for (int i = 0; i < items.size(); ++i)
+                        {
+                            const bool isSelected = (selectedItem == i);
+                            if (ImGui::Selectable(items[i].c_str(), isSelected))
+                            {
+                                selectedItem = i;
+                            }
+
+                            if (isSelected)
+                            {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+
+                    if (ImGui::Button("Add"))
+                    {
+                        if (selectedItem == 0)
+                        {
+                            object->addComponent(Component::Create<Model>());
+                        }
+                        if (selectedItem == 1)
+                        {
+                            object->addComponent(Component::Create<Camera>());
+                        }
+                        if (selectedItem >= 2)
+                        {
+                            ScriptSystem::GetInstance()->addScript(object, items[selectedItem]);
+                        }
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::EndPopup();
+                }
             }
             break;
         }
         case MonitoringType::File:
-            ImGui::Text(m_pathToMonitoringFile.string().c_str());
-            ImGui::Separator();
-            if (m_formatHandlers.find(m_pathToMonitoringFile.extension().string()) != m_formatHandlers.end())
+            if (!m_pathToMonitoringFile.empty())
             {
-                m_formatHandlers[m_pathToMonitoringFile.extension().string()](m_pathToMonitoringFile);
+                ImGui::Text(m_pathToMonitoringFile.string().c_str());
+                ImGui::Separator();
+                if (m_formatHandlers.find(m_pathToMonitoringFile.extension().string()) != m_formatHandlers.end())
+                {
+                    m_formatHandlers[m_pathToMonitoringFile.extension().string()](m_pathToMonitoringFile);
+                }
             }
             break;
         default:

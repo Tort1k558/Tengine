@@ -637,7 +637,7 @@ namespace TengineEditor
     void UISystem::renderWindowObjects() 
     {
 
-        static int currentItem = 0;
+        static int selectedItem = 0;
         ImGui::Begin("Objects", nullptr);
         if (SceneManager::GetCurrentScene())
         {
@@ -648,32 +648,65 @@ namespace TengineEditor
                 objectNames.push_back(object->getName());
             }
             std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
-
-            if (ImGui::ListBox("##empty", &currentItem, [](void* data, int idx, const char** out_text) {
-                auto& items = *static_cast<std::vector<std::string>*>(data);
-                if (idx < 0 || idx >= static_cast<int>(items.size())) {
-                    *out_text = nullptr;
-                }
-                else {
-                    *out_text = items[idx].c_str();
-                }
-                return true;
-                }, static_cast<void*>(&objectNames), static_cast<int>(objectNames.size())))
+            
+            if (ImGui::BeginListBox("##empty"))
             {
-                m_nameOfSelectedObject = objectNames[currentItem];
-                WindowMonitor::SetMonitoringObject(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject));
+                for (int i = 0; i < objectNames.size(); ++i)
+                {
+                    static bool isEditName = false;
+                    static std::string newName;
+                    if (isEditName && selectedItem == i)
+                    {
+                        if (ImGui::InputText("##", &newName, ImGuiInputTextFlags_EnterReturnsTrue))
+                        {
+                            isEditName = false;
+                            objects[i]->setName(newName);
+                        }
+                    }
+                    else
+                    {
+                        bool isSelected = (selectedItem == i);
+                        if (ImGui::Selectable(objectNames[i].c_str(), isSelected))
+                        {
+                            selectedItem = i;
+                            WindowMonitor::SetMonitoringObject(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject));
+                        }
+                        if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
+                        {
+                            selectedItem = i;
+                            WindowMonitor::SetMonitoringObject(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject));
+                            ImGui::OpenPopup("ObjectContextMenu");
+                        }
+                        if (ImGui::IsKeyPressed(ImGuiKey_F2) && ImGui::IsItemHovered())
+                        {
+                            newName = objectNames[i];
+                            selectedItem = i;
+                            isEditName = true;
+                        }
+                    }
+                }
+                m_nameOfSelectedObject = objectNames[selectedItem];
+                
+                if (ImGui::BeginPopup("ObjectContextMenu"))
+                {
+                    if (ImGui::MenuItem("Delete object"))
+                    {
+                        SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject)->getName());
+                        WindowMonitor::SetMonitoringObject(nullptr);
+                        m_nameOfSelectedObject.clear();
+                        selectedItem = 0;
+                    }
+                    ImGui::EndPopup();
+                }
+
+                ImGui::EndListBox();
             }
+            
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y - 25.0f);
 
             if (ImGui::Button("Create object"))
             {
                 Object::Create();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Delete object") && !m_nameOfSelectedObject.empty())
-            {
-                SceneManager::GetCurrentScene()->removeObjectByName(SceneManager::GetCurrentScene()->getObjectByName(m_nameOfSelectedObject)->getName());
-                m_nameOfSelectedObject.clear();
             }
         }
         ImGui::End();

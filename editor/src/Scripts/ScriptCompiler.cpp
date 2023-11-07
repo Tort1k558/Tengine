@@ -389,7 +389,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE )"+ nameLib + R"()
 
 
-target_compile_options(${PROJECT_NAME} PRIVATE /wd4251)
+target_compile_options(${PROJECT_NAME} PRIVATE /wd4251 /wd4996)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${CMAKE_SOURCE_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>
@@ -406,15 +406,15 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
     void ScriptCompiler::BuildDll()
     {
-        std::string cmakeBuildCommand;
         if (m_scriptBuildConfiguration == BuildConfiguration::Debug)
         {
-            cmakeBuildCommand = "cmake --build builds/ScriptModule --config Debug";
+            std::filesystem::remove_all("builds/ScriptModule/Debug");
+            std::system("cmake --build builds/ScriptModule --config Debug");
         }
         else if (m_scriptBuildConfiguration == BuildConfiguration::Release)
         {
-            cmakeBuildCommand = "cmake --build builds/ScriptModule --config Release";
+            std::filesystem::remove_all("builds/ScriptModule/Release");
+            std::system("cmake --build builds/ScriptModule --config Release");
         }
-        std::system(cmakeBuildCommand.c_str());
     }
 }
