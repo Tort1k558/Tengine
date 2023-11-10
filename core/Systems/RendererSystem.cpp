@@ -4,7 +4,6 @@
 #include"Components/Transform.h"
 #include"Utils/Mesh.h"
 #include"Core/Logger.h"
-#include"Core/Timer.h"
 #include"Core/AssetManager.h"
 #include"Renderer/VertexArray.h"
 #include"Renderer/VertexBuffer.h"
@@ -145,30 +144,33 @@ namespace Tengine
 				defaultShader->setUniformMat4("u_model", transform->getMatrix());
 				defaultShader->setUniformVec3("u_viewPos", camera->getParent()->getComponent<Transform>()->getPosition());
 
-				std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
-				for (size_t i = 0; i < submeshes.size(); i++)
+				if (model->getMesh())
 				{
-					if (model->hasSubmeshMaterial(i))
+					std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+					for (size_t i = 0; i < submeshes.size(); i++)
 					{
-						std::shared_ptr<Material> material = model->getSubmeshMaterial(i);
-						if (material->hasTexture(MaterialTexture::Diffuse))
+						if (model->hasSubmeshMaterial(i))
 						{
-							material->getTexture(MaterialTexture::Diffuse)->bind(0);
+							std::shared_ptr<Material> material = model->getSubmeshMaterial(i);
+							if (material->hasTexture(MaterialTexture::Diffuse))
+							{
+								material->getTexture(MaterialTexture::Diffuse)->bind(0);
+							}
+							if (material->hasTexture(MaterialTexture::Normal))
+							{
+								material->getTexture(MaterialTexture::Normal)->bind(1);
+							}
+							if (material->hasTexture(MaterialTexture::Specular))
+							{
+								material->getTexture(MaterialTexture::Specular)->bind(2);
+							}
+							if (material->hasTexture(MaterialTexture::Roughness))
+							{
+								material->getTexture(MaterialTexture::Roughness)->bind(3);
+							}
 						}
-						if (material->hasTexture(MaterialTexture::Normal))
-						{
-							material->getTexture(MaterialTexture::Normal)->bind(1);
-						}
-						if (material->hasTexture(MaterialTexture::Specular))
-						{
-							material->getTexture(MaterialTexture::Specular)->bind(2);
-						}
-						if (material->hasTexture(MaterialTexture::Roughness))
-						{
-							material->getTexture(MaterialTexture::Roughness)->bind(3);
-						}
+						m_context->drawIndexed(submeshes[i]->getVertexArray());
 					}
-					m_context->drawIndexed(submeshes[i]->getVertexArray());
 				}
 			}
 		}

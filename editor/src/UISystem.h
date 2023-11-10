@@ -22,13 +22,9 @@ namespace TengineEditor
 		static std::shared_ptr<UISystem> GetInstance();
 	private:
 		void renderMenuBar();
-		void renderWindowObjects();
-		void renderWindowComponents();
 		void renderWindowInfo();
-		void renderFileBrowser();
 
 		std::shared_ptr<Window> m_window;
-		std::string m_nameOfSelectedObject;
 		std::shared_ptr<Object> m_sceneCamera;
 		std::shared_ptr<FrameBuffer> m_sceneFramebuffer;
 

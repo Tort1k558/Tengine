@@ -60,32 +60,12 @@ namespace Tengine
 		}
 		modelFile->callback = [this](const std::string& path)
 		{
-			*this = *AssetManager::LoadModel(path);
+			std::shared_ptr<Model> newModel = AssetManager::LoadModel(path);
+			newModel->setParent(this->getParent());
+			*this = *newModel;
+
 		};
 		displayInfo.addElement(modelFile);
-		//std::shared_ptr<FieldCollapsingHeader> submeshesHeader = std::make_shared<FieldCollapsingHeader>();
-		//submeshesHeader->name = "Submeshes";
-		//std::vector<std::shared_ptr<SubMesh>> submeshes = m_mesh->getSubmeshes();
-		//for (size_t i = 0; i < submeshes.size(); i++)
-		//{
-		//	std::shared_ptr<FieldCollapsingHeader> submeshHeader = std::make_shared<FieldCollapsingHeader>();
-		//	submeshHeader->name = "Submesh" + std::to_string(i);
-		//	std::shared_ptr<Material> material = getSubmeshMaterial(i);
-		//	if (material)
-		//	{
-		//		std::shared_ptr<FieldFile> materialFile = std::make_shared<FieldFile>();
-		//		materialFile->name = "Material";
-		//		materialFile->path = material->getPath();
-		//		materialFile->callback = [this, i](const std::string& path)
-		//		{
-		//			this->setSubmeshMaterial(i,AssetManager::LoadMaterial(path));
-		//		};
-		//		
-		//		submeshHeader->elements.push_back(materialFile);
-		//	}
-		//	submeshesHeader->elements.push_back(submeshHeader);
-		//}
-		//displayInfo.addElement(submeshesHeader);
 
 		return displayInfo;
 	}

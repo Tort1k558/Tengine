@@ -1,7 +1,6 @@
 #pragma once
 
 #include<memory>
-#include<filesystem>
 
 #include"Core/Math.h"
 #include"Core/AssetManager.h"
@@ -40,7 +39,7 @@ namespace Tengine
 		virtual void* getData() = 0;
 		virtual unsigned int getId() = 0;
 
-		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type,TextureFilter filter = TextureFilter::None);
+		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type, TextureFilter filter = TextureFilter::None);
 
 	protected:
 		UVec2 m_size;
