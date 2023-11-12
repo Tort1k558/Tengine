@@ -20,7 +20,8 @@ namespace Tengine
 		Image,
 		CollapsingHeader,
 		Button,
-		File
+		File,
+		Bool
 	};
 
 	struct TENGINE FieldInfo
@@ -123,6 +124,16 @@ namespace Tengine
 		}
 		std::filesystem::path path;
 		std::function<void(const std::string& path)> callback;
+	};
+
+	struct TENGINE FieldBool : public FieldInfo
+	{
+		FieldBool()
+		{
+			type = FieldType::Bool;
+		}
+		bool* data = nullptr;
+		std::function<void()> callback;
 	};
 
 	class TENGINE ComponentInfo

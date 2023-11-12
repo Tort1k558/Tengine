@@ -12,7 +12,6 @@ namespace TengineEditor
 
     void WindowObjects::Render()
     {
-        static int selectedItem = 0;
         ImGui::Begin("Objects", nullptr);
         if (SceneManager::GetCurrentScene())
         {
@@ -26,37 +25,41 @@ namespace TengineEditor
 
             if (ImGui::BeginListBox("##empty"))
             {
-                for (int i = 0; i < objectNames.size(); ++i)
+                for (const auto& object : objects)
                 {
                     static bool isEditName = false;
                     static std::string newName;
-                    if (isEditName && selectedItem == i)
+                    if (isEditName && GetSelectedObject()->getId() == object->getId())
                     {
                         if (ImGui::InputText("##InputName", &newName, ImGuiInputTextFlags_EnterReturnsTrue))
                         {
                             isEditName = false;
-                            objects[i]->setName(newName);
+                            object->setName(newName);
                         }
                     }
                     else
                     {
-                        bool isSelected = (selectedItem == i);
-                        if (ImGui::Selectable(objectNames[i].c_str(), isSelected))
+                        bool isSelected = false;
+                        if (GetSelectedObject())
                         {
-                            SetSelectedObject(SceneManager::GetCurrentScene()->getObjectByName(objectNames[i]));
+                            isSelected = GetSelectedObject()->getId() == object->getId();
+                        }
+                        if (ImGui::Selectable(object->getName().c_str(), isSelected))
+                        {
+                            SetSelectedObject(SceneManager::GetCurrentScene()->getObjectByName(object->getName()));
                             isEditName = false;
                             WindowMonitor::SetMonitoringObject(GetSelectedObject());
                         }
                         if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) && ImGui::IsItemHovered())
                         {
-                            SetSelectedObject(SceneManager::GetCurrentScene()->getObjectByName(objectNames[i]));
+                            SetSelectedObject(SceneManager::GetCurrentScene()->getObjectByName(object->getName()));
                             isEditName = false;
                             WindowMonitor::SetMonitoringObject(GetSelectedObject());
                             ImGui::OpenPopup("ObjectContextMenu");
                         }
                         if (ImGui::IsKeyPressed(ImGuiKey_F2) && ImGui::IsItemHovered())
                         {
-                            SetSelectedObject(SceneManager::GetCurrentScene()->getObjectByName(objectNames[i]));
+                            SetSelectedObject(SceneManager::GetCurrentScene()->getObjectByName(object->getName()));
                             newName = GetSelectedObject()->getName();
                             isEditName = true;
                         }

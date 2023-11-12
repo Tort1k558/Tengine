@@ -98,12 +98,22 @@ namespace Tengine
 	{
 		Mat4 translateMatrix = Mat4(1.0f);
 		translateMatrix = Math::TranslateMatrix(translateMatrix, m_position);
-		Mat4 rotateMatrix(1.0f);
-		rotateMatrix = Math::RotateMatrix(rotateMatrix, Vec3(1.0f, 0.0f, 0.0f), m_rotation.x);
-		rotateMatrix = Math::RotateMatrix(rotateMatrix, Vec3(0.0f, 1.0f, 0.0f), m_rotation.y);
-		rotateMatrix = Math::RotateMatrix(rotateMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
+		Mat4 rotationMatrix(1.0f);
+		rotationMatrix = Math::RotateMatrix(rotationMatrix, Vec3(1.0f, 0.0f, 0.0f), m_rotation.x);
+		rotationMatrix = Math::RotateMatrix(rotationMatrix, Vec3(0.0f, 1.0f, 0.0f), m_rotation.y);
+		rotationMatrix = Math::RotateMatrix(rotationMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
 		Mat4 scaleMatrix = Math::GetScaleMatrix(m_scale);
-		return translateMatrix * rotateMatrix * scaleMatrix;
+		return translateMatrix * rotationMatrix * scaleMatrix;
+	}
+
+	Vec3 Transform::getForwardVector() const
+	{
+		Mat4 rotationMatrix(1.0f);
+		rotationMatrix = Math::RotateMatrix(rotationMatrix, Vec3(1.0f, 0.0f, 0.0f), m_rotation.x);
+		rotationMatrix = Math::RotateMatrix(rotationMatrix, Vec3(0.0f, 1.0f, 0.0f), m_rotation.y);
+		rotationMatrix = Math::RotateMatrix(rotationMatrix, Vec3(0.0f, 0.0f, 1.0f), m_rotation.z);
+
+		return -Vec3(rotationMatrix[2]);
 	}
 
 	ComponentInfo Transform::getInfo()

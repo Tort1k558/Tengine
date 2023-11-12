@@ -21,6 +21,7 @@ namespace Tengine
 		ShaderCode() = delete;
 
 		static ShaderSource GetDefaultShader();
+		static ShaderSource GetLightingShader();
 		static ShaderSource GetFramebufferShader();
 	};
 }

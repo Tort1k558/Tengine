@@ -4,6 +4,7 @@
 #include<Components/Transform.h>
 #include<Components/Camera.h>
 #include<Components/Model.h>
+#include<Components/Light.h>
 #include<Core/Timer.h>
 #include<Core/Logger.h>
 #include<Core/Input.h>
@@ -49,25 +50,36 @@ namespace TengineEditor
         std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
         
         std::shared_ptr<Object> object = Object::Create();
+        object->setName("Sphere");
         std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-        transform->setScale({ 10.0f,10.0f,1.0f });
         transform->setPositionY(-1.0f);
         transform->setRotationX(-90.0f);
         object->addComponent(Component::Create<Model>(Primitives::CreateSphere(50, 50)));
         
+
         std::shared_ptr<Object> object2 = Object::Create();
-        std::shared_ptr<Camera> camera = Component::Create<Camera>(ProjectionType::Perspective);
-        object2->addComponent(camera);
         object2->setName("Camera");
+        std::shared_ptr<Camera> camera = Component::Create<Camera>(ProjectionType::Perspective);
+        camera->setLighting(true);
+        object2->addComponent(camera);
         std::shared_ptr<Transform> transform2 = object2->getComponent<Transform>();
         transform2->setPosition({ 0.0f,0.0f,2.0f });
-        
         ScriptSystem::GetInstance()->addScript(object2, "CameraController");
+
+
         std::shared_ptr<Object> object3 = Object::Create();
+        object3->setName("Backpack");
         std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
         transform3->setPositionY(2.0f);
-        
         object3->addComponent(AssetManager::CreateModel("Assets/Meshes/backpack/backpack.obj"));
+
+
+        std::shared_ptr<Object> object4 = Object::Create();
+        object4->setName("DirLight");
+        std::shared_ptr<Transform> transform4 = object4->getComponent<Transform>();
+        transform4->setPositionY(5.0f);
+        transform4->setRotationX(270.0f);
+        object4->addComponent(Component::Create<DirectionLight>());
     }
 
     void Editor::update()

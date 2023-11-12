@@ -5,6 +5,7 @@
 #include"Components/Camera.h"
 #include"Components/Model.h"
 #include"Components/Transform.h"
+#include"Components/Light.h"
 #include"Utils/Primitives.h"
 #include"Systems/ScriptSystem.h"
 #include"Components/Script.h"
@@ -114,6 +115,42 @@ namespace Tengine
 							}
 							object->addComponent(model);
 						}
+						else if (it.key() == "DirectionLight")
+						{
+							std::shared_ptr<DirectionLight> light = Component::Create<DirectionLight>();
+							ComponentInfo info = light->getInfo();
+							auto elements = info.getElements();
+							auto& componentData = dataObject[info.getComponentName()];
+							for (size_t i = 0; i < elements.size(); i++)
+							{
+								DeserializeField(componentData[elements[i]->name], elements[i]);
+							}
+							object->addComponent(light);
+						}
+						else if (it.key() == "PointLight")
+						{
+							std::shared_ptr<PointLight> light = Component::Create<PointLight>();
+							ComponentInfo info = light->getInfo();
+							auto elements = info.getElements();
+							auto& componentData = dataObject[info.getComponentName()];
+							for (size_t i = 0; i < elements.size(); i++)
+							{
+								DeserializeField(componentData[elements[i]->name], elements[i]);
+							}
+							object->addComponent(light);
+						}
+						else if (it.key() == "SpotLight")
+						{
+							std::shared_ptr<SpotLight> light = Component::Create<SpotLight>();
+							ComponentInfo info = light->getInfo();
+							auto elements = info.getElements();
+							auto& componentData = dataObject[info.getComponentName()];
+							for (size_t i = 0; i < elements.size(); i++)
+							{
+								DeserializeField(componentData[elements[i]->name], elements[i]);
+							}
+							object->addComponent(light);
+						}
 						else
 						{
 							std::vector<std::string> nameScripts = ScriptSystem::GetInstance()->getScriptNames();
@@ -173,38 +210,61 @@ namespace Tengine
 		case FieldType::Float:
 		{
 			std::shared_ptr<FieldFloat> field = std::dynamic_pointer_cast<FieldFloat>(element);
-			*field->data = static_cast<float>(data[0]);
+			*field->data = data[0].get<float>();
+			if (field->callback)
+			{
+				field->callback();
+			}
 			break;
 		}
 		case FieldType::Vec2:
 		{
 			std::shared_ptr<FieldVec2> field = std::dynamic_pointer_cast<FieldVec2>(element);
 			*field->data = Vec2(data[0], data[1]);
+			if (field->callback)
+			{
+				field->callback();
+			}
 			break;
 		}
 		case FieldType::Vec3:
 		{
 			std::shared_ptr<FieldVec3> field = std::dynamic_pointer_cast<FieldVec3>(element);
 			*field->data = Vec3(data[0], data[1], data[2]);
+			if (field->callback)
+			{
+				field->callback();
+			}
 			break;
 		}
 		case FieldType::Vec4:
 		{
 			std::shared_ptr<FieldVec4> field = std::dynamic_pointer_cast<FieldVec4>(element);
 			*field->data = Vec4(data[0], data[1], data[2], data[3]);
+			if (field->callback)
+			{
+				field->callback();
+			}
 			break;
 		}
 		case FieldType::Enum:
 		{
 			std::shared_ptr<FieldEnum> field = std::dynamic_pointer_cast<FieldEnum>(element);
 			*field->currentElement = data;
-			field->callback(*field->currentElement);
+			if (field->callback)
+			{
+				field->callback(*field->currentElement);
+			}
 			break;
 		}
 		case FieldType::File:
 		{
 			std::shared_ptr<FieldFile> field = std::dynamic_pointer_cast<FieldFile>(element);
-			field->callback(data);
+			field->path = data.get<std::string>();
+			if (field->callback)
+			{
+				field->callback(data);
+			}
 			break;
 		}
 		case FieldType::CollapsingHeader:
@@ -213,6 +273,16 @@ namespace Tengine
 			for (const auto& el : field->elements)
 			{
 				DeserializeField(data[el->name], el);
+			}
+			break;
+		}
+		case FieldType::Bool:
+		{
+			std::shared_ptr<FieldBool> field = std::dynamic_pointer_cast<FieldBool>(element);
+			*field->data = data.get<bool>();
+			if (field->callback)
+			{
+				field->callback();
 			}
 			break;
 		}
@@ -268,6 +338,12 @@ namespace Tengine
 			{
 				SerializeField(data[el->name], el);
 			}
+			break;
+		}
+		case FieldType::Bool:
+		{
+			std::shared_ptr<FieldBool> field = std::dynamic_pointer_cast<FieldBool>(element);
+			data = *field->data;
 			break;
 		}
 		default:

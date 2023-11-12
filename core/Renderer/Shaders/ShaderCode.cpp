@@ -27,6 +27,22 @@ namespace Tengine
         return source;
     }
 
+    ShaderSource ShaderCode::GetLightingShader()
+    {
+        ShaderSource source;
+        switch (RendererSystem::GetInstance()->getRendererType())
+        {
+        case RendererType::OpenGL:
+            source.addSourceShader(ShaderType::Vertex, GLSL::lightingShaderVertex);
+            source.addSourceShader(ShaderType::Fragment, GLSL::lightingShaderFragment);
+            break;
+        default:
+            Logger::Critical("ERROR::ShaderCode::CurrentShader doesn't support in this RenderContext!");
+            break;
+        }
+        return source;
+    }
+
     ShaderSource ShaderCode::GetFramebufferShader()
     {
         ShaderSource source;

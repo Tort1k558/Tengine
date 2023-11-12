@@ -7,6 +7,7 @@
 
 #include<Components/Camera.h>
 #include<Components/Model.h>
+#include"Components/Light.h"
 
 namespace TengineEditor
 {
@@ -75,7 +76,7 @@ namespace TengineEditor
                 if (ImGui::BeginPopup("Select Component"))
                 {
                     static int selectedItem = 0;
-                    std::vector<std::string> items = { "Model", "Camera" };
+                    std::vector<std::string> items = { "Model", "Camera","Direction Light","Point Light","Spot Light" };
                     for (const auto& scriptName : ScriptSystem::GetInstance()->getScriptNames())
                     {
                         items.push_back(scriptName);
@@ -108,7 +109,19 @@ namespace TengineEditor
                         {
                             object->addComponent(Component::Create<Camera>());
                         }
-                        if (selectedItem >= 2)
+                        if (selectedItem == 2)
+                        {
+                            object->addComponent(Component::Create<DirectionLight>());
+                        }
+                        if (selectedItem == 3)
+                        {
+                            object->addComponent(Component::Create<PointLight>());
+                        }
+                        if (selectedItem == 4)
+                        {
+                            object->addComponent(Component::Create<SpotLight>());
+                        }
+                        if (selectedItem >= 5)
                         {
                             ScriptSystem::GetInstance()->addScript(object, items[selectedItem]);
                         }
@@ -134,7 +147,7 @@ namespace TengineEditor
             break;
         }
         ImGui::End();
-	}
+    }
 
     void WindowMonitor::SetMonitoringObject(std::shared_ptr<Object> object)
     {
@@ -176,19 +189,37 @@ namespace TengineEditor
         case FieldType::Vec2:
         {
             std::shared_ptr<FieldVec2> slider = std::dynamic_pointer_cast<FieldVec2>(element);
-            ImGui::DragFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
+            if (ImGui::DragFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            {
+                if (slider->callback)
+                {
+                    slider->callback();
+                }
+            }
             break;
         }
         case FieldType::Vec3:
         {
             std::shared_ptr<FieldVec3> slider = std::dynamic_pointer_cast<FieldVec3>(element);
-            ImGui::DragFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
+            if (ImGui::DragFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            {
+                if (slider->callback)
+                {
+                    slider->callback();
+                }
+            }
             break;
         }
         case FieldType::Vec4:
         {
             std::shared_ptr<FieldVec4> slider = std::dynamic_pointer_cast<FieldVec4>(element);
-            ImGui::DragFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue);
+            if (ImGui::DragFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            {
+                if (slider->callback)
+                {
+                    slider->callback();
+                }
+            }
             break;
         }
         case FieldType::Enum:
@@ -271,12 +302,26 @@ namespace TengineEditor
                     if (path != "")
                     {
                         file->path = path;
-                        file->callback(file->path.string());
+                        if (file->callback)
+                        {
+                            file->callback(file->path.string());
+                        }
                     }
                 }
                 ImGui::EndDragDropTarget();
             }
             break;
+        }
+        case FieldType::Bool:
+        {
+            std::shared_ptr<FieldBool> field = std::dynamic_pointer_cast<FieldBool>(element);
+            if (ImGui::Checkbox(field->name.c_str(), field->data))
+            {
+                if (field->callback)
+                {
+                    field->callback();
+                }
+            }
         }
         default:
             break;

@@ -50,118 +50,105 @@ namespace Tengine
 	
 	ComponentInfo Camera::getInfo()
 	{
-		ComponentInfo displayInfo;
-		displayInfo.setComponentName("Camera");
+		ComponentInfo componentInfo;
+		componentInfo.setComponentName("Camera");
 		std::shared_ptr<FieldEnum> projectionType = std::make_shared<FieldEnum>();
 		projectionType->name = "Projection";
-		projectionType->type = FieldType::Enum;
 		projectionType->elements = { "Perspective","Orthographical" };
 		projectionType->currentElement = reinterpret_cast<int*>(&m_projectionType);
 		projectionType->callback = [this](int element)
 		{
 			this->setCameraType(m_projectionType);
 		};
-		displayInfo.addElement(projectionType);
+		componentInfo.addElement(projectionType);
 
 		std::shared_ptr<FieldFloat> projectionSettingsZNear = std::make_shared<FieldFloat>();
 		projectionSettingsZNear->data = &m_projection->m_zNear;
 		projectionSettingsZNear->minValue = 0.01f;
 		projectionSettingsZNear->maxValue = 10000.0f;
 		projectionSettingsZNear->name = "zNear";
-		projectionSettingsZNear->type = FieldType::Float;
 		projectionSettingsZNear->callback = [this]() {m_projection->updateProjection(); };
-		displayInfo.addElement(projectionSettingsZNear);
+		componentInfo.addElement(projectionSettingsZNear);
 		std::shared_ptr<FieldFloat> projectionSettingsZFar = std::make_shared<FieldFloat>();
 		projectionSettingsZFar->data = &m_projection->m_zFar;
 		projectionSettingsZFar->minValue = 0.01f;
 		projectionSettingsZFar->maxValue = 10000.0f;
 		projectionSettingsZFar->name = "zFar";
-		projectionSettingsZFar->type = FieldType::Float;
 		projectionSettingsZFar->callback = [this]() {m_projection->updateProjection(); };
-		displayInfo.addElement(projectionSettingsZFar);
+		componentInfo.addElement(projectionSettingsZFar);
 
 		switch (m_projectionType)
 		{
 		case ProjectionType::Perspective:
 		{
-			std::shared_ptr<PerspectiveProjection> perspective = getPerspectiveProjection();
+			std::shared_ptr<PerspectiveProjection> perspective = std::dynamic_pointer_cast<PerspectiveProjection>(getProjection());
 			std::shared_ptr<FieldFloat> projectionSettingsAspect = std::make_shared<FieldFloat>();
 			projectionSettingsAspect->data = &perspective->m_aspectRatio;
 			projectionSettingsAspect->minValue = 0.0f;
 			projectionSettingsAspect->maxValue = 3.0f;
 			projectionSettingsAspect->name = "Aspect";
-			projectionSettingsAspect->type = FieldType::Float;
 			projectionSettingsAspect->callback = [this]() {m_projection->updateProjection(); };
-			displayInfo.addElement(projectionSettingsAspect);
+			componentInfo.addElement(projectionSettingsAspect);
 			std::shared_ptr<FieldFloat> projectionSettingsFov = std::make_shared<FieldFloat>();
 			projectionSettingsFov->data = &perspective->m_fov;
 			projectionSettingsFov->minValue = 0.0f;
 			projectionSettingsFov->maxValue = 360.0f;
 			projectionSettingsFov->name = "Fov";
-			projectionSettingsFov->type = FieldType::Float;
 			projectionSettingsFov->callback = [this]() {m_projection->updateProjection(); };
-			displayInfo.addElement(projectionSettingsFov);
+			componentInfo.addElement(projectionSettingsFov);
 			break;
 		}
 		case ProjectionType::Orthographical:
 		{
-			std::shared_ptr<OrthographicalProjection> projection = getOrthographicalProjection();
+			std::shared_ptr<OrthographicalProjection> projection = std::dynamic_pointer_cast<OrthographicalProjection>(getProjection());
 			std::shared_ptr<FieldFloat> projectionSettingsLeft = std::make_shared<FieldFloat>();
 			projectionSettingsLeft->data = &projection->m_left;
 			projectionSettingsLeft->minValue = -0.01f;
 			projectionSettingsLeft->maxValue = -10.0f;
 			projectionSettingsLeft->name = "Left";
-			projectionSettingsLeft->type = FieldType::Float;
 			projectionSettingsLeft->callback = [this]() {m_projection->updateProjection(); };
-			displayInfo.addElement(projectionSettingsLeft);
+			componentInfo.addElement(projectionSettingsLeft);
 			std::shared_ptr<FieldFloat> projectionSettingsRight = std::make_shared<FieldFloat>();
 			projectionSettingsRight->data = &projection->m_right;
 			projectionSettingsRight->minValue = 0.01f;
 			projectionSettingsRight->maxValue = 10.0f;
 			projectionSettingsRight->name = "Right";
-			projectionSettingsRight->type = FieldType::Float;
 			projectionSettingsRight->callback = [this]() {m_projection->updateProjection(); };
-			displayInfo.addElement(projectionSettingsRight);
+			componentInfo.addElement(projectionSettingsRight);
 			std::shared_ptr<FieldFloat> projectionSettingsBottom = std::make_shared<FieldFloat>();
 			projectionSettingsBottom->data = &projection->m_bottom;
 			projectionSettingsBottom->minValue = -0.01f;
 			projectionSettingsBottom->maxValue = -10.0f;
 			projectionSettingsBottom->name = "Bottom";
-			projectionSettingsBottom->type = FieldType::Float;
 			projectionSettingsBottom->callback = [this]() {m_projection->updateProjection(); };
-			displayInfo.addElement(projectionSettingsBottom);
+			componentInfo.addElement(projectionSettingsBottom);
 			std::shared_ptr<FieldFloat> projectionSettingsTop = std::make_shared<FieldFloat>();
 			projectionSettingsTop->data = &projection->m_top;
 			projectionSettingsTop->minValue = 0.01f;
 			projectionSettingsTop->maxValue = 10.0f;
 			projectionSettingsTop->name = "Top";
-			projectionSettingsTop->type = FieldType::Float;
 			projectionSettingsTop->callback = [this]() {m_projection->updateProjection(); };
-			displayInfo.addElement(projectionSettingsTop);
+			componentInfo.addElement(projectionSettingsTop);
 			break;
 		}
 		default:
 			break;
 		}
-		return displayInfo;
+		std::shared_ptr<FieldBool> enableLighting = std::make_shared<FieldBool>();
+		enableLighting->data = &m_isLighting;
+		enableLighting->name = "Lighting";
+		componentInfo.addElement(enableLighting);
+		return componentInfo;
 	}
 
-	std::shared_ptr<PerspectiveProjection> Camera::getPerspectiveProjection() const
+	bool Camera::isLighting() const
 	{
-		if (m_projectionType == ProjectionType::Perspective)
-		{
-			return std::dynamic_pointer_cast<PerspectiveProjection>(m_projection);
-		}
-		return nullptr;
+		return m_isLighting;
 	}
 
-	std::shared_ptr<OrthographicalProjection> Camera::getOrthographicalProjection() const
+	void Camera::setLighting(bool value)
 	{
-		if (m_projectionType == ProjectionType::Orthographical)
-		{
-			return std::dynamic_pointer_cast<OrthographicalProjection>(m_projection);
-		}
-		return nullptr;
+		m_isLighting = value;
 	}
 
 	std::shared_ptr<Projection> Camera::getProjection() const

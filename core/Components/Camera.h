@@ -93,16 +93,16 @@ namespace Tengine
 
 		void setCameraType(ProjectionType type);
 		void setRotationOrder(RotationOrder order);
+		void setLighting(bool value);
 
 		Mat4 getViewMatrix();
 		Vec3 getDirection() const;
 		Vec3 getUp();
-		std::shared_ptr<PerspectiveProjection> getPerspectiveProjection() const;
-		std::shared_ptr<OrthographicalProjection> getOrthographicalProjection() const;
 		std::shared_ptr<Projection> getProjection() const;
 		RotationOrder getRotationOrder() const;
 		ProjectionType getProjectionType() const;
 		ComponentInfo getInfo() override;
+		bool isLighting() const;
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;
 
@@ -111,5 +111,6 @@ namespace Tengine
 		RotationOrder m_rotationOrder = RotationOrder::YXZ;
 		Vec3 m_direction = { 0.0f,0.0f, -1.0f };
 		Vec3 m_up = { 0.0f,1.0f,0.0f };
+		bool m_isLighting = false;
 	};
 }
