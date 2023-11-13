@@ -12,25 +12,18 @@ namespace TengineEditor
 	void FileManager::Init()
 	{
 		m_pathToEditor = std::filesystem::current_path();
+		m_relativePath = "Assets";
 	}
 
 	void FileManager::NewFolder(std::filesystem::path path)
 	{
-		std::filesystem::path pathToFile = path.string();
-		for (size_t i = 0; std::filesystem::exists(pathToFile); i++)
-		{
-			pathToFile = GetPathToAssets().string() + "/" + path.string() + std::to_string(i);
-		}
+		std::filesystem::path pathToFile = GetUniqueFilePath(path.string());
 		std::filesystem::create_directory(pathToFile);
 	}
 
 	void FileManager::NewFile(std::filesystem::path path, std::string_view data)
 	{
-		std::filesystem::path pathToFile = path.string();
-		for (size_t i = 0; std::filesystem::exists(pathToFile); i++)
-		{
-			pathToFile = GetPathToAssets().string() + "/" + path.string() + std::to_string(i);
-		}
+		std::filesystem::path pathToFile = GetUniqueFilePath(path.string());
 		std::ofstream file(pathToFile);
 		if (file.is_open())
 		{
@@ -88,19 +81,6 @@ namespace TengineEditor
 		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
 		return pathToEditor;
 	}
-
-	std::vector<std::filesystem::path> FileManager::GetAllProjectFiles()
-	{
-		std::vector<std::filesystem::path> filePaths;
-		if (ProjectManager::GetInstance())
-		{
-			for (const auto& entry : std::filesystem::directory_iterator(GetPathToAssets())) 
-			{
-				filePaths.push_back(entry.path());
-			}
-		}
-		return filePaths;
-	}
 	
 	std::vector<std::filesystem::path> FileManager::GetFilesFromCurrentDirectory(std::filesystem::path path)
 	{
@@ -119,5 +99,15 @@ namespace TengineEditor
 			}
 		}
 		return filePaths;
+	}
+	std::filesystem::path FileManager::GetUniqueFilePath(std::filesystem::path originalPath)
+	{
+		std::filesystem::path pathToFile = originalPath;
+
+		for (size_t i = 0; std::filesystem::exists(pathToFile); i++) {
+			pathToFile =  originalPath.parent_path().string() + "/" + originalPath.stem().string() + std::to_string(i) + originalPath.extension().string();
+		}
+
+		return pathToFile;
 	}
 }

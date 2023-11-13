@@ -4,6 +4,9 @@
 #include<imgui/misc/cpp/imgui_stdlib.h>
 
 #include<Scene/SceneManager.h>
+#include<Utils/Material.h>
+#include<Utils/Primitives.h>
+#include<Components/Model.h>
 
 #include"FileManager.h"
 #include"WindowMonitor.h"
@@ -59,7 +62,7 @@ namespace TengineEditor
                                 ImGui::Button(path.filename().string().c_str());
                             }
                         };
-                    std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetAllProjectFiles();
+                    std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetFilesFromCurrentDirectory(FileManager::GetPathToAssets());
                     for (int i = 0; i < pathToProjectFiles.size(); i++)
                     {
                         renderFileTree(pathToProjectFiles[i]);
@@ -79,6 +82,7 @@ namespace TengineEditor
                     ImGui::OpenPopup("FileBrowserContextMenu");
                 }
 
+                bool openPrimitiveMenu = false;
                 if (ImGui::BeginPopup("FileBrowserContextMenu"))
                 {
                     if (ImGui::MenuItem("Create File"))
@@ -88,6 +92,81 @@ namespace TengineEditor
                     if (ImGui::MenuItem("Create Folder"))
                     {
                         FileManager::NewFolder(FileManager::GetRelativePath().string() + "/NewFolder");
+                    }
+                    if (ImGui::MenuItem("Create Model"))
+                    {
+                        std::shared_ptr<Model> model = Component::Create<Model>();
+                        model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Model.model"));
+                        AssetManager::SaveModel(model.get());
+                    }
+                    if (ImGui::MenuItem("Create Material"))
+                    {
+                        std::shared_ptr<Material> material = std::make_shared<Material>();
+                        material->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Material.material"));
+                        AssetManager::SaveMaterial(material.get());
+                    }
+                    if (ImGui::MenuItem("Create Primitive"))
+                    {
+                        openPrimitiveMenu = true;
+                    }
+                    ImGui::EndPopup();
+                }
+
+                //Creating Primitive
+                if (openPrimitiveMenu)
+                {
+                    ImGui::OpenPopup("PrimitiveMenu");
+                }
+
+                if (ImGui::BeginPopupModal("PrimitiveMenu"))
+                {
+                    std::vector<std::string> primitiveNames = { "Quad","Sphere","Cube" };
+                    static int currentElement = 0;
+                    if (ImGui::BeginCombo("Primitive", primitiveNames[currentElement].c_str()))
+                    {
+                        for (int i = 0; i < primitiveNames.size(); ++i)
+                        {
+                            const bool isSelected = (currentElement == i);
+                            if (ImGui::Selectable(primitiveNames[i].c_str(), isSelected))
+                            {
+                                currentElement = i;
+                            }
+
+                            if (isSelected)
+                            {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+                    static int sectors = 1;
+                    static int stacks = 1;
+                    if (primitiveNames[currentElement] == "Sphere")
+                    {
+                        ImGui::InputInt("Sectors", &sectors);
+                        ImGui::InputInt("Stacks", &stacks);
+                    }
+                    if (ImGui::Button("Create"))
+                    {
+                        if (primitiveNames[currentElement] == "Quad")
+                        {
+                            std::shared_ptr<Model> model = Component::Create<Model>();
+                            model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Quad.model"));
+                            model->setMesh(Primitives::CreateQuad());
+                        }
+                        else  if (primitiveNames[currentElement] == "Sphere")
+                        {
+                            std::shared_ptr<Model> model = Component::Create<Model>();
+                            model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Sphere.model"));
+                            model->setMesh(Primitives::CreateSphere(sectors, stacks));
+                        }
+                        else  if (primitiveNames[currentElement] == "Cube")
+                        {
+                            std::shared_ptr<Model> model = Component::Create<Model>();
+                            model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Cube.model"));
+                            model->setMesh(Primitives::CreateCube());
+                        }
+                        ImGui::CloseCurrentPopup();
                     }
                     ImGui::EndPopup();
                 }
@@ -199,6 +278,7 @@ namespace TengineEditor
             }
             ImGui::EndTable();
         }
+
         ImGui::End();
     }
 

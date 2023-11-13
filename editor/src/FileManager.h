@@ -19,8 +19,8 @@ namespace TengineEditor
 		static std::filesystem::path GetPathToAssets();
 		static std::filesystem::path GetRelativePath();
 		static std::filesystem::path GetPathToEditor();
-		static std::vector<std::filesystem::path> GetAllProjectFiles();
 		static std::vector<std::filesystem::path> GetFilesFromCurrentDirectory(std::filesystem::path path);
+		static std::filesystem::path GetUniqueFilePath(std::filesystem::path originalPath);
 	private:
 		static std::filesystem::path m_relativePath;
 		static std::filesystem::path m_pathToEditor;

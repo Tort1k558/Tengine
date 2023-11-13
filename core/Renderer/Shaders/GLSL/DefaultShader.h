@@ -20,9 +20,9 @@ out vec3 fragPos;
 
 void main()
 {
-	fragPos = vec3(u_model * vec4(vertexPos,1.0));
-	normal = normalize(mat3(transpose(inverse(u_model))) * vertexNormal);
     uv = vertexUv;
+	normal = normalize(mat3(transpose(inverse(u_model))) * vertexNormal);
+	fragPos = vec3(u_model * vec4(vertexPos,1.0));
     gl_Position = u_projection * u_view * u_model * vec4(vertexPos,1.0);
 })";
 		const char* defaultShaderFragment = R"(#version 460 
@@ -69,9 +69,9 @@ out vec3 fragPos;
 
 void main()
 {
-	fragPos = vec3(u_model * vec4(vertexPos,1.0));
-	normal = normalize(mat3(transpose(inverse(u_model))) * vertexNormal);
     uv = vertexUv;
+	normal = normalize(mat3(transpose(inverse(u_model))) * vertexNormal);
+	fragPos = vec3(u_model * vec4(vertexPos,1.0));
     gl_Position = u_projection * u_view * u_model * vec4(vertexPos,1.0);
 })";
 		const char* lightingShaderFragment = R"(#version 460 

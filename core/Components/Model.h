@@ -10,7 +10,6 @@ namespace Tengine
 	{
 	public:
 		Model() = default;
-		Model(std::shared_ptr<Mesh> mesh);
 		std::shared_ptr<Mesh> getMesh() const;
 		void setMesh(std::shared_ptr<Mesh> mesh);
 		void setSubmeshMaterial(size_t index, std::shared_ptr<Material> material);
@@ -22,7 +21,6 @@ namespace Tengine
 
 		ComponentInfo getInfo() final;
 	private:
-		void save();
 		std::unordered_map<size_t, std::shared_ptr<Material>> m_materials;
 		std::shared_ptr<Mesh> m_mesh;
 	};

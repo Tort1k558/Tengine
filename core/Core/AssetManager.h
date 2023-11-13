@@ -40,6 +40,10 @@ namespace Tengine
 		static std::shared_ptr<Model> LoadModel(std::filesystem::path path);
 		static std::shared_ptr<Model> CreateModel(std::filesystem::path pathToMesh);
 
+
+		static void SaveModel(Model* model);
+		static void SaveMaterial(Material* material);
+
 		template<typename T>
 		static std::shared_ptr<T> GetResource(std::string_view name);
 	private:

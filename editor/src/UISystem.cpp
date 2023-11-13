@@ -221,7 +221,7 @@ namespace TengineEditor
                 }
                 meshFile->callback = [&model](const std::string& path)
                     {
-                        model->setMesh(AssetManager::LoadMesh(path));
+                        *model = *AssetManager::CreateModel(path);
                     };
                 WindowMonitor::ShowField(meshFile);
 

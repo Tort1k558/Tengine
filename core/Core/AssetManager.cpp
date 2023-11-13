@@ -271,20 +271,24 @@ namespace Tengine
         }
 
         model = Component::Create<Model>();
+        model->setPath(path);
         std::ifstream file(path.string());
         if (file.is_open())
         {
             nlohmann::json data = nlohmann::json::parse(file);
             std::string pathToMesh = data["PathToMesh"].get<std::string>();
-            model->setMesh(LoadMesh(pathToMesh));
-            std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
-            for (const auto& item : data.items())
+            if (!pathToMesh.empty())
             {
-                if (item.key().find("PathToSubmeshMaterial") != std::string::npos)
+                model->setMesh(LoadMesh(pathToMesh));
+                std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+                for (const auto& item : data.items())
                 {
-                    int submeshNumber = std::stoi(item.key().substr(item.key().find_last_of("PathToSubmeshMaterial") + 1,
-                        item.key().size() - item.key().find_last_of("PathToSubmeshMaterial")));
-                    model->setSubmeshMaterial(submeshNumber, LoadMaterial(item.value().get<std::string>()));
+                    if (item.key().find("PathToSubmeshMaterial") != std::string::npos)
+                    {
+                        int submeshNumber = std::stoi(item.key().substr(item.key().find_last_of("PathToSubmeshMaterial") + 1,
+                            item.key().size() - item.key().find_last_of("PathToSubmeshMaterial")));
+                        model->setSubmeshMaterial(submeshNumber, LoadMaterial(item.value().get<std::string>()));
+                    }
                 }
             }
         }
@@ -360,6 +364,102 @@ namespace Tengine
         }
 
         return model;
+    }
+
+    void AssetManager::SaveModel(Model* model)
+    {
+        nlohmann::json data;
+        if (model->getMesh())
+        {
+            data["PathToMesh"] = model->getMesh()->getPath();
+            std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+            for (size_t i = 0; i < submeshes.size(); i++)
+            {
+                if (model->hasSubmeshMaterial(i))
+                {
+                    data["PathToSubmeshMaterial" + std::to_string(i)] = model->getSubmeshMaterial(i)->getPath();
+                }
+            }
+        }
+        else
+        {
+            data["PathToMesh"] = "";
+        }
+        std::string pathToModelFile;
+        if (model->getPath().empty())
+        {
+            if (model->getMesh()->getPath().string().find("Primitive::") != std::string::npos)
+            {
+                size_t i = 0;
+                while (std::filesystem::exists("Primitive" + std::to_string(i) + ".model"))
+                {
+                    i++;
+                }
+                pathToModelFile = "Primitive" + std::to_string(i) + ".model";
+            }
+            else
+            {
+                pathToModelFile = model->getMesh()->getPath().parent_path().string() + "/" + model->getMesh()->getPath().stem().string() + ".model";
+            }
+        }
+        else
+        {
+            pathToModelFile = model->getPath().parent_path().string() + "/" + model->getPath().stem().string() + ".model";
+        }
+
+        model->setPath(pathToModelFile);
+        std::ofstream file(pathToModelFile, std::ios_base::out);
+        if (file.is_open())
+        {
+            file << data.dump(4);
+            file.close();
+        }
+        else
+        {
+            Logger::Critical("ERROR::Model::Failed to save the model file!");
+        }
+    }
+
+    void AssetManager::SaveMaterial(Material* material)
+    {
+        if (!material->getPath().empty())
+        {
+            nlohmann::json data;
+            for (const auto& texture : material->getTextures())
+            {
+                switch (texture.first)
+                {
+                case MaterialTexture::Diffuse:
+                    data["Diffuse"] = texture.second->getPath();
+                    break;
+                case MaterialTexture::Specular:
+                    data["Specular"] = texture.second->getPath();
+                    break;
+                case MaterialTexture::Height:
+                    data["Height"] = texture.second->getPath();
+                    break;
+                case MaterialTexture::Normal:
+                    data["Normal"] = texture.second->getPath();
+                    break;
+                case MaterialTexture::Roughness:
+                    break;
+                case MaterialTexture::Occlusion:
+                    break;
+                case MaterialTexture::Metalness:
+                    break;
+                default:
+                    break;
+                }
+            }
+            std::ofstream file(material->getPath().parent_path().string() + "/" + material->getPath().stem().string() + ".material", std::ios_base::out);
+            if (file.is_open()) {
+                file << data.dump(4);
+                file.close();
+            }
+            else {
+                Logger::Critical("ERROR::Material::Failed to save the material!");
+            }
+        }
     }
 
     std::filesystem::path Resource::getPath() const

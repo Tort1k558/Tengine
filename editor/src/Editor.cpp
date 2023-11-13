@@ -54,7 +54,10 @@ namespace TengineEditor
         std::shared_ptr<Transform> transform = object->getComponent<Transform>();
         transform->setPositionY(-1.0f);
         transform->setRotationX(-90.0f);
-        object->addComponent(Component::Create<Model>(Primitives::CreateSphere(50, 50)));
+        std::shared_ptr<Model> sphere = Component::Create<Model>();
+        sphere->setPath("Assets/Meshes/Sphere.model");
+        sphere->setMesh(Primitives::CreateSphere(50, 50));
+        object->addComponent(sphere);
         
 
         std::shared_ptr<Object> object2 = Object::Create();
