@@ -6,6 +6,7 @@
 
 namespace Tengine
 {
+
 	std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType type, TextureFilter filter)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())

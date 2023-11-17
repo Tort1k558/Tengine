@@ -108,105 +108,54 @@ namespace TengineEditor
             std::shared_ptr<Material> material = AssetManager::LoadMaterial(path);
             if (material)
             {
-
-                std::shared_ptr<FieldImage> albedo = std::make_shared<FieldImage>();
-                albedo->size = { 75,75 };
-                std::shared_ptr<FieldImage> specular = std::make_shared<FieldImage>();
-                specular->size = { 75,75 };
-                std::shared_ptr<FieldImage> normals = std::make_shared<FieldImage>();
-                normals->size = { 75,75 };
-                std::shared_ptr<FieldImage> height = std::make_shared<FieldImage>();
-                height->size = { 75,75 };
-                std::shared_ptr<FieldImage> roughness = std::make_shared<FieldImage>();
-                roughness->size = { 75,75 };
-                std::shared_ptr<FieldImage> metalness = std::make_shared<FieldImage>();
-                metalness->size = { 75,75 };
-                if (material)
-                {
-                	albedo->texture = material->getTexture(MaterialTexture::Diffuse);
-                	specular->texture = material->getTexture(MaterialTexture::Specular);
-                	normals->texture = material->getTexture(MaterialTexture::Normal);
-                	height->texture = material->getTexture(MaterialTexture::Height);
-                	roughness->texture = material->getTexture(MaterialTexture::Roughness);
-                	metalness->texture = material->getTexture(MaterialTexture::Metalness);
-                }
-                std::shared_ptr<FieldFile> albedoFile = std::make_shared<FieldFile>();
-                albedoFile->name = "Albedo Texture";
-                if (albedo->texture)
-                {
-                    albedoFile->path = albedo->texture->getPath();
-                }
-                albedoFile->callback = [&material](const std::string& path) 
+                auto showSubMaterial = [](std::string materialName, std::shared_ptr<SubMaterial> subMaterial)
                     {
-                            material->setTextureMaterial(MaterialTexture::Diffuse, AssetManager::LoadTexture(path));
+                        std::shared_ptr<FieldFile> file = std::make_shared<FieldFile>();
+                        file->name = materialName;
+                        std::shared_ptr<FieldImage> image = std::make_shared<FieldImage>();
+                        image->size = { 75,75 };
+                        if (subMaterial->hasTexture())
+                        {
+                            file->path = subMaterial->getTexture()->getPath();
+                            image->texture = subMaterial->getTexture();
+                        }
+                        file->callback = [subMaterial](const std::string& path)
+                            {
+                                *subMaterial = *(std::make_shared<SubMaterial>(AssetManager::LoadTexture(path)));
+                            };
+                        WindowMonitor::ShowField(file);
+                        WindowMonitor::ShowField(image);
+                        Vec3 color = subMaterial->getColor();
+                        if (ImGui::ColorEdit3(materialName.c_str(), &(color)[0]))
+                        {
+                            subMaterial->setColor(color);
+                        }
                     };
-                WindowMonitor::ShowField(albedoFile);
-                WindowMonitor::ShowField(albedo);
-
-                std::shared_ptr<FieldFile> specularFile = std::make_shared<FieldFile>();
-                specularFile->name = "Specular Texture";
-                if (specular->texture)
+                std::unordered_map<SubMaterialType, std::shared_ptr<SubMaterial>> subMaterials = material->getSubMaterials();
+                
+                for (auto& subMaterial : subMaterials)
                 {
-                    specularFile->path = specular->texture->getPath();
-                }
-                specularFile->callback = [&material](const std::string& path)
+                    switch (subMaterial.first)
                     {
-                        material->setTextureMaterial(MaterialTexture::Specular, AssetManager::LoadTexture(path));
-                    };
-                WindowMonitor::ShowField(specularFile);
-                WindowMonitor::ShowField(specular);
-
-                std::shared_ptr<FieldFile> normalFile = std::make_shared<FieldFile>();
-                normalFile->name = "Normal Texture";
-                if (normals->texture)
-                {
-                    normalFile->path = normals->texture->getPath();
+                    case SubMaterialType::Diffuse:
+                        showSubMaterial("Albedo", subMaterial.second);
+                        break;
+                    case SubMaterialType::Normal:
+                        showSubMaterial("Normal", subMaterial.second);
+                        break;
+                    case SubMaterialType::Specular:
+                        showSubMaterial("Specular", subMaterial.second);
+                        break;
+                    case SubMaterialType::Height:
+                        showSubMaterial("Height", subMaterial.second);
+                        break;
+                    case SubMaterialType::Roughness:
+                        showSubMaterial("Roughness", subMaterial.second);
+                        break;
+                    default:
+                        break;
+                    }
                 }
-                normalFile->callback = [&material](const std::string& path)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Normal, AssetManager::LoadTexture(path));
-                    };
-                WindowMonitor::ShowField(normalFile);
-                WindowMonitor::ShowField(normals);
-
-                std::shared_ptr<FieldFile> heightFile = std::make_shared<FieldFile>();
-                heightFile->name = "Height Texture";
-                if (height->texture)
-                {
-                    heightFile->path = height->texture->getPath();
-                }
-                heightFile->callback = [&material](const std::string& path)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Height, AssetManager::LoadTexture(path));
-                    };
-                WindowMonitor::ShowField(heightFile);
-                WindowMonitor::ShowField(height);
-
-                std::shared_ptr<FieldFile> roughnessFile = std::make_shared<FieldFile>();
-                roughnessFile->name = "Roughness Texture";
-                if (roughness->texture)
-                {
-                    roughnessFile->path = roughness->texture->getPath();
-                }
-                roughnessFile->callback = [&material](const std::string& path)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Roughness, AssetManager::LoadTexture(path));
-                    };
-                WindowMonitor::ShowField(roughnessFile);
-                WindowMonitor::ShowField(roughness);
-
-                std::shared_ptr<FieldFile> metalnessFile = std::make_shared<FieldFile>();
-                metalnessFile->name = "Metalness Texture";
-                if (metalness->texture)
-                {
-                    metalnessFile->path = metalness->texture->getPath();
-                }
-                metalnessFile->callback = [&material](const std::string& path)
-                    {
-                        material->setTextureMaterial(MaterialTexture::Metalness, AssetManager::LoadTexture(path));
-                    };
-                WindowMonitor::ShowField(metalnessFile);
-                WindowMonitor::ShowField(metalness);
             }
             });
 

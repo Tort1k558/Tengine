@@ -27,13 +27,19 @@ void main()
 })";
 		const char* defaultShaderFragment = R"(#version 460 
 
+struct SubMaterial
+{
+    sampler2D texture;
+    vec3 color;
+};
+
 struct Material 
 {
-    sampler2D albedo;
-    sampler2D normal;
-    sampler2D specular;
-    sampler2D roughness;
-};
+    SubMaterial albedo;
+    SubMaterial normal;
+    SubMaterial specular;
+    SubMaterial roughness;
+}; 
 
 uniform Material u_material;
 
@@ -47,8 +53,8 @@ out vec4 fragColor;
 
 void main()
 {
-	vec3 albedo = texture(u_material.albedo, uv).rgb;
-    vec3 normalFromTexture = texture(u_material.normal, uv).rgb;
+	vec3 albedo = texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color;
+    vec3 normalFromTexture = texture(u_material.normal.texture, uv).rgb + u_material.normal.color;
 	normalFromTexture = normalize(normalFromTexture * 2.0 - 1.0);
 
     fragColor = vec4(albedo,1.0);
@@ -76,12 +82,17 @@ void main()
 })";
 		const char* lightingShaderFragment = R"(#version 460 
 
+struct SubMaterial
+{
+    sampler2D texture;
+    vec3 color;
+};
 struct Material 
 {
-    sampler2D albedo;
-    sampler2D normal;
-    sampler2D specular;
-    sampler2D roughness;
+    SubMaterial albedo;
+    SubMaterial normal;
+    SubMaterial specular;
+    SubMaterial roughness;
 }; 
 
 struct DirLight {
@@ -155,7 +166,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 lightDir = normalize(-light.direction);
 
     float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * texture(u_material.albedo, uv).rgb * lightColor * light.intensity;
+    vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * lightColor * light.intensity;
 
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
@@ -176,7 +187,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
         float attenuation = 1.0 / (1.0 + 0.01 * distanceToPoint + 0.032 * (distanceToPoint * distanceToPoint));
 
         float diff = max(dot(normal, lightDir), 0.0);
-        vec3 diffuse = diff * lightColor * light.intensity * attenuation;
+        vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * lightColor * light.intensity * attenuation;
 
         vec3 reflectDir = reflect(-lightDir, normal);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);

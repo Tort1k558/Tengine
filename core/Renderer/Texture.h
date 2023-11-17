@@ -5,9 +5,11 @@
 #include"Core/Math.h"
 #include"Core/AssetManager.h"
 
+
 namespace Tengine
 {
 	class Resource;
+	class ComponentInfo;
 
 	enum class TextureType
 	{
@@ -40,11 +42,10 @@ namespace Tengine
 		virtual unsigned int getId() = 0;
 
 		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type, TextureFilter filter = TextureFilter::None);
-
 	protected:
-		UVec2 m_size;
-		void* m_data;
-		TextureType m_type;
-		TextureFilter m_filter;
+		UVec2 m_size = { 0, 0 };
+		void* m_data = nullptr;
+		TextureType m_type = TextureType::RGB8;
+		TextureFilter m_filter = TextureFilter::None;
 	};
 }

@@ -45,9 +45,9 @@ namespace Tengine
 
 	ComponentInfo Model::getInfo()
 	{
-		ComponentInfo displayInfo;
+		ComponentInfo componentInfo;
 
-		displayInfo.setComponentName("Model");
+		componentInfo.setComponentName("Model");
 		std::shared_ptr<FieldFile> modelFile = std::make_shared<FieldFile>();
 		modelFile->name = "PathToModelFile";
 		if (!m_path.empty())
@@ -61,8 +61,8 @@ namespace Tengine
 			*this = *newModel;
 
 		};
-		displayInfo.addElement(modelFile);
+		componentInfo.addElement(modelFile);
 
-		return displayInfo;
+		return componentInfo;
 	}
 }

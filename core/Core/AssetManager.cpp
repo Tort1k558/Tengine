@@ -176,15 +176,51 @@ namespace Tengine
             {
                 if (item.key() == "Diffuse")
                 {
-                    material->setTextureMaterial(MaterialTexture::Diffuse, LoadTexture(item.value().get<std::string>()));
+                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
+                    std::string pathToTexture = item.value()["path"].get<std::string>();
+                    if (pathToTexture != "null")
+                    {
+                        subMaterial->setTexture(LoadTexture(pathToTexture));
+                    }
+                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
+                    subMaterial->setColor(color);
+                    material->setSubMaterial(SubMaterialType::Diffuse, subMaterial);
                 }
                 else if (item.key() == "Normal")
                 {
-                    material->setTextureMaterial(MaterialTexture::Normal, LoadTexture(item.value().get<std::string>()));
+                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
+                    std::string pathToTexture = item.value()["path"].get<std::string>();
+                    if (pathToTexture != "null")
+                    {
+                        subMaterial->setTexture(LoadTexture(pathToTexture));
+                    }
+                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
+                    subMaterial->setColor(color);
+                    material->setSubMaterial(SubMaterialType::Normal, subMaterial);
                 }
                 else if (item.key() == "Specular")
                 {
-                    material->setTextureMaterial(MaterialTexture::Specular, LoadTexture(item.value().get<std::string>()));
+                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
+                    std::string pathToTexture = item.value()["path"].get<std::string>();
+                    if (pathToTexture != "null")
+                    {
+                        subMaterial->setTexture(LoadTexture(pathToTexture));
+                    }
+                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
+                    subMaterial->setColor(color);
+                    material->setSubMaterial(SubMaterialType::Specular, subMaterial);
+                }
+                else if (item.key() == "Roughness")
+                {
+                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
+                    std::string pathToTexture = item.value()["path"].get<std::string>();
+                    if (pathToTexture != "null")
+                    {
+                        subMaterial->setTexture(LoadTexture(pathToTexture));
+                    }
+                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
+                    subMaterial->setColor(color);
+                    material->setSubMaterial(SubMaterialType::Roughness, subMaterial);
                 }
             }
             file.close();
@@ -326,33 +362,38 @@ namespace Tengine
             aiMaterial* aimaterial = scene->mMaterials[i]; std::shared_ptr<Texture> diffuse = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE, parentPath);
             if (diffuse)
             {
-                material->setTextureMaterial(MaterialTexture::Diffuse, diffuse);
+                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(diffuse);
+                material->setSubMaterial(SubMaterialType::Diffuse, subMaterial);
+            }
+            std::shared_ptr<Texture> normals = LoadMaterialTexture(aimaterial, aiTextureType_NORMALS, parentPath);
+            if (normals)
+            {
+                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(normals);
+                material->setSubMaterial(SubMaterialType::Normal, subMaterial);
             }
             std::shared_ptr<Texture> specular = LoadMaterialTexture(aimaterial, aiTextureType_SPECULAR, parentPath);
             if (specular)
             {
-                material->setTextureMaterial(MaterialTexture::Specular, specular);
-            }
-
-            std::shared_ptr<Texture> normals = LoadMaterialTexture(aimaterial, aiTextureType_NORMALS, parentPath);
-            if (normals)
-            {
-                material->setTextureMaterial(MaterialTexture::Normal, normals);
+                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(specular);
+                material->setSubMaterial(SubMaterialType::Specular, subMaterial);
             }
             std::shared_ptr<Texture> roughness = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE_ROUGHNESS, parentPath);
             if (roughness)
             {
-                material->setTextureMaterial(MaterialTexture::Roughness, roughness);
+                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(roughness);
+                material->setSubMaterial(SubMaterialType::Roughness, subMaterial);
             }
             std::shared_ptr<Texture> occlusion = LoadMaterialTexture(aimaterial, aiTextureType_AMBIENT_OCCLUSION, parentPath);
             if (occlusion)
             {
-                material->setTextureMaterial(MaterialTexture::Occlusion, occlusion);
+                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(occlusion);
+                material->setSubMaterial(SubMaterialType::Occlusion, subMaterial);
             }
             std::shared_ptr<Texture> metalness = LoadMaterialTexture(aimaterial, aiTextureType_METALNESS, parentPath);
             if (metalness)
             {
-                material->setTextureMaterial(MaterialTexture::Metalness, metalness);
+                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(metalness);
+                material->setSubMaterial(SubMaterialType::Metalness, subMaterial);
             }
             m_resources[material->getPath().string()] = material;
             materials.push_back(material);
@@ -425,30 +466,37 @@ namespace Tengine
         if (!material->getPath().empty())
         {
             nlohmann::json data;
-            for (const auto& texture : material->getTextures())
+            for (const auto& subMaterial : material->getSubMaterials())
             {
-                switch (texture.first)
+                std::string subMaterialType;
+                switch (subMaterial.first)
                 {
-                case MaterialTexture::Diffuse:
-                    data["Diffuse"] = texture.second->getPath();
+                case SubMaterialType::Diffuse:
+                    subMaterialType = "Diffuse";
                     break;
-                case MaterialTexture::Specular:
-                    data["Specular"] = texture.second->getPath();
+                case SubMaterialType::Normal:
+                    subMaterialType = "Normal";
                     break;
-                case MaterialTexture::Height:
-                    data["Height"] = texture.second->getPath();
+                case SubMaterialType::Specular:
+                    subMaterialType = "Specular";
                     break;
-                case MaterialTexture::Normal:
-                    data["Normal"] = texture.second->getPath();
+                case SubMaterialType::Height:
+                    subMaterialType = "Height";
                     break;
-                case MaterialTexture::Roughness:
-                    break;
-                case MaterialTexture::Occlusion:
-                    break;
-                case MaterialTexture::Metalness:
+                case SubMaterialType::Roughness:
+                    subMaterialType = "Roughness";
                     break;
                 default:
                     break;
+                }
+                if (!subMaterialType.empty())
+                {
+                    if (subMaterial.second->hasTexture())
+                    {
+                        data[subMaterialType]["path"] = subMaterial.second->getTexture()->getPath();
+                    }
+                    Vec3 color = subMaterial.second->getColor();
+                    data[subMaterialType]["color"] = { color.r , color.g, color.b };
                 }
             }
             std::ofstream file(material->getPath().parent_path().string() + "/" + material->getPath().stem().string() + ".material", std::ios_base::out);
