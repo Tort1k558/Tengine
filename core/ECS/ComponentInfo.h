@@ -17,9 +17,7 @@ namespace Tengine
 		Vec3,
 		Vec4,
 		Enum,
-		Image,
 		CollapsingHeader,
-		Button,
 		File,
 		Bool
 	};
@@ -87,16 +85,6 @@ namespace Tengine
 		std::function<void(int element)> callback;
 	};
 
-	struct TENGINE FieldImage : public FieldInfo
-	{
-		FieldImage()
-		{
-			type = FieldType::Image;
-		}
-		std::shared_ptr<Texture> texture = nullptr;
-		Vec2 size = { 0.0f,0.0f };
-	};
-
 	struct TENGINE FieldCollapsingHeader : public FieldInfo
 	{
 		FieldCollapsingHeader()
@@ -104,15 +92,6 @@ namespace Tengine
 			type = FieldType::CollapsingHeader;
 		}
 		std::vector<std::shared_ptr<FieldInfo>> elements;
-	};
-
-	struct TENGINE FieldButton : public FieldInfo
-	{
-		FieldButton()
-		{
-			type = FieldType::Button;
-		}
-		std::function<void()> callback;
 	};
 
 	struct TENGINE FieldFile : public FieldInfo

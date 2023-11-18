@@ -20,6 +20,7 @@
 #include<Systems/ScriptSystem.h>
 #include<Utils/Material.h>
 
+#include"UIRender.h"
 #include"FileManager.h"
 #include"ProjectBuilder.h"
 #include"ProjectManager.h"
@@ -113,21 +114,19 @@ namespace TengineEditor
                         if (material->hasSubMaterial(type))
                         {
                             std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(type);
-                            std::shared_ptr<FieldFile> file = std::make_shared<FieldFile>();
-                            file->name = subMaterialName;
-                            std::shared_ptr<FieldImage> image = std::make_shared<FieldImage>();
-                            image->size = { 75,75 };
+                            std::string texturePath;
                             if (subMaterial->hasTexture())
                             {
-                                file->path = subMaterial->getTexture()->getPath();
-                                image->texture = subMaterial->getTexture();
+                                texturePath = subMaterial->getTexture()->getPath().string();
                             }
-                            file->callback = [subMaterial](const std::string& path)
-                                {
-                                    *subMaterial = *(std::make_shared<SubMaterial>(AssetManager::LoadTexture(path)));
-                                };
-                            WindowMonitor::ShowField(file);
-                            WindowMonitor::ShowField(image);
+                            if (UIRender::DrawFile(subMaterialName, texturePath))
+                            {
+                                *subMaterial = *(std::make_shared<SubMaterial>(AssetManager::LoadTexture(texturePath)));
+                            }
+                            if (subMaterial->hasTexture())
+                            {
+                                UIRender::DrawImage(reinterpret_cast<void*>(subMaterial->getTexture()->getId()), { 75,75 });
+                            }
                             Vec3 color = subMaterial->getColor();
                             if (ImGui::ColorEdit3(subMaterialName.c_str(), &(color)[0]))
                             {
@@ -139,7 +138,7 @@ namespace TengineEditor
                             ImGui::Text(subMaterialName.c_str());
                             ImGui::Text("None");
                             ImGui::SameLine();
-                            if (ImGui::Button("Create"))
+                            if (UIRender::DrawButton("Create"))
                             {
                                 material->setSubMaterial(type, std::make_shared<SubMaterial>());
                             }
@@ -157,37 +156,32 @@ namespace TengineEditor
         WindowMonitor::AddFormatHandler(".model", [](std::filesystem::path path) 
             {
                 std::shared_ptr<Model> model = AssetManager::LoadModel(path);
-                std::shared_ptr<FieldFile> meshFile = std::make_shared<FieldFile>();
-                meshFile->name = "PathToMesh";
-                if (model->getMesh())
+                std::string meshPath = model->getMesh()->getPath().string();
+                if (UIRender::DrawFile("PathToMesh", meshPath))
                 {
-                    meshFile->path = model->getMesh()->getPath();
+                    *model = *AssetManager::CreateModel(meshPath);
                 }
-                meshFile->callback = [&model](const std::string& path)
-                    {
-                        *model = *AssetManager::CreateModel(path);
-                    };
-                WindowMonitor::ShowField(meshFile);
 
-                if (model->getMesh())
+                if (UIRender::DrawCollapsingHeader("SubMeshes"))
                 {
-                    std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
-                    for (size_t i = 0; i < submeshes.size(); i++)
+                    if (model->getMesh())
                     {
-                        std::shared_ptr<FieldCollapsingHeader> submeshData = std::make_shared<FieldCollapsingHeader>();
-                        submeshData->name = "SubMesh" + std::to_string(i);
-                        std::shared_ptr<FieldFile> submeshMaterial = std::make_shared<FieldFile>();
-                        submeshMaterial->name = "SubMesh Material" + std::to_string(i);
-                        if (model->hasSubmeshMaterial(i))
+                        std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+                        for (size_t i = 0; i < submeshes.size(); i++)
                         {
-                            submeshMaterial->path = model->getSubmeshMaterial(i)->getPath();
-                        }
-                        submeshMaterial->callback = [&model,i](const std::string& path)
+                            if (UIRender::DrawCollapsingHeader("SubMesh" + std::to_string(i)))
                             {
-                                model->setSubmeshMaterial(i, AssetManager::LoadMaterial(path));
-                            };
-                        submeshData->elements.push_back(submeshMaterial);
-                        WindowMonitor::ShowField(submeshData);
+                                std::string submeshMaterialPath;
+                                if (model->hasSubmeshMaterial(i))
+                                {
+                                    submeshMaterialPath = model->getSubmeshMaterial(i)->getPath().string();
+                                }
+                                if (UIRender::DrawFile("SubMesh Material" + std::to_string(i), submeshMaterialPath))
+                                {
+                                    model->setSubmeshMaterial(i, AssetManager::LoadMaterial(submeshMaterialPath));
+                                }
+                            }
+                        }
                     }
                 }
             });

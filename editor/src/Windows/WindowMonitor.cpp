@@ -9,6 +9,8 @@
 #include<Components/Model.h>
 #include"Components/Light.h"
 
+#include"UIRender.h"
+
 namespace TengineEditor
 {
     WindowMonitor::MonitoringType WindowMonitor::m_monitoringType = MonitoringType::None;
@@ -177,7 +179,7 @@ namespace TengineEditor
         case FieldType::Float:
         {
             std::shared_ptr<FieldFloat> slider = std::dynamic_pointer_cast<FieldFloat>(element);
-            if (ImGui::DragFloat(slider->name.c_str(), static_cast<float*>(slider->data), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawFloat(slider->name, static_cast<float*>(slider->data), 0.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -189,7 +191,7 @@ namespace TengineEditor
         case FieldType::Vec2:
         {
             std::shared_ptr<FieldVec2> slider = std::dynamic_pointer_cast<FieldVec2>(element);
-            if (ImGui::DragFloat2(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawVec2(slider->name, static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -201,7 +203,7 @@ namespace TengineEditor
         case FieldType::Vec3:
         {
             std::shared_ptr<FieldVec3> slider = std::dynamic_pointer_cast<FieldVec3>(element);
-            if (ImGui::DragFloat3(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawVec3(slider->name, static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -213,7 +215,7 @@ namespace TengineEditor
         case FieldType::Vec4:
         {
             std::shared_ptr<FieldVec4> slider = std::dynamic_pointer_cast<FieldVec4>(element);
-            if (ImGui::DragFloat4(slider->name.c_str(), static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawVec4(slider->name, static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -225,47 +227,16 @@ namespace TengineEditor
         case FieldType::Enum:
         {
             std::shared_ptr<FieldEnum> combo = std::dynamic_pointer_cast<FieldEnum>(element);
-            if (ImGui::BeginCombo(combo->name.c_str(), combo->elements[*combo->currentElement].c_str()))
+            if (UIRender::DrawCombo(combo->name, combo->elements, *combo->currentElement))
             {
-                for (int i = 0; i < combo->elements.size(); ++i)
-                {
-                    const bool isSelected = (*combo->currentElement == i);
-                    if (ImGui::Selectable(combo->elements[i].c_str(), isSelected))
-                    {
-                        *combo->currentElement = i;
-                        combo->callback(i);
-                    }
-
-                    if (isSelected)
-                    {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            break;
-        }
-        case FieldType::Image:
-        {
-            std::shared_ptr<FieldImage> image = std::dynamic_pointer_cast<FieldImage>(element);
-            if (!image->name.empty())
-            {
-                ImGui::Text(image->name.c_str());
-            }
-            if (image->texture)
-            {
-                ImGui::Image(reinterpret_cast<void*>(image->texture->getId()), { image->size.x,image->size.y });
-            }
-            else
-            {
-                ImGui::Text("No Texture");
+                combo->callback(*combo->currentElement);
             }
             break;
         }
         case FieldType::CollapsingHeader:
         {
             std::shared_ptr<FieldCollapsingHeader> header = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
-            if (ImGui::CollapsingHeader(header->name.c_str()))
+            if (UIRender::DrawCollapsingHeader(header->name.c_str()))
             {
                 for (size_t i = 0; i < header->elements.size(); i++)
                 {
@@ -274,48 +245,21 @@ namespace TengineEditor
             };
             break;
         }
-        case FieldType::Button:
-        {
-            std::shared_ptr<FieldButton> button = std::dynamic_pointer_cast<FieldButton>(element);
-            if (ImGui::Button(button->name.c_str()))
-            {
-                button->callback();
-            };
-            break;
-        }
         case FieldType::File:
         {
             std::shared_ptr<FieldFile> file = std::dynamic_pointer_cast<FieldFile>(element);
-
-            if (!file->name.empty())
+            std::string filePath = file->path.string();
+            if (UIRender::DrawFile(file->name, filePath))
             {
-                ImGui::Text(file->name.c_str());
-                ImGui::SameLine();
-            }
-            if (ImGui::InputText("##empty", &file->path.string(), ImGuiInputTextFlags_EnterReturnsTrue))
-            {
-
-            }
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("path")) {
-                    std::string path(static_cast<const char*>(payload->Data), payload->DataSize);
-                    if (path != "")
-                    {
-                        file->path = path;
-                        if (file->callback)
-                        {
-                            file->callback(file->path.string());
-                        }
-                    }
-                }
-                ImGui::EndDragDropTarget();
+                file->path = filePath;
+                file->callback(filePath);
             }
             break;
         }
         case FieldType::Bool:
         {
             std::shared_ptr<FieldBool> field = std::dynamic_pointer_cast<FieldBool>(element);
-            if (ImGui::Checkbox(field->name.c_str(), field->data))
+            if (UIRender::DrawCheckbox(field->name.c_str(), field->data))
             {
                 if (field->callback)
                 {

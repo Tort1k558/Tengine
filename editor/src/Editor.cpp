@@ -83,6 +83,8 @@ namespace TengineEditor
         transform4->setPositionY(5.0f);
         transform4->setRotationX(270.0f);
         object4->addComponent(Component::Create<DirectionLight>());
+
+        SceneManager::Save(SceneManager::GetCurrentScene());
     }
 
     void Editor::update()
