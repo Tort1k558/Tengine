@@ -108,54 +108,49 @@ namespace TengineEditor
             std::shared_ptr<Material> material = AssetManager::LoadMaterial(path);
             if (material)
             {
-                auto showSubMaterial = [](std::string materialName, std::shared_ptr<SubMaterial> subMaterial)
+                auto checkSubMaterial = [&material](std::string subMaterialName, SubMaterialType type)
                     {
-                        std::shared_ptr<FieldFile> file = std::make_shared<FieldFile>();
-                        file->name = materialName;
-                        std::shared_ptr<FieldImage> image = std::make_shared<FieldImage>();
-                        image->size = { 75,75 };
-                        if (subMaterial->hasTexture())
+                        if (material->hasSubMaterial(type))
                         {
-                            file->path = subMaterial->getTexture()->getPath();
-                            image->texture = subMaterial->getTexture();
-                        }
-                        file->callback = [subMaterial](const std::string& path)
+                            std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(type);
+                            std::shared_ptr<FieldFile> file = std::make_shared<FieldFile>();
+                            file->name = subMaterialName;
+                            std::shared_ptr<FieldImage> image = std::make_shared<FieldImage>();
+                            image->size = { 75,75 };
+                            if (subMaterial->hasTexture())
                             {
-                                *subMaterial = *(std::make_shared<SubMaterial>(AssetManager::LoadTexture(path)));
-                            };
-                        WindowMonitor::ShowField(file);
-                        WindowMonitor::ShowField(image);
-                        Vec3 color = subMaterial->getColor();
-                        if (ImGui::ColorEdit3(materialName.c_str(), &(color)[0]))
+                                file->path = subMaterial->getTexture()->getPath();
+                                image->texture = subMaterial->getTexture();
+                            }
+                            file->callback = [subMaterial](const std::string& path)
+                                {
+                                    *subMaterial = *(std::make_shared<SubMaterial>(AssetManager::LoadTexture(path)));
+                                };
+                            WindowMonitor::ShowField(file);
+                            WindowMonitor::ShowField(image);
+                            Vec3 color = subMaterial->getColor();
+                            if (ImGui::ColorEdit3(subMaterialName.c_str(), &(color)[0]))
+                            {
+                                subMaterial->setColor(color);
+                            }
+                        }
+                        else
                         {
-                            subMaterial->setColor(color);
+                            ImGui::Text(subMaterialName.c_str());
+                            ImGui::Text("None");
+                            ImGui::SameLine();
+                            if (ImGui::Button("Create"))
+                            {
+                                material->setSubMaterial(type, std::make_shared<SubMaterial>());
+                            }
                         }
                     };
-                std::unordered_map<SubMaterialType, std::shared_ptr<SubMaterial>> subMaterials = material->getSubMaterials();
-                
-                for (auto& subMaterial : subMaterials)
-                {
-                    switch (subMaterial.first)
-                    {
-                    case SubMaterialType::Diffuse:
-                        showSubMaterial("Albedo", subMaterial.second);
-                        break;
-                    case SubMaterialType::Normal:
-                        showSubMaterial("Normal", subMaterial.second);
-                        break;
-                    case SubMaterialType::Specular:
-                        showSubMaterial("Specular", subMaterial.second);
-                        break;
-                    case SubMaterialType::Height:
-                        showSubMaterial("Height", subMaterial.second);
-                        break;
-                    case SubMaterialType::Roughness:
-                        showSubMaterial("Roughness", subMaterial.second);
-                        break;
-                    default:
-                        break;
-                    }
-                }
+
+                checkSubMaterial("Albedo", SubMaterialType::Diffuse);
+                checkSubMaterial("Normal", SubMaterialType::Normal);
+                checkSubMaterial("Specular", SubMaterialType::Specular);
+                checkSubMaterial("Height", SubMaterialType::Height);
+                checkSubMaterial("Roughness", SubMaterialType::Roughness);
             }
             });
 
