@@ -38,7 +38,7 @@ namespace TengineEditor
                     ComponentInfo info = component->getInfo();
                     if (!info.getComponentName().empty())
                     {
-                        if (ImGui::CollapsingHeader(info.getComponentName().c_str()))
+                        if (UIRender::DrawCollapsingHeader(info.getComponentName()))
                         {
                             for (const auto& element : info.getElements())
                             {
@@ -83,24 +83,7 @@ namespace TengineEditor
                     {
                         items.push_back(scriptName);
                     }
-                    if (ImGui::BeginCombo("##Components", items[selectedItem].c_str()))
-                    {
-                        for (int i = 0; i < items.size(); ++i)
-                        {
-                            const bool isSelected = (selectedItem == i);
-                            if (ImGui::Selectable(items[i].c_str(), isSelected))
-                            {
-                                selectedItem = i;
-                            }
-
-                            if (isSelected)
-                            {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
-
+                    UIRender::DrawCombo("##Components", items, selectedItem);
                     if (ImGui::Button("Add"))
                     {
                         if (selectedItem == 0)

@@ -6,6 +6,7 @@
 #include<imgui/backends/imgui_impl_opengl3.h>
 #include<imgui/imgui.h>
 #include<imgui/misc/cpp/imgui_stdlib.h>
+#include<imguizmo/ImGuizmo.h>
 #include<nfd.h>
 
 #include<Components/Camera.h>
@@ -98,7 +99,6 @@ namespace TengineEditor
         glfwInit();
         ImGui_ImplOpenGL3_Init();
         ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
-
         m_sceneFramebuffer = FrameBuffer::Create({ 1024,768 });
         m_sceneCamera = std::make_shared<Object>();
         m_sceneCamera->setName("SceneCamera");
@@ -193,6 +193,7 @@ namespace TengineEditor
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        
         ImGuiWindowFlags windowsFlags = ImGuiWindowFlags_MenuBar;
         windowsFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
         windowsFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
@@ -209,6 +210,7 @@ namespace TengineEditor
         ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
         ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
         renderMenuBar();
         renderWindowInfo();
@@ -217,11 +219,14 @@ namespace TengineEditor
         WindowFileBrowser::Render();
         
         
+
         //Scene
         ImGui::Begin("Scene", nullptr);
 
+
         std::shared_ptr<Camera> sceneCamera = m_sceneCamera->getComponent<Camera>();
         std::shared_ptr<Transform> sceneCameraTransform = m_sceneCamera->getComponent<Transform>();
+
         if(ImGui::IsWindowFocused())
         {
             static float speed = 7.0f;
@@ -282,20 +287,67 @@ namespace TengineEditor
         {
             m_sceneFramebuffer = FrameBuffer::Create({ availableAreaSceneWindow.x,availableAreaSceneWindow.y });
         }
+        
+        //Gizmo
+        ImVec2 sceneWindowPosition = ImGui::GetWindowPos();
+        ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetRect(sceneWindowPosition.x, sceneWindowPosition.y, sceneWindowSize.x, sceneWindowSize.y);
+        ImGuizmo::AllowAxisFlip(false);
+
+        static ImGuizmo::OPERATION gizmoOperation = ImGuizmo::TRANSLATE;
+        static ImGuizmo::MODE gizmoMode = ImGuizmo::WORLD;
+        if (ImGui::IsKeyPressed(ImGuiKey_Q))
+        {
+            gizmoOperation = ImGuizmo::TRANSLATE;
+            gizmoMode = ImGuizmo::WORLD;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_E))
+        {
+            gizmoOperation = ImGuizmo::ROTATE;
+            gizmoMode = ImGuizmo::LOCAL;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            gizmoOperation = ImGuizmo::SCALE;
+            gizmoMode = ImGuizmo::LOCAL;
+        }
+
+        if (WindowObjects::GetSelectedObject())
+        {
+            Mat4 view = sceneCamera->getViewMatrix();
+            Mat4 projection = sceneCamera->getProjection()->getProjectionMatrix();
+            std::shared_ptr<Transform> transformSelected = WindowObjects::GetSelectedObject()->getComponent<Transform>();
+            Mat4 model(1.0f);
+            ImGuizmo::RecomposeMatrixFromComponents(&transformSelected->getPosition()[0], &transformSelected->getRotation()[0],
+                &transformSelected->getScale()[0], &model[0][0]);
+
+            if (ImGuizmo::Manipulate(&view[0][0], &projection[0][0], gizmoOperation, gizmoMode, &model[0][0]))
+            {
+                Vec3 transform, rotation, scale;
+                ImGuizmo::DecomposeMatrixToComponents(&model[0][0], &transform[0], &rotation[0], &scale[0]);
+                transformSelected->setPosition(transform);
+                transformSelected->setRotation(rotation);
+                transformSelected->setScale(scale);
+            }
+        }
         ImGui::End();
+
 
         //Game
         static bool isGameRunning = false;
         ImGui::Begin("Game", nullptr);
         if (isGameRunning) {
-            if (ImGui::Button("stop")) {
+            if (ImGui::Button("stop")) 
+            {
                 isGameRunning = false;
                 SystemManager::DestroySystems();
                 SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
             }
         }
         else {
-            if (ImGui::Button("start")) {
+            if (ImGui::Button("start")) 
+            {
                 isGameRunning = true;
                 SceneManager::Save(SceneManager::GetCurrentScene());
                 SystemManager::AddSystem(ScriptSystem::GetInstance());

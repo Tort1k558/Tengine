@@ -69,6 +69,7 @@ namespace TengineEditor
         }
         return result;
     }
+
     bool UIRender::DrawButton(std::string_view name)
     {
         if (ImGui::Button(name.data()))
@@ -77,6 +78,7 @@ namespace TengineEditor
         }
         return false;
     }
+
     bool UIRender::DrawCheckbox(std::string_view name, bool* data)
     {
         if (ImGui::Checkbox(name.data(), data))
@@ -85,6 +87,7 @@ namespace TengineEditor
         }
         return false;
     }
+
     bool UIRender::DrawCollapsingHeader(std::string_view name)
     {
         if (ImGui::CollapsingHeader(name.data()))
@@ -93,6 +96,7 @@ namespace TengineEditor
         }
         return false;
     }
+
     bool UIRender::DrawFile(std::string_view name, std::string& pathToFile)
     {
         bool result = false;

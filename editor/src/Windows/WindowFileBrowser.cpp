@@ -10,6 +10,7 @@
 
 #include"FileManager.h"
 #include"WindowMonitor.h"
+#include"UIRender.h"
 
 namespace TengineEditor
 {
@@ -122,23 +123,7 @@ namespace TengineEditor
                 {
                     std::vector<std::string> primitiveNames = { "Quad","Sphere","Cube" };
                     static int currentElement = 0;
-                    if (ImGui::BeginCombo("Primitive", primitiveNames[currentElement].c_str()))
-                    {
-                        for (int i = 0; i < primitiveNames.size(); ++i)
-                        {
-                            const bool isSelected = (currentElement == i);
-                            if (ImGui::Selectable(primitiveNames[i].c_str(), isSelected))
-                            {
-                                currentElement = i;
-                            }
-
-                            if (isSelected)
-                            {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
+                    UIRender::DrawCombo("Primitive", primitiveNames, currentElement);
                     static int sectors = 1;
                     static int stacks = 1;
                     if (primitiveNames[currentElement] == "Sphere")

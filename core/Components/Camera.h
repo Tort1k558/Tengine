@@ -13,7 +13,7 @@ namespace Tengine
 	};
 	class Camera;
 
-	class Projection
+	class TENGINE Projection
 	{
 	public:
 		virtual ~Projection() = default;
@@ -33,7 +33,7 @@ namespace Tengine
 		friend class Camera;
 	};
 
-	class PerspectiveProjection : public Projection
+	class TENGINE PerspectiveProjection : public Projection
 	{
 	public:
 		PerspectiveProjection();
@@ -50,7 +50,7 @@ namespace Tengine
 		friend class Camera;
 	};
 
-	class OrthographicalProjection : public Projection
+	class TENGINE OrthographicalProjection : public Projection
 	{
 	public:
 		OrthographicalProjection();
