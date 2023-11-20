@@ -21,8 +21,8 @@ namespace Tengine
 
 	void SubMaterial::setTexture(std::shared_ptr<Texture> texture)
 	{
-		saveParent();
 		m_texture = texture;
+		saveParent();
 	}
 
 	std::shared_ptr<Texture> SubMaterial::getTexture() const
@@ -40,8 +40,8 @@ namespace Tengine
 	}
 	void SubMaterial::setColor(Vec3 color)
 	{
-		saveParent();
 		m_color = color;
+		saveParent();
 	}
 
 	Vec3 SubMaterial::getColor() const
@@ -103,6 +103,15 @@ namespace Tengine
 			return false;
 		}
 		return true;
+	}
+
+	void Material::removeSubMaterial(SubMaterialType type)
+	{
+		if (hasSubMaterial(type))
+		{
+			m_subMaterials.erase(type);
+		}
+		AssetManager::SaveMaterial(this);
 	}
 
 }

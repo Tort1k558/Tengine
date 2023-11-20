@@ -143,9 +143,9 @@ namespace Tengine
 			{
 				shader = AssetManager::GetResource<Shader>("LightingShader");
 				std::vector<std::shared_ptr<DirectionLight>> directionLights = scene->getComponents<DirectionLight>();
+				shader->setUniformInt("countDirLights", directionLights.size());
 				if (!directionLights.empty())
 				{
-					shader->setUniformInt("countDirLights", directionLights.size());
 					for (size_t i = 0; i < directionLights.size(); i++)
 					{
 						std::shared_ptr<Object> parent = directionLights[i]->getParent();
@@ -158,9 +158,9 @@ namespace Tengine
 					}
 				}
 				std::vector<std::shared_ptr<PointLight>> pointLights = scene->getComponents<PointLight>();
+				shader->setUniformInt("countPointLights", pointLights.size());
 				if (!pointLights.empty())
 				{
-					shader->setUniformInt("countPointLights", pointLights.size());
 					for (size_t i = 0; i < pointLights.size(); i++)
 					{
 						std::shared_ptr<Object> parent = pointLights[i]->getParent();
@@ -174,9 +174,23 @@ namespace Tengine
 					}
 				}
 				std::vector<std::shared_ptr<SpotLight>> spotLights = scene->getComponents<SpotLight>();
+				shader->setUniformInt("countSpotLights", spotLights.size());
 				if (!spotLights.empty())
 				{
-
+					for (size_t i = 0; i < spotLights.size(); i++)
+					{
+						std::shared_ptr<Object> parent = spotLights[i]->getParent();
+						if (parent && parent->getComponent<Transform>())
+						{
+							std::shared_ptr<Transform> lightTransform = parent->getComponent<Transform>();
+							shader->setUniformVec3("spotLights[" + std::to_string(i) + "].position", lightTransform->getPosition());
+							shader->setUniformVec3("spotLights[" + std::to_string(i) + "].direction", lightTransform->getForwardVector());
+							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].intensity", spotLights[i]->getIntensity());
+							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].range", spotLights[i]->getRange());
+							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].innerConeAngle", Math::DegreesToRadians(spotLights[i]->getInnerConeAngle()));
+							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].outerConeAngle", Math::DegreesToRadians(spotLights[i]->getOuterConeAngle()));
+						}
+					}
 				}
 			}
 			else

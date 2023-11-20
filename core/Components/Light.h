@@ -39,9 +39,14 @@ namespace Tengine
 	{
 	public:
 		SpotLight();
+		float getInnerConeAngle();
+		void setInnerConeAngle(float angle);
+		float getOuterConeAngle();
+		void setOuterConeAngle(float angle);
 		ComponentInfo getInfo() override;
 
 	private:
-		float m_coneAngle = 45.0f;
+		float m_innerConeAngle = 12.5f;
+		float m_outerConeAngle = 16.5f;
 	};
 }

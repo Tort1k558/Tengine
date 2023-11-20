@@ -111,6 +111,7 @@ namespace TengineEditor
             {
                 auto checkSubMaterial = [&material](std::string subMaterialName, SubMaterialType type)
                     {
+                        ImGui::PushID(subMaterialName.c_str());
                         if (material->hasSubMaterial(type))
                         {
                             std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(type);
@@ -132,6 +133,10 @@ namespace TengineEditor
                             {
                                 subMaterial->setColor(color);
                             }
+                            if (UIRender::DrawButton("Delete"))
+                            {
+                                material->removeSubMaterial(type);
+                            }
                         }
                         else
                         {
@@ -143,6 +148,7 @@ namespace TengineEditor
                                 material->setSubMaterial(type, std::make_shared<SubMaterial>());
                             }
                         }
+                        ImGui::PopID();
                     };
 
                 checkSubMaterial("Albedo", SubMaterialType::Diffuse);
@@ -223,6 +229,40 @@ namespace TengineEditor
         //Scene
         ImGui::Begin("Scene", nullptr);
 
+        static ImGuizmo::OPERATION gizmoOperation = ImGuizmo::TRANSLATE;
+        static ImGuizmo::MODE gizmoMode = ImGuizmo::WORLD;
+        if (UIRender::DrawButton("Translate"))
+        {
+            gizmoOperation = ImGuizmo::TRANSLATE;
+            gizmoMode = ImGuizmo::WORLD;
+        }
+        ImGui::SameLine();
+        if (UIRender::DrawButton("Rotate"))
+        {
+            gizmoOperation = ImGuizmo::ROTATE;
+            gizmoMode = ImGuizmo::LOCAL;
+        }
+        ImGui::SameLine();
+        if (UIRender::DrawButton("Scale"))
+        {
+            gizmoOperation = ImGuizmo::SCALE;
+            gizmoMode = ImGuizmo::LOCAL;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_Q))
+        {
+            gizmoOperation = ImGuizmo::TRANSLATE;
+            gizmoMode = ImGuizmo::WORLD;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_E))
+        {
+            gizmoOperation = ImGuizmo::ROTATE;
+            gizmoMode = ImGuizmo::LOCAL;
+        }
+        if (ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            gizmoOperation = ImGuizmo::SCALE;
+            gizmoMode = ImGuizmo::LOCAL;
+        }
 
         std::shared_ptr<Camera> sceneCamera = m_sceneCamera->getComponent<Camera>();
         std::shared_ptr<Transform> sceneCameraTransform = m_sceneCamera->getComponent<Transform>();
@@ -288,31 +328,14 @@ namespace TengineEditor
             m_sceneFramebuffer = FrameBuffer::Create({ availableAreaSceneWindow.x,availableAreaSceneWindow.y });
         }
         
+
         //Gizmo
         ImVec2 sceneWindowPosition = ImGui::GetWindowPos();
         ImVec2 sceneWindowSize = ImGui::GetWindowSize();
+
         ImGuizmo::SetDrawlist();
         ImGuizmo::SetRect(sceneWindowPosition.x, sceneWindowPosition.y, sceneWindowSize.x, sceneWindowSize.y);
         ImGuizmo::AllowAxisFlip(false);
-
-        static ImGuizmo::OPERATION gizmoOperation = ImGuizmo::TRANSLATE;
-        static ImGuizmo::MODE gizmoMode = ImGuizmo::WORLD;
-        if (ImGui::IsKeyPressed(ImGuiKey_Q))
-        {
-            gizmoOperation = ImGuizmo::TRANSLATE;
-            gizmoMode = ImGuizmo::WORLD;
-        }
-        if (ImGui::IsKeyPressed(ImGuiKey_E))
-        {
-            gizmoOperation = ImGuizmo::ROTATE;
-            gizmoMode = ImGuizmo::LOCAL;
-        }
-        if (ImGui::IsKeyPressed(ImGuiKey_R))
-        {
-            gizmoOperation = ImGuizmo::SCALE;
-            gizmoMode = ImGuizmo::LOCAL;
-        }
-
         if (WindowObjects::GetSelectedObject())
         {
             Mat4 view = sceneCamera->getViewMatrix();

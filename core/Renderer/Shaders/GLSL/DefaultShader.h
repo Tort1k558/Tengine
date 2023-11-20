@@ -114,7 +114,8 @@ struct SpotLight {
     vec3 color;
     float intensity;
     float range;
-    float coneAngle;
+    float innerConeAngle;
+    float outerConeAngle;
 };
 
 in vec2 uv;
@@ -140,6 +141,7 @@ uniform vec3 u_viewPos;
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir);
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir);
 
 
 void main()
@@ -155,7 +157,10 @@ void main()
 	{
   		result += CalcPointLight(pointLights[i], normal, viewDir);
 	}
-
+    for(int i = 0; i < countSpotLights; i++)
+	{
+  		result += CalcSpotLight(spotLights[i], normal, viewDir);
+	}
     fragColor = vec4(result,1.0);
 }
 
@@ -180,7 +185,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
     //REMOVE COLOR
     vec3 lightColor = vec3(1.0);
     vec3 lightDir = normalize(light.position - fragPos);
-
+    
     float distanceToPoint = length(light.position - fragPos);
     if (distanceToPoint <= light.range) 
     {
@@ -193,6 +198,33 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
         vec3 specular = spec * lightColor * light.intensity * attenuation;    
         return diffuse + specular;
+    }
+    return vec3(0.0);
+}
+
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
+{
+    vec3 lightColor = vec3(1.0);
+    vec3 lightDir = normalize(light.position - fragPos);
+    
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon   = cos(light.innerConeAngle) - cos(light.outerConeAngle);
+    float intensity = clamp((theta - cos(light.outerConeAngle)) / epsilon, 0.0, 1.0); 
+    if (theta > cos(light.outerConeAngle))
+    {
+        float distanceToPoint = length(light.position - fragPos);
+        if (distanceToPoint <= light.range) 
+        {
+            float attenuation = 1.0 / (1.0 + 0.01 * distanceToPoint + 0.032 * (distanceToPoint * distanceToPoint));
+
+            float diff = max(dot(normal, lightDir), 0.0);
+            vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * lightColor * light.intensity * intensity * attenuation;
+
+            vec3 reflectDir = reflect(-lightDir, normal);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+            vec3 specular = spec * lightColor * light.intensity * intensity * attenuation;
+            return diffuse + specular;
+        }
     }
     return vec3(0.0);
 }

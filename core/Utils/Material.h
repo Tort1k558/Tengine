@@ -53,6 +53,8 @@ namespace Tengine
 		std::shared_ptr<SubMaterial> getSubMaterial(SubMaterialType type);
 		bool hasSubMaterial(SubMaterialType type);
 
+		void removeSubMaterial(SubMaterialType type);
+
 	private:
 		std::unordered_map<SubMaterialType, std::shared_ptr<SubMaterial>> m_subMaterials;
 	};

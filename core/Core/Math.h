@@ -93,6 +93,11 @@ namespace Tengine
 			return glm::cross(vec1, vec2);
 		}
 
+		inline Vec4 Normalize(Vec4 vec)
+		{
+			return glm::normalize(vec);
+		}
+
 		inline Vec3 Normalize(Vec3 vec)
 		{
 			return glm::normalize(vec);
@@ -102,9 +107,10 @@ namespace Tengine
 		{
 			return glm::normalize(vec);
 		}
-		inline Vec4 Normalize(Vec4 vec)
+
+		inline float DegreesToRadians(float degrees)
 		{
-			return glm::normalize(vec);
+			return glm::radians(degrees);
 		}
 	}
 }

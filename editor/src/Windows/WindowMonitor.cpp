@@ -15,7 +15,7 @@ namespace TengineEditor
 {
     WindowMonitor::MonitoringType WindowMonitor::m_monitoringType = MonitoringType::None;
     std::unordered_map<std::string, std::function<void(std::filesystem::path)>> WindowMonitor::m_formatHandlers;
-    std::shared_ptr<Object> WindowMonitor::m_monitoringObject;
+    UUID WindowMonitor::m_idMonitoringObject;
     std::filesystem::path WindowMonitor::m_pathToMonitoringFile;
 
 	void WindowMonitor::Render()
@@ -27,11 +27,11 @@ namespace TengineEditor
             break;
         case MonitoringType::Object:
         {
-            if (m_monitoringObject)
+            std::shared_ptr<Object> object = SceneManager::GetCurrentScene()->getObjectByUUID(m_idMonitoringObject);
+            if (object)
             {
                 bool contextMenuOpened = false;
                 static std::shared_ptr<Component> selectedComponent;
-                std::shared_ptr<Object> object = m_monitoringObject;
                 std::vector<std::shared_ptr<Component>> components = object->getComponents();
                 for (const auto& component : components)
                 {
@@ -136,16 +136,19 @@ namespace TengineEditor
 
     void WindowMonitor::SetMonitoringObject(std::shared_ptr<Object> object)
     {
-        m_monitoringObject = object;
-        m_monitoringType = MonitoringType::Object;
-        m_pathToMonitoringFile = "";
+        if (object)
+        {
+            m_idMonitoringObject = object->getId();
+            m_monitoringType = MonitoringType::Object;
+            m_pathToMonitoringFile = "";
+        }
     }
 
     void WindowMonitor::SetPathMonitoringFile(std::filesystem::path pathToFile)
     {
         m_pathToMonitoringFile = pathToFile;
         m_monitoringType = MonitoringType::File;
-        m_monitoringObject = nullptr;
+        m_idMonitoringObject = UUID("null");
     }
 
     void WindowMonitor::AddFormatHandler(std::string_view format, std::function<void(std::filesystem::path pathToFile)> func)

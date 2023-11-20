@@ -172,55 +172,38 @@ namespace Tengine
         if (file.is_open())
         {
             nlohmann::json data = nlohmann::json::parse(file);
+            auto loadSubMaterial = [&material](nlohmann::json& data, SubMaterialType type)
+                {
+                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
+                    if (data.find("path") != data.end())
+                    {
+                        std::string pathToTexture = data["path"].get<std::string>();
+                        if (pathToTexture != "null")
+                        {
+                            subMaterial->setTexture(LoadTexture(pathToTexture));
+                        }
+                    }
+                    Vec3 color = { data["color"][0],data["color"][1],data["color"][2] };
+                    subMaterial->setColor(color);
+                    material->setSubMaterial(type, subMaterial);
+                };
             for (const auto& item : data.items())
             {
                 if (item.key() == "Diffuse")
                 {
-                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
-                    std::string pathToTexture = item.value()["path"].get<std::string>();
-                    if (pathToTexture != "null")
-                    {
-                        subMaterial->setTexture(LoadTexture(pathToTexture));
-                    }
-                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
-                    subMaterial->setColor(color);
-                    material->setSubMaterial(SubMaterialType::Diffuse, subMaterial);
+                    loadSubMaterial(item.value(), SubMaterialType::Diffuse);
                 }
                 else if (item.key() == "Normal")
                 {
-                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
-                    std::string pathToTexture = item.value()["path"].get<std::string>();
-                    if (pathToTexture != "null")
-                    {
-                        subMaterial->setTexture(LoadTexture(pathToTexture));
-                    }
-                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
-                    subMaterial->setColor(color);
-                    material->setSubMaterial(SubMaterialType::Normal, subMaterial);
+                    loadSubMaterial(item.value(), SubMaterialType::Normal);
                 }
                 else if (item.key() == "Specular")
                 {
-                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
-                    std::string pathToTexture = item.value()["path"].get<std::string>();
-                    if (pathToTexture != "null")
-                    {
-                        subMaterial->setTexture(LoadTexture(pathToTexture));
-                    }
-                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
-                    subMaterial->setColor(color);
-                    material->setSubMaterial(SubMaterialType::Specular, subMaterial);
+                    loadSubMaterial(item.value(), SubMaterialType::Specular);
                 }
                 else if (item.key() == "Roughness")
                 {
-                    std::shared_ptr<SubMaterial> subMaterial = std::make_shared<SubMaterial>();
-                    std::string pathToTexture = item.value()["path"].get<std::string>();
-                    if (pathToTexture != "null")
-                    {
-                        subMaterial->setTexture(LoadTexture(pathToTexture));
-                    }
-                    Vec3 color = { item.value()["color"][0],item.value()["color"][1],item.value()["color"][2] };
-                    subMaterial->setColor(color);
-                    material->setSubMaterial(SubMaterialType::Roughness, subMaterial);
+                    loadSubMaterial(item.value(), SubMaterialType::Roughness);
                 }
             }
             file.close();

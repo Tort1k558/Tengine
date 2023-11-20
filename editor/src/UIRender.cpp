@@ -49,7 +49,7 @@ namespace TengineEditor
     bool UIRender::DrawCombo(std::string_view name, std::vector<std::string> elements,int& currentElement)
     {
         bool result = false;
-        if (ImGui::BeginCombo(name.data(), elements[0].c_str()))
+        if (ImGui::BeginCombo(name.data(), elements[currentElement].c_str()))
         {
             for (int i = 0; i < elements.size(); ++i)
             {
