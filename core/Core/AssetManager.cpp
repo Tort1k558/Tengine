@@ -13,9 +13,9 @@
 #include"Core/Logger.h"
 #include"Renderer/Shader.h"
 #include"Renderer/Texture.h"
+#include"Renderer/CubeMapTexture.h"
 #include"Utils/Mesh.h"
 #include"Utils/Primitives.h"
-
 namespace Tengine
 {
     std::string ReadFile(std::filesystem::path path)
@@ -126,17 +126,10 @@ namespace Tengine
         {
             return texture;
         }
-        stbi_set_flip_vertically_on_load(true);
-        int width, height, channels;
+        std::shared_ptr<Image> image = LoadImage(path);
 
-        unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
-        if (data == nullptr)
-        {
-            Logger::Critical("ERROR::Failed to load the texture: {0}", path.string().c_str());
-            return nullptr;
-        }
         TextureType type = TextureType::RGB8;
-        switch (channels)
+        switch (image->getChannels())
         {
         case 1:
             type = TextureType::R8;
@@ -151,13 +144,13 @@ namespace Tengine
             type = TextureType::RGBA8;
             break;
         }
-        texture = Texture::Create(data, { width,height }, type);
+        texture = Texture::Create(image, type);
         texture->setPath(path);
-        stbi_image_free(data);
 
         m_resources[path.string()] = texture;
         return texture;
     }
+
 
     std::shared_ptr<Material> AssetManager::LoadMaterial(std::filesystem::path path)
     {
@@ -390,6 +383,134 @@ namespace Tengine
         return model;
     }
 
+    std::shared_ptr<CubeMapTexture> AssetManager::CreateCubeMapTexture(std::array<std::filesystem::path, 6> paths)
+    {
+        std::filesystem::path parentPath = paths[0].parent_path();
+        std::filesystem::path path;
+        for (size_t i = 0; true; i++)
+        {
+            if (!std::filesystem::exists(parentPath.string() + "/CubeMap" + std::to_string(i) + ".cubeMap"))
+            {
+                path = parentPath.string() + "/CubeMap" + std::to_string(i) + ".cubeMap";
+                break;
+            }
+        }
+        std::array<std::shared_ptr<Image>, 6> images;
+        std::array<TextureType, 6> types;
+        for (size_t i = 0; i < paths.size(); i++)
+        {
+            images[i] = LoadImage(paths[i], false);
+            TextureType type = TextureType::RGB8;
+            switch (images[i]->getChannels())
+            {
+            case 1:
+                type = TextureType::R8;
+                break;
+            case 2:
+                type = TextureType::RG8;
+                break;
+            case 3:
+                type = TextureType::RGB8;
+                break;
+            case 4:
+                type = TextureType::RGBA8;
+                break;
+            }
+            types[i] = type;
+        }
+        std::shared_ptr<CubeMapTexture> cubeMapTexture = CubeMapTexture::Create(images, types);
+        cubeMapTexture->setSupportingInfo("right", images[0]->getPath().string());
+        cubeMapTexture->setSupportingInfo("left", images[1]->getPath().string());
+        cubeMapTexture->setSupportingInfo("top", images[2]->getPath().string());
+        cubeMapTexture->setSupportingInfo("bottom", images[3]->getPath().string());
+        cubeMapTexture->setSupportingInfo("front", images[4]->getPath().string());
+        cubeMapTexture->setSupportingInfo("back", images[5]->getPath().string());
+        cubeMapTexture->setPath(path);
+        m_resources[path.string()] = cubeMapTexture;
+        SaveCubeMapTexture(cubeMapTexture.get());
+        return cubeMapTexture;
+    }
+
+    std::shared_ptr<CubeMapTexture> AssetManager::LoadCubeMapTexture(std::filesystem::path path)
+    {
+        std::shared_ptr<CubeMapTexture> cubeMapTexture = GetResource<CubeMapTexture>(path.string());
+        if (cubeMapTexture)
+        {
+            return cubeMapTexture;
+        }
+        std::array<std::shared_ptr<Image>, 6> images;
+        std::ifstream file(path.string());
+        if (file.is_open())
+        {
+            nlohmann::json data = nlohmann::json::parse(file);
+            for (const auto& item : data.items())
+            {
+                if (item.key() == "right")
+                {
+                    images[0] = LoadImage(item.value(), false);
+                }
+                else if (item.key() == "left")
+                {
+                    images[1] = LoadImage(item.value(), false);
+                }
+                else if (item.key() == "top")
+                {
+                    images[2] = LoadImage(item.value(), false);
+                }
+                else if (item.key() == "bottom")
+                {
+                    images[3] = LoadImage(item.value(), false);
+                }
+                else if (item.key() == "front")
+                {
+                    images[4] = LoadImage(item.value(), false);
+                }
+                else if (item.key() == "back")
+                {
+                    images[5] = LoadImage(item.value(), false);
+                }
+            }
+            file.close();
+        }
+        else
+        {
+            Logger::Critical("ERROR::AssetManager::Failed to open the material file!");
+        }
+        std::array<TextureType, 6> types;
+        for (size_t i = 0; i < images.size(); i++)
+        {
+            TextureType type = TextureType::RGB8;
+            switch (images[i]->getChannels())
+            {
+            case 1:
+                type = TextureType::R8;
+                break;
+            case 2:
+                type = TextureType::RG8;
+                break;
+            case 3:
+                type = TextureType::RGB8;
+                break;
+            case 4:
+                type = TextureType::RGBA8;
+                break;
+            }
+            types[i] = type;
+        }
+        cubeMapTexture = CubeMapTexture::Create(images, types);
+        cubeMapTexture->setPath(path);
+        for (size_t i = 0; i < images.size(); i++)
+        {
+            cubeMapTexture->setSupportingInfo("right", images[0]->getPath().string());
+            cubeMapTexture->setSupportingInfo("left", images[1]->getPath().string());
+            cubeMapTexture->setSupportingInfo("top", images[2]->getPath().string());
+            cubeMapTexture->setSupportingInfo("bottom", images[3]->getPath().string());
+            cubeMapTexture->setSupportingInfo("front", images[4]->getPath().string());
+            cubeMapTexture->setSupportingInfo("back", images[5]->getPath().string());
+        }
+        return cubeMapTexture;
+    }
+
     void AssetManager::SaveModel(Model* model)
     {
         nlohmann::json data;
@@ -493,6 +614,45 @@ namespace Tengine
         }
     }
 
+    void AssetManager::SaveCubeMapTexture(CubeMapTexture* texture)
+    {
+        if (!texture->getPath().empty())
+        {
+            nlohmann::json data;
+            data["right"] = texture->getSupportingInfo("right");
+            data["left"] = texture->getSupportingInfo("left");
+            data["top"] = texture->getSupportingInfo("top");
+            data["bottom"] = texture->getSupportingInfo("bottom");
+            data["front"] = texture->getSupportingInfo("front");
+            data["back"] = texture->getSupportingInfo("back");
+
+            std::ofstream file(texture->getPath().parent_path().string() + "/" + texture->getPath().stem().string() + ".cubeMap", std::ios_base::out);
+            if (file.is_open()) {
+                file << data.dump(4);
+                file.close();
+            }
+            else {
+                Logger::Critical("ERROR::Material::Failed to save the cubeMap texture!");
+            }
+        }
+    }
+
+    std::shared_ptr<Image> AssetManager::LoadImage(std::filesystem::path path, bool flipY)
+    {
+        stbi_set_flip_vertically_on_load(flipY);
+        int width, height, channels;
+
+        unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
+        if (data == nullptr)
+        {
+            Logger::Critical("ERROR::Failed to load the image: {0}", path.string().c_str());
+            return nullptr;
+        }
+        std::shared_ptr<Image> image = std::make_shared<Image>(data, UVec2(width, height), channels);
+        image->setPath(path);
+        return image;
+    }
+
     std::filesystem::path Resource::getPath() const
     {
         return m_path;
@@ -501,5 +661,19 @@ namespace Tengine
     void Resource::setPath(std::filesystem::path path)
     {
         m_path = path;
+    }
+
+    void Resource::setSupportingInfo(std::string_view key, std::string_view value)
+    {
+        m_supportingInfo[key.data()] = value;
+    }
+
+    std::string Resource::getSupportingInfo(std::string_view key)
+    {
+        if (m_supportingInfo.find(key.data()) != m_supportingInfo.end())
+        {
+            return m_supportingInfo[key.data()];
+        }
+        return "";
     }
 }

@@ -116,4 +116,36 @@ namespace Tengine
                 }
             }, nullptr);
     }
+    void RendererContextOpenGL::setDepthFunc(DepthFunc func)
+    {
+        switch (func)
+        {
+        case Tengine::DepthFunc::Always:
+            glDepthFunc(GL_ALWAYS);
+            break;
+        case Tengine::DepthFunc::Never:
+            glDepthFunc(GL_NEVER);
+            break;
+        case Tengine::DepthFunc::Less:
+            glDepthFunc(GL_LESS);
+            break;
+        case Tengine::DepthFunc::Equal:
+            glDepthFunc(GL_EQUAL);
+            break;
+        case Tengine::DepthFunc::LessOrEqual:
+            glDepthFunc(GL_LEQUAL);
+            break;
+        case Tengine::DepthFunc::Greater:
+            glDepthFunc(GL_GREATER);
+            break;
+        case Tengine::DepthFunc::NotEqual:
+            glDepthFunc(GL_NOTEQUAL);
+            break;
+        case Tengine::DepthFunc::GreaterOrEqual:
+            glDepthFunc(GL_GEQUAL);
+            break;
+        default:
+            break;
+        }
+    }
 }

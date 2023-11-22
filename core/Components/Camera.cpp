@@ -22,6 +22,11 @@ namespace Tengine
 		return m_projectionType;
 	}
 
+	std::shared_ptr<CubeMapTexture> Camera::getSkybox()
+	{
+		return m_skybox;
+	}
+
 	Mat4 Camera::getViewMatrix()
 	{
 		std::shared_ptr<Transform> transform = getParent()->getComponent<Transform>();
@@ -89,6 +94,7 @@ namespace Tengine
 			projectionSettingsAspect->name = "Aspect";
 			projectionSettingsAspect->callback = [this]() {m_projection->updateProjection(); };
 			componentInfo.addElement(projectionSettingsAspect);
+
 			std::shared_ptr<FieldFloat> projectionSettingsFov = std::make_shared<FieldFloat>();
 			projectionSettingsFov->data = &perspective->m_fov;
 			projectionSettingsFov->minValue = 0.0f;
@@ -101,6 +107,7 @@ namespace Tengine
 		case ProjectionType::Orthographical:
 		{
 			std::shared_ptr<OrthographicalProjection> projection = std::dynamic_pointer_cast<OrthographicalProjection>(getProjection());
+
 			std::shared_ptr<FieldFloat> projectionSettingsLeft = std::make_shared<FieldFloat>();
 			projectionSettingsLeft->data = &projection->m_left;
 			projectionSettingsLeft->minValue = -0.01f;
@@ -108,6 +115,7 @@ namespace Tengine
 			projectionSettingsLeft->name = "Left";
 			projectionSettingsLeft->callback = [this]() {m_projection->updateProjection(); };
 			componentInfo.addElement(projectionSettingsLeft);
+
 			std::shared_ptr<FieldFloat> projectionSettingsRight = std::make_shared<FieldFloat>();
 			projectionSettingsRight->data = &projection->m_right;
 			projectionSettingsRight->minValue = 0.01f;
@@ -115,6 +123,7 @@ namespace Tengine
 			projectionSettingsRight->name = "Right";
 			projectionSettingsRight->callback = [this]() {m_projection->updateProjection(); };
 			componentInfo.addElement(projectionSettingsRight);
+
 			std::shared_ptr<FieldFloat> projectionSettingsBottom = std::make_shared<FieldFloat>();
 			projectionSettingsBottom->data = &projection->m_bottom;
 			projectionSettingsBottom->minValue = -0.01f;
@@ -122,6 +131,7 @@ namespace Tengine
 			projectionSettingsBottom->name = "Bottom";
 			projectionSettingsBottom->callback = [this]() {m_projection->updateProjection(); };
 			componentInfo.addElement(projectionSettingsBottom);
+
 			std::shared_ptr<FieldFloat> projectionSettingsTop = std::make_shared<FieldFloat>();
 			projectionSettingsTop->data = &projection->m_top;
 			projectionSettingsTop->minValue = 0.01f;
@@ -138,6 +148,15 @@ namespace Tengine
 		enableLighting->data = &m_isLighting;
 		enableLighting->name = "Lighting";
 		componentInfo.addElement(enableLighting);
+
+		std::shared_ptr<FieldFile> skybox = std::make_shared<FieldFile>();
+		skybox->name = "CubeMapTexture";
+		skybox->path = m_skybox ? m_skybox->getPath() : "";
+		skybox->callback = [this](const std::string& path) 
+			{
+				this->setSkybox(AssetManager::LoadCubeMapTexture(path));
+			};
+		componentInfo.addElement(skybox);
 		return componentInfo;
 	}
 
@@ -149,6 +168,11 @@ namespace Tengine
 	void Camera::setLighting(bool value)
 	{
 		m_isLighting = value;
+	}
+
+	void Camera::setSkybox(std::shared_ptr<CubeMapTexture> skybox)
+	{
+		m_skybox = skybox;
 	}
 
 	std::shared_ptr<Projection> Camera::getProjection() const

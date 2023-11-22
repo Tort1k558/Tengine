@@ -1,5 +1,5 @@
 #pragma once
-#include"../RendererContext.h"
+#include"Renderer/RendererContext.h"
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<memory>
@@ -18,5 +18,6 @@ namespace Tengine
 		void enableDepthTest() final;
 		void disableDepthTest() final;
 		void enableDebugInfo() final;
+		void setDepthFunc(DepthFunc func) final;
 	};
 }

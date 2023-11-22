@@ -3,14 +3,17 @@
 
 namespace Tengine
 {
-	class TENGINE LightIntensable
+	class TENGINE Light
 	{
 	public:
-		virtual ~LightIntensable() = default;
+		virtual ~Light() = default;
 		float getIntensity();
 		void setIntensity(float intensity);
+		Vec3 getColor();
+		void setColor(Vec3 color);
 	protected:
 		float m_intensity = 1.0f;
+		Vec3 m_color = { 1.0f,1.0f,1.0f };
 	};
 
 	class TENGINE LightRangable
@@ -23,19 +26,19 @@ namespace Tengine
 		float m_range = 5.0f;
 	};
 
-	class TENGINE DirectionLight : public Component, public LightIntensable
+	class TENGINE DirectionLight : public Component, public Light
 	{
 	public:
 		DirectionLight();
 		ComponentInfo getInfo() override;
 	};
-	class TENGINE PointLight : public Component, public LightIntensable, public LightRangable
+	class TENGINE PointLight : public Component, public Light, public LightRangable
 	{
 	public:
 		PointLight();
 		ComponentInfo getInfo() override;
 	};
-	class TENGINE SpotLight : public Component, public LightIntensable, public LightRangable
+	class TENGINE SpotLight : public Component, public Light, public LightRangable
 	{
 	public:
 		SpotLight();

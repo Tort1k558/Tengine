@@ -6,9 +6,14 @@
 
 namespace Tengine
 {
+	GLenum TextureTypeToOpenGLFormat(TextureType type);
+	GLenum TextureTypeToOpenGLInternalFormat(TextureType type);
+	GLenum TextureTypeToOpenGLType(TextureType type);
+
 	class TextureOpenGL : public Texture
 	{
 	public:
+		TextureOpenGL(std::shared_ptr<Image> image, TextureType type,TextureFilter filter = TextureFilter::None);
 		TextureOpenGL(void* data, UVec2 size, TextureType type,TextureFilter filter = TextureFilter::None);
 		~TextureOpenGL();
 		TextureOpenGL(const TextureOpenGL&) = delete;
@@ -20,7 +25,10 @@ namespace Tengine
 		void* getData() final;
 		unsigned int getId() final;
 	private:
-		friend class FrameBufferOpenGL;
+		void generateTexture(void* data, UVec2 size);
 		GLuint m_id;
+
+		friend class FrameBufferOpenGL;
 	};
+
 }

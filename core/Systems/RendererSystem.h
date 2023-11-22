@@ -18,16 +18,21 @@ namespace Tengine
 		void init() final;
 		void update() final;
 		void destroy() final;
+
 		void updateViewport(UVec2 size);
+
 		void setRendererType(RendererType type);
 		void setTextureFilter(TextureFilter filter);
 		RendererType getRendererType();
 		TextureFilter getTextureFilter();
 		std::shared_ptr<FrameBuffer> getFramebuffer();
 		void renderFramebuffer(std::shared_ptr<FrameBuffer> framebuffer);
+
 		void disableRenderToDefaultFramebuffer();
 		void enableRenderToDefaultFramebuffer();
+
 		void renderCamera(std::shared_ptr<Camera> camera);
+
 		std::shared_ptr<RendererContext> getRendererContext();
 		static std::shared_ptr<RendererSystem> GetInstance();
 	private:

@@ -2,13 +2,23 @@
 
 namespace Tengine
 {
-	float LightIntensable::getIntensity()
+	float Light::getIntensity()
 	{
 		return m_intensity;
 	}
-	void LightIntensable::setIntensity(float intensity)
+	void Light::setIntensity(float intensity)
 	{
 		m_intensity = intensity;
+	}
+
+	Vec3 Light::getColor()
+	{
+		return m_color;
+	}
+
+	void Light::setColor(Vec3 color)
+	{
+		m_color = color;
 	}
 
 	float LightRangable::getRange()
@@ -30,6 +40,13 @@ namespace Tengine
 		ComponentInfo componentInfo;
 		componentInfo.setComponentName("DirectionLight");
 
+		std::shared_ptr<FieldVec3> fieldColor = std::make_shared<FieldVec3>();
+		fieldColor->name = "Color";
+		fieldColor->minValue = 0.000001f;
+		fieldColor->maxValue = 1.0f;
+		fieldColor->data = &m_color;
+		componentInfo.addElement(fieldColor);
+
 		std::shared_ptr<FieldFloat> fieldIntensity = std::make_shared<FieldFloat>();
 		fieldIntensity->name = "Intensity";
 		fieldIntensity->minValue = 0.000001f;
@@ -48,6 +65,13 @@ namespace Tengine
 	{
 		ComponentInfo componentInfo;
 		componentInfo.setComponentName("PointLight");
+
+		std::shared_ptr<FieldVec3> fieldColor = std::make_shared<FieldVec3>();
+		fieldColor->name = "Color";
+		fieldColor->minValue = 0.000001f;
+		fieldColor->maxValue = 1.0f;
+		fieldColor->data = &m_color;
+		componentInfo.addElement(fieldColor);
 
 		std::shared_ptr<FieldFloat> fieldIntensity = std::make_shared<FieldFloat>();
 		fieldIntensity->name = "Intensity";
@@ -95,6 +119,13 @@ namespace Tengine
 	{
 		ComponentInfo componentInfo;
 		componentInfo.setComponentName("SpotLight");
+
+		std::shared_ptr<FieldVec3> fieldColor = std::make_shared<FieldVec3>();
+		fieldColor->name = "Color";
+		fieldColor->minValue = 0.000001f;
+		fieldColor->maxValue = 1.0f;
+		fieldColor->data = &m_color;
+		componentInfo.addElement(fieldColor);
 
 		std::shared_ptr<FieldFloat> fieldIntensity = std::make_shared<FieldFloat>();
 		fieldIntensity->name = "Intensity";

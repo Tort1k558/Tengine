@@ -3,6 +3,7 @@
 #include"ECS/Component.h"
 #include"Core/Math.h"
 #include"Core/Core.h"
+#include"Renderer/CubeMapTexture.h"
 
 namespace Tengine
 {
@@ -85,6 +86,7 @@ namespace Tengine
 		ZXY,
 		ZYX
 	};
+
 	class TENGINE Camera : public Component
 	{
 	public:
@@ -94,15 +96,18 @@ namespace Tengine
 		void setCameraType(ProjectionType type);
 		void setRotationOrder(RotationOrder order);
 		void setLighting(bool value);
+		void setSkybox(std::shared_ptr<CubeMapTexture> skybox);
 
+		std::shared_ptr<CubeMapTexture> getSkybox();
 		Mat4 getViewMatrix();
 		Vec3 getDirection() const;
 		Vec3 getUp();
 		std::shared_ptr<Projection> getProjection() const;
 		RotationOrder getRotationOrder() const;
 		ProjectionType getProjectionType() const;
-		ComponentInfo getInfo() override;
 		bool isLighting() const;
+
+		ComponentInfo getInfo() final;
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;
 
@@ -112,5 +117,6 @@ namespace Tengine
 		Vec3 m_direction = { 0.0f,0.0f, -1.0f };
 		Vec3 m_up = { 0.0f,1.0f,0.0f };
 		bool m_isLighting = false;
+		std::shared_ptr<CubeMapTexture> m_skybox = nullptr;
 	};
 }

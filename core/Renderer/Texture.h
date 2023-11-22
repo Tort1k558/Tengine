@@ -1,10 +1,12 @@
 #pragma once
 
 #include<memory>
+#include<array>
 
 #include"Core/Math.h"
 #include"Core/AssetManager.h"
 
+#include"Utils/Image.h"
 
 namespace Tengine
 {
@@ -37,14 +39,12 @@ namespace Tengine
 
 		virtual void bind(unsigned int slot) = 0;
 
-		UVec2 getSize();
 		virtual void* getData() = 0;
 		virtual unsigned int getId() = 0;
 
+		static std::shared_ptr<Texture> Create(std::shared_ptr<Image> image, TextureType type, TextureFilter filter = TextureFilter::None);
 		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type, TextureFilter filter = TextureFilter::None);
 	protected:
-		UVec2 m_size = { 0, 0 };
-		void* m_data = nullptr;
 		TextureType m_type = TextureType::RGB8;
 		TextureFilter m_filter = TextureFilter::None;
 	};

@@ -219,14 +219,14 @@ namespace TengineEditor
             }
             break;
         }
-        case FieldType::CollapsingHeader:
+        case FieldType::Array:
         {
-            std::shared_ptr<FieldCollapsingHeader> header = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
-            if (UIRender::DrawCollapsingHeader(header->name.c_str()))
+            std::shared_ptr<FieldArray> array = std::dynamic_pointer_cast<FieldArray>(element);
+            if (UIRender::DrawCollapsingHeader(array->name.c_str()))
             {
-                for (size_t i = 0; i < header->elements.size(); i++)
+                for (size_t i = 0; i < array->elements.size(); i++)
                 {
-                    ShowField(header->elements[i]);
+                    ShowField(array->elements[i]);
                 }
             };
             break;

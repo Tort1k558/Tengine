@@ -166,24 +166,20 @@ void main()
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
-    //REMOVE COLOR
-	vec3 lightColor = vec3(1.0);
     vec3 lightDir = normalize(-light.direction);
 
     float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * lightColor * light.intensity;
+    vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * light.color * light.intensity;
 
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    vec3 specular = spec * lightColor * light.intensity;
+    vec3 specular = spec * light.color * light.intensity;
 
 
     return diffuse + specular; 
 } 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 {
-    //REMOVE COLOR
-    vec3 lightColor = vec3(1.0);
     vec3 lightDir = normalize(light.position - fragPos);
     
     float distanceToPoint = length(light.position - fragPos);
@@ -192,11 +188,11 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
         float attenuation = 1.0 / (1.0 + 0.01 * distanceToPoint + 0.032 * (distanceToPoint * distanceToPoint));
 
         float diff = max(dot(normal, lightDir), 0.0);
-        vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * lightColor * light.intensity * attenuation;
+        vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * light.color * light.intensity * attenuation;
 
         vec3 reflectDir = reflect(-lightDir, normal);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-        vec3 specular = spec * lightColor * light.intensity * attenuation;    
+        vec3 specular = spec * light.color * light.intensity * attenuation;    
         return diffuse + specular;
     }
     return vec3(0.0);
@@ -204,7 +200,6 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 viewDir)
 
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
 {
-    vec3 lightColor = vec3(1.0);
     vec3 lightDir = normalize(light.position - fragPos);
     
     float theta = dot(lightDir, normalize(-light.direction));
@@ -218,15 +213,42 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 viewDir)
             float attenuation = 1.0 / (1.0 + 0.01 * distanceToPoint + 0.032 * (distanceToPoint * distanceToPoint));
 
             float diff = max(dot(normal, lightDir), 0.0);
-            vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * lightColor * light.intensity * intensity * attenuation;
+            vec3 diffuse = diff * (texture(u_material.albedo.texture, uv).rgb + u_material.albedo.color) * light.color * light.intensity * intensity * attenuation;
 
             vec3 reflectDir = reflect(-lightDir, normal);
             float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-            vec3 specular = spec * lightColor * light.intensity * intensity * attenuation;
+            vec3 specular = spec * light.color * light.intensity * intensity * attenuation;
             return diffuse + specular;
         }
     }
     return vec3(0.0);
+}
+)";
+const char* skyboxShaderVertex = R"(#version 460
+
+layout(location = 0) in vec3 vertexPos;
+
+uniform mat4 u_view;
+uniform mat4 u_projection;
+
+out vec3 uvw;
+
+void main()
+{
+    uvw = vertexPos;
+    gl_Position = (u_projection * u_view * vec4(vertexPos,1.0)).xyww;
+})";
+const char* skyboxShaderFragment = R"(#version 460
+
+in vec3 uvw;
+
+out vec4 fragColor;
+
+uniform samplerCube skybox;
+
+void main()
+{
+    fragColor = texture(skybox,uvw);
 }
 )";
 	}

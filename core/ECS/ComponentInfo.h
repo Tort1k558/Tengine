@@ -17,7 +17,7 @@ namespace Tengine
 		Vec3,
 		Vec4,
 		Enum,
-		CollapsingHeader,
+		Array,
 		File,
 		Bool
 	};
@@ -85,12 +85,13 @@ namespace Tengine
 		std::function<void(int element)> callback;
 	};
 
-	struct TENGINE FieldCollapsingHeader : public FieldInfo
+	struct TENGINE FieldArray : public FieldInfo
 	{
-		FieldCollapsingHeader()
+		FieldArray()
 		{
-			type = FieldType::CollapsingHeader;
+			type = FieldType::Array;
 		}
+		std::function<void()> callback;
 		std::vector<std::shared_ptr<FieldInfo>> elements;
 	};
 
@@ -99,9 +100,8 @@ namespace Tengine
 		FieldFile()
 		{
 			type = FieldType::File;
-			path = "Null";
 		}
-		std::filesystem::path path;
+		std::filesystem::path path = "null";
 		std::function<void(const std::string& path)> callback;
 	};
 
@@ -114,7 +114,6 @@ namespace Tengine
 		bool* data = nullptr;
 		std::function<void()> callback;
 	};
-
 	class TENGINE ComponentInfo
 	{
 	public:

@@ -267,9 +267,9 @@ namespace Tengine
 			}
 			break;
 		}
-		case FieldType::CollapsingHeader:
+		case FieldType::Array:
 		{
-			std::shared_ptr<FieldCollapsingHeader> field = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
+			std::shared_ptr<FieldArray> field = std::dynamic_pointer_cast<FieldArray>(element);
 			for (const auto& el : field->elements)
 			{
 				DeserializeField(data[el->name], el);
@@ -331,9 +331,9 @@ namespace Tengine
 			data = field->path;
 			break;
 		}
-		case FieldType::CollapsingHeader:
+		case FieldType::Array:
 		{
-			std::shared_ptr<FieldCollapsingHeader> field = std::dynamic_pointer_cast<FieldCollapsingHeader>(element);
+			std::shared_ptr<FieldArray> field = std::dynamic_pointer_cast<FieldArray>(element);
 			for (const auto& el : field->elements)
 			{
 				SerializeField(data[el->name], el);

@@ -77,14 +77,14 @@ namespace Tengine
         std::vector<Vertex> vertices;
         //                          Front
         vertices.push_back({ Vec3(-1.0f, -1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(0.0f, 0.0f) });
-        vertices.push_back({ Vec3(1.0f,  1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 1.0f) });
         vertices.push_back({ Vec3(-1.0f,  1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(0.0f, 1.0f) });
-        vertices.push_back({ Vec3(1.0f, -1.0f,  1.0f) ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 0.0f) });
+        vertices.push_back({ Vec3(1.0f,  1.0f,  1.0f)  ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 1.0f) });
+        vertices.push_back({ Vec3(1.0f, -1.0f,  1.0f)  ,Vec3(0.0f,0.0f,1.0f),Vec2(1.0f, 0.0f) });
         //                          Back
         vertices.push_back({ Vec3(-1.0f, -1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(1.0f, 0.0f) });
-        vertices.push_back({ Vec3(1.0f,  1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(0.0f, 1.0f) });
+        vertices.push_back({ Vec3(1.0f,  1.0f, -1.0f)  ,Vec3(0.0f,0.0f,-1.0f),Vec2(0.0f, 1.0f) });
         vertices.push_back({ Vec3(-1.0f,  1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(1.0f, 1.0f) });
-        vertices.push_back({ Vec3(1.0f, -1.0f, -1.0f) ,Vec3(0.0f,0.0f,-1.0f),Vec2(0.0f, 0.0f) });
+        vertices.push_back({ Vec3(1.0f, -1.0f, -1.0f)  ,Vec3(0.0f,0.0f,-1.0f),Vec2(0.0f, 0.0f) });
         //                          Left
         vertices.push_back({ Vec3(-1.0f, -1.0f, -1.0f) ,Vec3(-1.0f,0.0f,0.0f),Vec2(0.0f, 0.0f) });
         vertices.push_back({ Vec3(-1.0f,  1.0f,  1.0f) ,Vec3(-1.0f,0.0f,0.0f),Vec2(1.0f, 1.0f) });
@@ -106,7 +106,7 @@ namespace Tengine
         vertices.push_back({ Vec3(1.0f, -1.0f, -1.0f) ,Vec3(0.0f,-1.0f,0.0f),Vec2(1.0f, 1.0f) });
         vertices.push_back({ Vec3(-1.0f, -1.0f,  1.0f) ,Vec3(0.0f,-1.0f,0.0f),Vec2(0.0f, 0.0f) });
         // Front
-        std::vector<unsigned int> indices = { 0, 1, 2,  0, 1, 3,
+        std::vector<unsigned int> indices = { 0, 1, 2,  2, 3, 0,
             // Back
           4, 5, 6,  4, 5, 7,
             // Left

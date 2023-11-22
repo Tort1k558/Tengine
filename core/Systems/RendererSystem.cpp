@@ -9,12 +9,13 @@
 #include"Renderer/VertexBuffer.h"
 #include"Renderer/IndexBuffer.h"
 #include"Renderer/Shader.h"
+#include"Renderer/Shaders/ShaderCode.h"
+#include"Renderer/CubeMapTexture.h"
 #include"Scene/Scene.h"
 #include"Scene/SceneManager.h"
 #include"Utils/Primitives.h"
 #include"Components/Model.h"
 #include"Components/Light.h"
-#include"Renderer/Shaders/ShaderCode.h"
 namespace Tengine
 {
 	std::shared_ptr<RendererSystem> RendererSystem::m_instance;
@@ -38,6 +39,8 @@ namespace Tengine
 		AssetManager::AddShader("FramebufferShader", framebufferShaderSource.getSourceShader(ShaderType::Vertex), framebufferShaderSource.getSourceShader(ShaderType::Fragment));
 		ShaderSource lightingShaderSource = ShaderCode::GetLightingShader();
 		AssetManager::AddShader("LightingShader", lightingShaderSource.getSourceShader(ShaderType::Vertex), lightingShaderSource.getSourceShader(ShaderType::Fragment));
+		ShaderSource skyboxShaderSource = ShaderCode::GetSkyboxShader();
+		AssetManager::AddShader("SkyboxShader", skyboxShaderSource.getSourceShader(ShaderType::Vertex), skyboxShaderSource.getSourceShader(ShaderType::Fragment));
 		m_framebuffer = FrameBuffer::Create(m_viewportSize);
 
 	}
@@ -152,7 +155,9 @@ namespace Tengine
 
 						if (parent && parent->getComponent<Transform>())
 						{
-							shader->setUniformVec3("dirLights[" + std::to_string(i) + "].direction", parent->getComponent<Transform>()->getForwardVector());
+							std::shared_ptr<Transform> lightTransform = parent->getComponent<Transform>();
+							shader->setUniformVec3("dirLights[" + std::to_string(i) + "].direction", lightTransform->getForwardVector());
+							shader->setUniformVec3("dirLights[" + std::to_string(i) + "].color", directionLights[i]->getColor());
 							shader->setUniformFloat("dirLights[" + std::to_string(i) + "].intensity", directionLights[i]->getIntensity());
 						}
 					}
@@ -168,6 +173,7 @@ namespace Tengine
 						{
 							std::shared_ptr<Transform> lightTransform = parent->getComponent<Transform>();
 							shader->setUniformVec3("pointLights[" + std::to_string(i) + "].position", lightTransform->getPosition());
+							shader->setUniformVec3("pointLights[" + std::to_string(i) + "].color", pointLights[i]->getColor());
 							shader->setUniformFloat("pointLights[" + std::to_string(i) + "].intensity", pointLights[i]->getIntensity());
 							shader->setUniformFloat("pointLights[" + std::to_string(i) + "].range", pointLights[i]->getRange());
 						}
@@ -185,6 +191,7 @@ namespace Tengine
 							std::shared_ptr<Transform> lightTransform = parent->getComponent<Transform>();
 							shader->setUniformVec3("spotLights[" + std::to_string(i) + "].position", lightTransform->getPosition());
 							shader->setUniformVec3("spotLights[" + std::to_string(i) + "].direction", lightTransform->getForwardVector());
+							shader->setUniformVec3("spotLights[" + std::to_string(i) + "].color", spotLights[i]->getColor());
 							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].intensity", spotLights[i]->getIntensity());
 							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].range", spotLights[i]->getRange());
 							shader->setUniformFloat("spotLights[" + std::to_string(i) + "].innerConeAngle", Math::DegreesToRadians(spotLights[i]->getInnerConeAngle()));
@@ -246,6 +253,23 @@ namespace Tengine
 						m_context->drawIndexed(submeshes[i]->getVertexArray());
 					}
 				}
+			}
+			if (camera->getSkybox())
+			{
+				m_context->setDepthFunc(DepthFunc::LessOrEqual);
+
+				std::shared_ptr<CubeMapTexture> skybox = camera->getSkybox();
+				std::shared_ptr<Shader> skyboxShader = AssetManager::GetResource<Shader>("SkyboxShader");
+				skyboxShader->bind();
+				skyboxShader->setUniformMat4("u_view", Mat4(Mat3(camera->getViewMatrix())));
+				skyboxShader->setUniformMat4("u_projection", camera->getProjection()->getProjectionMatrix());
+				skyboxShader->setUniformInt("skybox", 0);
+				skybox->bind(0);
+
+				std::shared_ptr<Mesh> cube = Primitives::CreateCube();
+				m_context->drawIndexed(cube->getSubmeshes()[0]->getVertexArray());
+
+				m_context->setDepthFunc(DepthFunc::Less);
 			}
 		}
 	}

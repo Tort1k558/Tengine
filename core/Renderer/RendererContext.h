@@ -15,6 +15,18 @@ namespace Tengine
 		OpenGL,
 		OpenGLES
 	};
+	enum class DepthFunc
+	{
+		Always = 0,
+		Never,
+		Less,
+		Equal,
+		LessOrEqual,
+		Greater,
+		NotEqual,
+		GreaterOrEqual,
+
+	};
 
 	class TENGINE RendererContext
 	{
@@ -29,6 +41,7 @@ namespace Tengine
 		virtual void enableDepthTest() = 0;
 		virtual void disableDepthTest() = 0;
 		virtual void enableDebugInfo() = 0;
+		virtual void setDepthFunc(DepthFunc func) = 0;
 		RendererType getType();
 	protected:
 		RendererType m_type;

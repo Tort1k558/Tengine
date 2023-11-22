@@ -63,6 +63,25 @@ namespace Tengine
         return source;
     }
 
+    ShaderSource ShaderCode::GetSkyboxShader()
+    {
+        ShaderSource source;
+        switch (RendererSystem::GetInstance()->getRendererType())
+        {
+        case RendererType::OpenGL:
+            source.addSourceShader(ShaderType::Vertex, GLSL::skyboxShaderVertex);
+            source.addSourceShader(ShaderType::Fragment, GLSL::skyboxShaderFragment);
+            break;
+        case RendererType::OpenGLES:
+            //
+            break;
+        default:
+            Logger::Critical("ERROR::ShaderCode::CurrentShader doesn't support in this RenderContext!");
+            break;
+        }
+        return source;
+    }
+
     void ShaderSource::addSourceShader(ShaderType type, std::string_view source)
     {
         m_source[static_cast<int>(type)] = source;

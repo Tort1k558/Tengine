@@ -64,6 +64,16 @@ namespace TengineEditor
         object2->setName("Camera");
         std::shared_ptr<Camera> camera = Component::Create<Camera>(ProjectionType::Perspective);
         camera->setLighting(true);
+        camera->setSkybox(AssetManager::CreateCubeMapTexture(
+            {
+                "Assets/skybox/right.jpg",
+                "Assets/skybox/left.jpg",
+                "Assets/skybox/top.jpg",
+                "Assets/skybox/bottom.jpg",
+                "Assets/skybox/front.jpg",
+                "Assets/skybox/back.jpg"
+            
+            }));
         object2->addComponent(camera);
         std::shared_ptr<Transform> transform2 = object2->getComponent<Transform>();
         transform2->setPosition({ 0.0f,0.0f,2.0f });
