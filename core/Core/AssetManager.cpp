@@ -395,36 +395,18 @@ namespace Tengine
                 break;
             }
         }
-        std::array<std::shared_ptr<Image>, 6> images;
-        std::array<TextureType, 6> types;
+        std::array<std::shared_ptr<Texture>, 6> textures;
         for (size_t i = 0; i < paths.size(); i++)
         {
-            images[i] = LoadImage(paths[i], false);
-            TextureType type = TextureType::RGB8;
-            switch (images[i]->getChannels())
-            {
-            case 1:
-                type = TextureType::R8;
-                break;
-            case 2:
-                type = TextureType::RG8;
-                break;
-            case 3:
-                type = TextureType::RGB8;
-                break;
-            case 4:
-                type = TextureType::RGBA8;
-                break;
-            }
-            types[i] = type;
+            textures[i] = LoadTexture(paths[i]);
         }
-        std::shared_ptr<CubeMapTexture> cubeMapTexture = CubeMapTexture::Create(images, types);
-        cubeMapTexture->setSupportingInfo("right", images[0]->getPath().string());
-        cubeMapTexture->setSupportingInfo("left", images[1]->getPath().string());
-        cubeMapTexture->setSupportingInfo("top", images[2]->getPath().string());
-        cubeMapTexture->setSupportingInfo("bottom", images[3]->getPath().string());
-        cubeMapTexture->setSupportingInfo("front", images[4]->getPath().string());
-        cubeMapTexture->setSupportingInfo("back", images[5]->getPath().string());
+        std::shared_ptr<CubeMapTexture> cubeMapTexture = CubeMapTexture::Create(textures);
+        cubeMapTexture->setSupportingInfo("right", textures[0]->getPath().string());
+        cubeMapTexture->setSupportingInfo("left", textures[1]->getPath().string());
+        cubeMapTexture->setSupportingInfo("top", textures[2]->getPath().string());
+        cubeMapTexture->setSupportingInfo("bottom", textures[3]->getPath().string());
+        cubeMapTexture->setSupportingInfo("front", textures[4]->getPath().string());
+        cubeMapTexture->setSupportingInfo("back", textures[5]->getPath().string());
         cubeMapTexture->setPath(path);
         m_resources[path.string()] = cubeMapTexture;
         SaveCubeMapTexture(cubeMapTexture.get());
@@ -438,7 +420,7 @@ namespace Tengine
         {
             return cubeMapTexture;
         }
-        std::array<std::shared_ptr<Image>, 6> images;
+        std::array<std::shared_ptr<Texture>, 6> textures;
         std::ifstream file(path.string());
         if (file.is_open())
         {
@@ -447,27 +429,27 @@ namespace Tengine
             {
                 if (item.key() == "right")
                 {
-                    images[0] = LoadImage(item.value(), false);
+                    textures[0] = LoadTexture(item.value());
                 }
                 else if (item.key() == "left")
                 {
-                    images[1] = LoadImage(item.value(), false);
+                    textures[1] = LoadTexture(item.value());
                 }
                 else if (item.key() == "top")
                 {
-                    images[2] = LoadImage(item.value(), false);
+                    textures[2] = LoadTexture(item.value());
                 }
                 else if (item.key() == "bottom")
                 {
-                    images[3] = LoadImage(item.value(), false);
+                    textures[3] = LoadTexture(item.value());
                 }
                 else if (item.key() == "front")
                 {
-                    images[4] = LoadImage(item.value(), false);
+                    textures[4] = LoadTexture(item.value());
                 }
                 else if (item.key() == "back")
                 {
-                    images[5] = LoadImage(item.value(), false);
+                    textures[5] = LoadTexture(item.value());
                 }
             }
             file.close();
@@ -476,37 +458,16 @@ namespace Tengine
         {
             Logger::Critical("ERROR::AssetManager::Failed to open the material file!");
         }
-        std::array<TextureType, 6> types;
-        for (size_t i = 0; i < images.size(); i++)
-        {
-            TextureType type = TextureType::RGB8;
-            switch (images[i]->getChannels())
-            {
-            case 1:
-                type = TextureType::R8;
-                break;
-            case 2:
-                type = TextureType::RG8;
-                break;
-            case 3:
-                type = TextureType::RGB8;
-                break;
-            case 4:
-                type = TextureType::RGBA8;
-                break;
-            }
-            types[i] = type;
-        }
-        cubeMapTexture = CubeMapTexture::Create(images, types);
+        cubeMapTexture = CubeMapTexture::Create(textures);
         cubeMapTexture->setPath(path);
-        for (size_t i = 0; i < images.size(); i++)
+        for (size_t i = 0; i < textures.size(); i++)
         {
-            cubeMapTexture->setSupportingInfo("right", images[0]->getPath().string());
-            cubeMapTexture->setSupportingInfo("left", images[1]->getPath().string());
-            cubeMapTexture->setSupportingInfo("top", images[2]->getPath().string());
-            cubeMapTexture->setSupportingInfo("bottom", images[3]->getPath().string());
-            cubeMapTexture->setSupportingInfo("front", images[4]->getPath().string());
-            cubeMapTexture->setSupportingInfo("back", images[5]->getPath().string());
+            cubeMapTexture->setSupportingInfo("right", textures[0]->getPath().string());
+            cubeMapTexture->setSupportingInfo("left", textures[1]->getPath().string());
+            cubeMapTexture->setSupportingInfo("top", textures[2]->getPath().string());
+            cubeMapTexture->setSupportingInfo("bottom", textures[3]->getPath().string());
+            cubeMapTexture->setSupportingInfo("front", textures[4]->getPath().string());
+            cubeMapTexture->setSupportingInfo("back", textures[5]->getPath().string());
         }
         return cubeMapTexture;
     }

@@ -220,34 +220,35 @@ namespace Tengine
 					{
 						if (model->hasSubmeshMaterial(i))
 						{
+							auto bindSubMaterial = [&shader](std::shared_ptr<SubMaterial> subMaterial,std::string uniformName, int slot)
+								{
+									if (subMaterial->hasTexture())
+									{
+										shader->setUniformInt(uniformName + ".texture", slot);
+										subMaterial->getTexture()->bind(slot);
+									}
+									shader->setUniformVec3(uniformName + ".color", subMaterial->getColor());
+								};
 							std::shared_ptr<Material> material = model->getSubmeshMaterial(i);
 							if (material->hasSubMaterial(SubMaterialType::Diffuse))
 							{
 								std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(SubMaterialType::Diffuse);
-								shader->setUniformInt("u_material.albedo.texture", 0);
-								subMaterial->getTexture()->bind(0);
-								shader->setUniformVec3("u_material.albedo.color", subMaterial->getColor());
+								bindSubMaterial(subMaterial, "u_material.albedo", 0);
 							}
 							if (material->hasSubMaterial(SubMaterialType::Normal))
 							{
 								std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(SubMaterialType::Normal);
-								shader->setUniformInt("u_material.normal.texture", 1);
-								subMaterial->getTexture()->bind(1);
-								shader->setUniformVec3("u_material.normal.color", subMaterial->getColor());
+								bindSubMaterial(subMaterial, "u_material.normal", 1);
 							}
 							if (material->hasSubMaterial(SubMaterialType::Specular))
 							{
 								std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(SubMaterialType::Specular);
-								shader->setUniformInt("u_material.specular.texture", 2);
-								subMaterial->getTexture()->bind(2);
-								shader->setUniformVec3("u_material.specular.color", subMaterial->getColor());
+								bindSubMaterial(subMaterial, "u_material.specular", 2);
 							}
 							if (material->hasSubMaterial(SubMaterialType::Roughness))
 							{
 								std::shared_ptr<SubMaterial> subMaterial = material->getSubMaterial(SubMaterialType::Roughness);
-								shader->setUniformInt("u_material.roughness.texture", 3);
-								subMaterial->getTexture()->bind(3);
-								shader->setUniformVec3("u_material.roughness.color", subMaterial->getColor());
+								bindSubMaterial(subMaterial, "u_material.roughness", 3);
 							}
 						}
 						m_context->drawIndexed(submeshes[i]->getVertexArray());

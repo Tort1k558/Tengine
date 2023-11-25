@@ -7,6 +7,15 @@
 
 namespace Tengine
 {
+	enum class CubeMapSide
+	{
+		Right = 0,
+		Left,
+		Top,
+		Bottom,
+		Front,
+		Back
+	};
 	class TENGINE CubeMapTexture : public Resource
 	{
 	public:
@@ -15,8 +24,9 @@ namespace Tengine
 		virtual void bind(unsigned int slot) = 0;
 
 		virtual unsigned int getId() = 0;
-
-		static std::shared_ptr<CubeMapTexture> Create(std::array<std::shared_ptr<Image>, 6> images, std::array<TextureType, 6> types, TextureFilter filter = TextureFilter::None);
+		virtual void setTexture(CubeMapSide side, std::shared_ptr<Texture> texture) = 0;
+		virtual std::shared_ptr<void> getData(CubeMapSide side) = 0;
+		static std::shared_ptr<CubeMapTexture> Create(std::array<std::shared_ptr<Texture>, 6> textures, TextureFilter filter = TextureFilter::None);
 	protected:
 		TextureFilter m_filter = TextureFilter::None;
 	};

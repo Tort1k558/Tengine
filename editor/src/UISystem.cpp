@@ -191,6 +191,29 @@ namespace TengineEditor
                     }
                 }
             });
+
+        WindowMonitor::AddFormatHandler(".cubeMap", [](std::filesystem::path path) {
+            std::shared_ptr<CubeMapTexture> cubeMap = AssetManager::LoadCubeMapTexture(path);
+            if (cubeMap)
+            {
+                auto drawTexture = [&cubeMap](std::string name, CubeMapSide side)
+                    {
+                        std::string pathToTexture = cubeMap->getSupportingInfo(name);
+                        if (UIRender::DrawFile(name, pathToTexture))
+                        {
+                            cubeMap->setTexture(side, AssetManager::LoadTexture(pathToTexture));
+                            cubeMap->setSupportingInfo(name, pathToTexture);
+                            AssetManager::SaveCubeMapTexture(cubeMap.get());
+                        }
+                    };
+                drawTexture("right", CubeMapSide::Right);
+                drawTexture("left", CubeMapSide::Left);
+                drawTexture("top", CubeMapSide::Top);
+                drawTexture("bottom", CubeMapSide::Bottom);
+                drawTexture("front", CubeMapSide::Front);
+                drawTexture("back", CubeMapSide::Back);
+            }
+            });
     }
 
     void UISystem::update()

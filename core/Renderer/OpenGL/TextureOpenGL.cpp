@@ -69,14 +69,16 @@ namespace Tengine
 	{
 		m_type = type;
 		m_filter = filter;
-		generateTexture(image->getData(), image->getSize());
+		m_size = image->getSize();
+		generateTexture(image->getData());
 	}
 
 	TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type, TextureFilter filter)
 	{
 		m_type = type;
 		m_filter = filter;
-		generateTexture(data, size);
+		m_size = size;
+		generateTexture(data);
 	}
 
 	TextureOpenGL::~TextureOpenGL()
@@ -103,11 +105,11 @@ namespace Tengine
 		glBindTexture(GL_TEXTURE_2D, m_id);
 	}
 
-	void* TextureOpenGL::getData()
+	std::shared_ptr<void> TextureOpenGL::getData()
 	{
+		std::shared_ptr<void> pixels(malloc(m_size.x * m_size.y * TextureTypeToSize(m_type)), [](void* ptr) { free(ptr); });
 		bind(0);
-		void* pixels = nullptr;
-		glGetTexImage(GL_TEXTURE_2D, 0, TextureTypeToOpenGLFormat(m_type), GL_UNSIGNED_BYTE, pixels);
+		glGetTexImage(GL_TEXTURE_2D, 0, TextureTypeToOpenGLFormat(m_type), GL_UNSIGNED_BYTE, pixels.get());
 		return pixels;
 	}
 
@@ -115,12 +117,12 @@ namespace Tengine
 	{
 		return m_id;
 	}
-	void TextureOpenGL::generateTexture(void* data, UVec2 size)
+	void TextureOpenGL::generateTexture(void* data)
 	{
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_2D, m_id);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, TextureTypeToOpenGLInternalFormat(m_type), size.x, size.y, 0,
+		glTexImage2D(GL_TEXTURE_2D, 0, TextureTypeToOpenGLInternalFormat(m_type), m_size.x, m_size.y, 0,
 			TextureTypeToOpenGLFormat(m_type), TextureTypeToOpenGLType(m_type), data ? data : NULL);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		if (m_filter == TextureFilter::None)

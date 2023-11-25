@@ -2,23 +2,47 @@
 
 #include"Renderer/OpenGL/TextureOpenGL.h"
 
+
+
 namespace Tengine
 {
-	CubeMapTextureOpenGL::CubeMapTextureOpenGL(std::array<std::shared_ptr<Image>, 6> images, std::array<TextureType, 6> types, TextureFilter filter) :
+	void FlipImageY(void* data, UVec2 size, int bytesPerPixel)
+	{
+		unsigned char* bytes = static_cast<unsigned char*>(data);
+		size_t bytesPerRow = static_cast<size_t>(size.x) * bytesPerPixel;
+
+		for (int row = 0; row < size.y / 2; ++row) {
+			unsigned char* rowStart = bytes + row * bytesPerRow;
+			unsigned char* rowEnd = bytes + (size.y - row - 1) * bytesPerRow;
+
+			std::vector<unsigned char> temp(rowStart, rowStart + bytesPerRow);
+			std::copy(rowEnd, rowEnd + bytesPerRow, rowStart);
+			std::copy(temp.begin(), temp.end(), rowEnd);
+		}
+	}
+
+	CubeMapTextureOpenGL::CubeMapTextureOpenGL(std::array<std::shared_ptr<Texture>, 6> textures, TextureFilter filter) :
 		m_id(0)
 	{
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
 
-		for (size_t i = 0; i < images.size(); i++)
+		for (size_t i = 0; i < textures.size(); i++)
 		{
-			if (images[i]->getData())
+			if (textures[i]->getData())
 			{
-				UVec2 size = images[i]->getSize();
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureTypeToOpenGLInternalFormat(types[i]), size.x, size.y,
-					0, TextureTypeToOpenGLFormat(types[i]), TextureTypeToOpenGLType(types[i]), images[i]->getData());
+				UVec2 size = textures[i]->getSize();
+				TextureType type = textures[i]->getType();
+				std::shared_ptr<void> data = textures[i]->getData();
+
+				//We flip the texture because the origin of coordinates in CubeMap is different 
+				FlipImageY(data.get(), size, Texture::TextureTypeToSize(type));
+				
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureTypeToOpenGLInternalFormat(type), size.x, size.y,
+					0, TextureTypeToOpenGLFormat(type), TextureTypeToOpenGLType(type), data.get());
 			}
 		}
+		
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -49,8 +73,28 @@ namespace Tengine
 		glActiveTexture(GL_TEXTURE0 + slot);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
 	}
+
 	unsigned int CubeMapTextureOpenGL::getId()
 	{
 		return m_id;
+	}
+	void CubeMapTextureOpenGL::setTexture(CubeMapSide side, std::shared_ptr<Texture> texture)
+	{
+		UVec2 size = texture->getSize();
+		TextureType type = texture->getType();
+		std::shared_ptr<void> data = texture->getData();
+
+		FlipImageY(data.get(), size, Texture::TextureTypeToSize(type));
+
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, TextureTypeToOpenGLInternalFormat(type), size.x, size.y,
+			0, TextureTypeToOpenGLFormat(type), TextureTypeToOpenGLType(type), data.get());
+	}
+
+	std::shared_ptr<void> CubeMapTextureOpenGL::getData(CubeMapSide side)
+	{
+		//std::shared_ptr<void> pixels(malloc(m_size.x * m_size.y * TextureTypeToSize(m_type)), [](void* ptr) { free(ptr); });
+		//bind(0);
+		//glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, TextureTypeToOpenGLFormat(m_type), GL_UNSIGNED_BYTE, pixels.get());
+		//return nullptr;
 	}
 }

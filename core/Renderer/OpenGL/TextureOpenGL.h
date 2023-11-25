@@ -22,10 +22,10 @@ namespace Tengine
 		TextureOpenGL& operator=(TextureOpenGL&& texture) noexcept;
 
 		void bind(unsigned int slot) final;
-		void* getData() final;
+		std::shared_ptr<void> getData() final;
 		unsigned int getId() final;
 	private:
-		void generateTexture(void* data, UVec2 size);
+		void generateTexture(void* data);
 		GLuint m_id;
 
 		friend class FrameBufferOpenGL;

@@ -6,7 +6,7 @@
 
 namespace Tengine
 {
-	std::shared_ptr<CubeMapTexture> CubeMapTexture::Create(std::array<std::shared_ptr<Image>, 6> images, std::array<TextureType, 6> types, TextureFilter filter)
+	std::shared_ptr<CubeMapTexture> CubeMapTexture::Create(std::array<std::shared_ptr<Texture>, 6> textures, TextureFilter filter)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
 		{
@@ -14,7 +14,7 @@ namespace Tengine
 			Logger::Critical("ERROR::Renderer not initialized!");
 			return nullptr;
 		case RendererType::OpenGL:
-			return std::make_shared<CubeMapTextureOpenGL>(images, types, filter);
+			return std::make_shared<CubeMapTextureOpenGL>(textures, filter);
 		}
 		return nullptr;
 	}

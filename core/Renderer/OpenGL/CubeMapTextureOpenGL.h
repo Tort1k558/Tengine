@@ -8,7 +8,7 @@ namespace Tengine
 	class CubeMapTextureOpenGL : public CubeMapTexture
 	{
 	public:
-		CubeMapTextureOpenGL(std::array<std::shared_ptr<Image>, 6> images, std::array<TextureType, 6> types, TextureFilter filter = TextureFilter::None);
+		CubeMapTextureOpenGL(std::array<std::shared_ptr<Texture>, 6> textures, TextureFilter filter = TextureFilter::None);
 		~CubeMapTextureOpenGL();
 		CubeMapTextureOpenGL(const CubeMapTextureOpenGL&) = delete;
 		CubeMapTextureOpenGL& operator=(const CubeMapTextureOpenGL&) = delete;
@@ -17,6 +17,8 @@ namespace Tengine
 
 		void bind(unsigned int slot) final;
 		unsigned int getId() final;
+		virtual void setTexture(CubeMapSide side, std::shared_ptr<Texture> texture) final;
+		virtual std::shared_ptr<void> getData(CubeMapSide side) final;
 	private:
 		GLuint m_id;
 	};

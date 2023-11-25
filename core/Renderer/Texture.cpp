@@ -6,6 +6,14 @@
 
 namespace Tengine
 {
+	TextureType Texture::getType()
+	{
+		return m_type;
+	}
+	UVec2 Texture::getSize()
+	{
+		return m_size;
+	}
 	std::shared_ptr<Texture> Texture::Create(std::shared_ptr<Image> image, TextureType type, TextureFilter filter)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
@@ -29,5 +37,29 @@ namespace Tengine
 			return std::make_shared<TextureOpenGL>(data, size, type, filter);
 		}
 		return nullptr;
+	}
+
+	unsigned int Texture::TextureTypeToSize(TextureType type)
+	{
+		switch (type)
+		{
+		case TextureType::R8:
+			return 1;
+		case TextureType::RG8:
+			return 2;
+		case TextureType::RGB8:
+			return 3;
+		case TextureType::RGBA8:
+			return 4;
+		case TextureType::DEPTH32F:
+			return 4;
+		default:
+			return 0;
+		}
+	}
+
+	unsigned int TextureTypeToSize(TextureType type)
+	{
+		return 0;
 	}
 }
