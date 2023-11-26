@@ -10,10 +10,12 @@ namespace Tengine
 	{
 		return m_type;
 	}
+
 	UVec2 Texture::getSize()
 	{
 		return m_size;
 	}
+
 	std::shared_ptr<Texture> Texture::Create(std::shared_ptr<Image> image, TextureType type, TextureFilter filter)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
@@ -26,6 +28,7 @@ namespace Tengine
 		}
 		return nullptr;
 	}
+
 	std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType type, TextureFilter filter)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
@@ -39,7 +42,7 @@ namespace Tengine
 		return nullptr;
 	}
 
-	unsigned int Texture::TextureTypeToSize(TextureType type)
+	unsigned int TextureTypeToSize(TextureType type)
 	{
 		switch (type)
 		{
@@ -56,10 +59,5 @@ namespace Tengine
 		default:
 			return 0;
 		}
-	}
-
-	unsigned int TextureTypeToSize(TextureType type)
-	{
-		return 0;
 	}
 }

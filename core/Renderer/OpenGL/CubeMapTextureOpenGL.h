@@ -17,7 +17,7 @@ namespace Tengine
 
 		void bind(unsigned int slot) final;
 		unsigned int getId() final;
-		virtual void setTexture(CubeMapSide side, std::shared_ptr<Texture> texture) final;
+		virtual void setSideTexture(CubeMapSide side, std::shared_ptr<Texture> texture) final;
 		virtual std::shared_ptr<void> getData(CubeMapSide side) final;
 	private:
 		GLuint m_id;

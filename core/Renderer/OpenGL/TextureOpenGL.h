@@ -8,6 +8,7 @@ namespace Tengine
 {
 	GLenum TextureTypeToOpenGLFormat(TextureType type);
 	GLenum TextureTypeToOpenGLInternalFormat(TextureType type);
+	TextureType OpenGLInternalFormatToTextureType(GLint type);
 	GLenum TextureTypeToOpenGLType(TextureType type);
 
 	class TextureOpenGL : public Texture

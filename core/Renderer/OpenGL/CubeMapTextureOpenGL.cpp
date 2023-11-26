@@ -36,7 +36,7 @@ namespace Tengine
 				std::shared_ptr<void> data = textures[i]->getData();
 
 				//We flip the texture because the origin of coordinates in CubeMap is different 
-				FlipImageY(data.get(), size, Texture::TextureTypeToSize(type));
+				FlipImageY(data.get(), size, TextureTypeToSize(type));
 				
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, TextureTypeToOpenGLInternalFormat(type), size.x, size.y,
 					0, TextureTypeToOpenGLFormat(type), TextureTypeToOpenGLType(type), data.get());
@@ -78,13 +78,13 @@ namespace Tengine
 	{
 		return m_id;
 	}
-	void CubeMapTextureOpenGL::setTexture(CubeMapSide side, std::shared_ptr<Texture> texture)
+	void CubeMapTextureOpenGL::setSideTexture(CubeMapSide side, std::shared_ptr<Texture> texture)
 	{
 		UVec2 size = texture->getSize();
 		TextureType type = texture->getType();
 		std::shared_ptr<void> data = texture->getData();
 
-		FlipImageY(data.get(), size, Texture::TextureTypeToSize(type));
+		FlipImageY(data.get(), size, TextureTypeToSize(type));
 
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, TextureTypeToOpenGLInternalFormat(type), size.x, size.y,
 			0, TextureTypeToOpenGLFormat(type), TextureTypeToOpenGLType(type), data.get());
@@ -92,9 +92,16 @@ namespace Tengine
 
 	std::shared_ptr<void> CubeMapTextureOpenGL::getData(CubeMapSide side)
 	{
-		//std::shared_ptr<void> pixels(malloc(m_size.x * m_size.y * TextureTypeToSize(m_type)), [](void* ptr) { free(ptr); });
-		//bind(0);
-		//glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, TextureTypeToOpenGLFormat(m_type), GL_UNSIGNED_BYTE, pixels.get());
-		//return nullptr;
+		bind(0);
+		GLint width, height, internalFormat;
+
+		glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, GL_TEXTURE_WIDTH, &width);
+		glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, GL_TEXTURE_HEIGHT, &height);
+		glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, GL_TEXTURE_INTERNAL_FORMAT, &internalFormat);
+		TextureType type = OpenGLInternalFormatToTextureType(internalFormat);
+		
+		std::shared_ptr<void> pixels(malloc(width * height * TextureTypeToSize(type)), [](void* ptr) { free(ptr); });
+		glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, TextureTypeToOpenGLFormat(type), GL_UNSIGNED_BYTE, pixels.get());
+		return pixels;
 	}
 }

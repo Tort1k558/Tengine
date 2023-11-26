@@ -201,7 +201,7 @@ namespace TengineEditor
                         std::string pathToTexture = cubeMap->getSupportingInfo(name);
                         if (UIRender::DrawFile(name, pathToTexture))
                         {
-                            cubeMap->setTexture(side, AssetManager::LoadTexture(pathToTexture));
+                            cubeMap->setSideTexture(side, AssetManager::LoadTexture(pathToTexture));
                             cubeMap->setSupportingInfo(name, pathToTexture);
                             AssetManager::SaveCubeMapTexture(cubeMap.get());
                         }
@@ -493,6 +493,10 @@ namespace TengineEditor
                     scene->setPath(ProjectManager::GetInstance()->getPath().string() + "/" + scene->getName());
                     SceneManager::SetCurrentScene(scene);
                     WindowObjects::SetSelectedObject(nullptr);
+                }
+                if (ImGui::MenuItem("EditorCamera"))
+                {
+                    WindowMonitor::SetMonitoringObject(m_sceneCamera);
                 }
                 ImGui::EndMenu();
             }

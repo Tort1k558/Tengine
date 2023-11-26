@@ -21,6 +21,7 @@ namespace Tengine
 		RGBA8,
 		DEPTH32F
 	};
+	unsigned int TextureTypeToSize(TextureType type);
 
 	enum class TextureFilter
 	{
@@ -45,7 +46,6 @@ namespace Tengine
 		UVec2 getSize();
 		static std::shared_ptr<Texture> Create(std::shared_ptr<Image> image, TextureType type, TextureFilter filter = TextureFilter::None);
 		static std::shared_ptr<Texture> Create(void* data, UVec2 size, TextureType type, TextureFilter filter = TextureFilter::None);
-		static unsigned int TextureTypeToSize(TextureType type);
 	protected:
 		UVec2 m_size = { 0,0 };
 		TextureType m_type = TextureType::RGB8;

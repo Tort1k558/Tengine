@@ -16,12 +16,7 @@ namespace TengineEditor
         if (SceneManager::GetCurrentScene())
         {
             std::vector<std::shared_ptr<Object>> objects = SceneManager::GetCurrentScene()->getAllObjects();
-            std::vector<std::string> objectNames;
-            for (const auto& object : objects)
-            {
-                objectNames.push_back(object->getName());
-            }
-            std::sort(objectNames.begin(), objectNames.end(), std::less<std::string>());
+
 
             if (ImGui::BeginListBox("##empty"))
             {

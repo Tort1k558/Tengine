@@ -29,7 +29,7 @@ namespace TengineEditor
 		};
 		static MonitoringType m_monitoringType;
 		static std::unordered_map<std::string, std::function<void(std::filesystem::path)>> m_formatHandlers;
-		static UUID m_idMonitoringObject;
+		static std::shared_ptr<Object> m_monitoringObject;
 		static std::filesystem::path m_pathToMonitoringFile;
 
 	};

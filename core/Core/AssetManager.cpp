@@ -469,7 +469,8 @@ namespace Tengine
             cubeMapTexture->setSupportingInfo("front", textures[4]->getPath().string());
             cubeMapTexture->setSupportingInfo("back", textures[5]->getPath().string());
         }
-        return cubeMapTexture;
+        m_resources[path.string()] = cubeMapTexture;
+;       return cubeMapTexture;
     }
 
     void AssetManager::SaveModel(Model* model)

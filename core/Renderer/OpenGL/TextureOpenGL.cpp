@@ -45,6 +45,26 @@ namespace Tengine
 		}
 	}
 
+	TextureType OpenGLInternalFormatToTextureType(GLint type)
+	{
+		switch (type)
+		{
+		case GL_R8:
+			return TextureType::R8;
+		case GL_RG8:
+			return TextureType::RG8;
+		case GL_RGB8:
+			return TextureType::RGB8;
+		case GL_RGBA8:
+			return TextureType::RGBA8;
+		case GL_DEPTH_COMPONENT32F:
+			return TextureType::DEPTH32F;
+		default:
+			Logger::Info("ERROR::OpenGL::Unknown texture type!");
+			return TextureType::RGB8;
+		}
+	}
+
 	GLenum TextureTypeToOpenGLType(TextureType type)
 	{
 		switch (type)
