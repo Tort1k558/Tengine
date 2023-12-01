@@ -3,11 +3,14 @@
 #include<fstream>
 #include<filesystem>
 #include<sstream>
+
 #include<Core/Logger.h>
 #include<Systems/ScriptSystem.h>
+#include<Utils/FileManager.h>
+
 #include"ProjectManager.h"
 #include"EditorScriptSystem.h"
-#include"FileManager.h"
+#include"Editor.h"
 
 namespace TengineEditor
 {
@@ -330,7 +333,7 @@ std::vector<std::string> GetScriptNames()
 		std::ofstream cmakeFile("builds/ScriptModule/CMakeLists.txt");
         if (cmakeFile.is_open()) 
         {
-            std::string pathToEditor = FileManager::GetPathToEditor().string();
+            std::string pathToEditor = Editor::GetPathToEditor().string();
             std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             std::string compilerOptions;

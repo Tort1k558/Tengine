@@ -70,7 +70,8 @@ namespace Tengine
 		for (auto& element : layout)
 		{
 			glEnableVertexAttribArray(m_elementCount);
-			glVertexAttribPointer(m_elementCount, GetCountOfElementType(element.type), TypeOfElementTypeToGL(element.type), element.normalized, layout.getStride(), (const void*)(element.offset));
+			glVertexAttribPointer(m_elementCount, GetCountOfElementType(element.type), TypeOfElementTypeToGL(element.type),
+				element.normalized, layout.getStride(), (const void*)(element.offset));
 			m_elementCount++;
 		}
 	}

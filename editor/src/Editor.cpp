@@ -20,10 +20,11 @@
 #include"Scripts/EditorScriptSystem.h"
 #include"UISystem.h"
 #include"ProjectManager.h"
-#include"FileManager.h"
 
 namespace TengineEditor
 {
+    std::filesystem::path Editor::m_pathToEditor;
+
     Editor::Editor(unsigned int width, unsigned int height, const std::string& title) :
         Application(width, height, title)
     {
@@ -43,56 +44,10 @@ namespace TengineEditor
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Debug);
 #endif
         RendererSystem::GetInstance()->disableRenderToDefaultFramebuffer();
-        
-        FileManager::Init();
 
-        ProjectManager::Create("ExampleProject");
-        std::shared_ptr<Scene> scene = SceneManager::GetCurrentScene();
-        
-        std::shared_ptr<Object> object = Object::Create();
-        object->setName("Sphere");
-        std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-        transform->setPositionY(-1.0f);
-        transform->setRotationX(-90.0f);
-        std::shared_ptr<Model> sphere = Component::Create<Model>();
-        sphere->setPath("Assets/Meshes/Sphere.model");
-        sphere->setMesh(Primitives::CreateSphere(50, 50));
-        object->addComponent(sphere);
-        
+        m_pathToEditor = std::filesystem::current_path();
 
-        std::shared_ptr<Object> object2 = Object::Create();
-        object2->setName("Camera");
-        std::shared_ptr<Camera> camera = Component::Create<Camera>(ProjectionType::Perspective);
-        camera->setLighting(true);
-        camera->setSkybox(AssetManager::CreateCubeMapTexture(
-            {
-                "Assets/skybox/right.jpg",
-                "Assets/skybox/left.jpg",
-                "Assets/skybox/top.jpg",
-                "Assets/skybox/bottom.jpg",
-                "Assets/skybox/front.jpg",
-                "Assets/skybox/back.jpg"
-            
-            }));
-        object2->addComponent(camera);
-        std::shared_ptr<Transform> transform2 = object2->getComponent<Transform>();
-        transform2->setPosition({ 0.0f,0.0f,2.0f });
-        ScriptSystem::GetInstance()->addScript(object2, "CameraController");
-
-
-        std::shared_ptr<Object> object3 = Object::Create();
-        object3->setName("Backpack");
-        std::shared_ptr<Transform> transform3 = object3->getComponent<Transform>();
-        transform3->setPositionY(2.0f);
-        object3->addComponent(AssetManager::CreateModel("Assets/Meshes/backpack/backpack.obj"));
-
-
-        std::shared_ptr<Object> object4 = Object::Create();
-        object4->setName("DirLight");
-        std::shared_ptr<Transform> transform4 = object4->getComponent<Transform>();
-        transform4->setPositionY(5.0f);
-        transform4->setRotationX(270.0f);
-        object4->addComponent(Component::Create<DirectionLight>());
+        ProjectManager::Load("ExampleProject/ProjectData.project");
 
         SceneManager::Save(SceneManager::GetCurrentScene());
     }
@@ -109,5 +64,21 @@ namespace TengineEditor
     void Editor::close()
     {
         UISystem::GetInstance()->destroy();
+    }
+
+    std::filesystem::path Editor::GetPathToEditor()
+    {
+        std::string pathToEditor = m_pathToEditor.string();
+        std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
+        return pathToEditor;
+    }
+
+    std::filesystem::path Editor::GetPathToAssets()
+    {
+        if (ProjectManager::GetInstance())
+        {
+            return "Assets";
+        }
+        return "";
     }
 }

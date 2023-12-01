@@ -7,13 +7,16 @@
 #include<Utils/Material.h>
 #include<Utils/Primitives.h>
 #include<Components/Model.h>
+#include<Utils/FileManager.h>
 
-#include"FileManager.h"
 #include"WindowMonitor.h"
 #include"UIRender.h"
+#include"ProjectManager.h"
+#include"Editor.h"
 
 namespace TengineEditor
 {
+    std::filesystem::path WindowFileBrowser::m_relativePath = "Assets";
 
     void WindowFileBrowser::Render()
     {
@@ -24,7 +27,7 @@ namespace TengineEditor
         if (ImGui::BeginTable("TreeOfFiles", 2, ImGuiTableFlags_Resizable))
         {
             ImGui::TableSetupColumn("Path:");
-            ImGui::TableSetupColumn(FileManager::GetRelativePath().string().c_str(), ImGuiTableColumnFlags_WidthFixed, windowWidth * 0.3f);
+            ImGui::TableSetupColumn(GetRelativePath().string().c_str(), ImGuiTableColumnFlags_WidthFixed, windowWidth * 0.3f);
             ImGui::TableHeadersRow();
 
             //Tree
@@ -37,7 +40,7 @@ namespace TengineEditor
                 {
                     if (ImGui::IsItemClicked())
                     {
-                        FileManager::SetRelativePath("Assets");
+                        SetRelativePath("Assets");
                     }
                     std::function<void(std::filesystem::path)> renderFileTree = [&renderFileTree](std::filesystem::path path)
                         {
@@ -46,7 +49,7 @@ namespace TengineEditor
                                 bool treeIsOpened = ImGui::TreeNodeEx(path.filename().string().c_str(), ImGuiTreeNodeFlags_OpenOnDoubleClick);
                                 if (ImGui::IsItemClicked())
                                 {
-                                    FileManager::SetRelativePath(path);
+                                    SetRelativePath(path);
                                 }
                                 if (treeIsOpened)
                                 {
@@ -63,7 +66,7 @@ namespace TengineEditor
                                 ImGui::Button(path.filename().string().c_str());
                             }
                         };
-                    std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetFilesFromCurrentDirectory(FileManager::GetPathToAssets());
+                    std::vector<std::filesystem::path> pathToProjectFiles = FileManager::GetFilesFromCurrentDirectory(Editor::GetPathToAssets());
                     for (int i = 0; i < pathToProjectFiles.size(); i++)
                     {
                         renderFileTree(pathToProjectFiles[i]);
@@ -88,22 +91,22 @@ namespace TengineEditor
                 {
                     if (ImGui::MenuItem("Create File"))
                     {
-                        FileManager::NewFile(FileManager::GetRelativePath().string() + "/NewFile");
+                        FileManager::NewFile(GetRelativePath().string() + "/NewFile");
                     }
                     if (ImGui::MenuItem("Create Folder"))
                     {
-                        FileManager::NewFolder(FileManager::GetRelativePath().string() + "/NewFolder");
+                        FileManager::NewFolder(GetRelativePath().string() + "/NewFolder");
                     }
                     if (ImGui::MenuItem("Create Model"))
                     {
                         std::shared_ptr<Model> model = Component::Create<Model>();
-                        model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Model.model"));
+                        model->setPath(FileManager::GetUniqueFilePath(GetRelativePath().string() + "/Model.model"));
                         AssetManager::SaveModel(model.get());
                     }
                     if (ImGui::MenuItem("Create Material"))
                     {
                         std::shared_ptr<Material> material = std::make_shared<Material>();
-                        material->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Material.material"));
+                        material->setPath(FileManager::GetUniqueFilePath(GetRelativePath().string() + "/Material.material"));
                         AssetManager::SaveMaterial(material.get());
                     }
                     if (ImGui::MenuItem("Create Primitive"))
@@ -136,19 +139,19 @@ namespace TengineEditor
                         if (primitiveNames[currentElement] == "Quad")
                         {
                             std::shared_ptr<Model> model = Component::Create<Model>();
-                            model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Quad.model"));
+                            model->setPath(FileManager::GetUniqueFilePath(GetRelativePath().string() + "/Quad.model"));
                             model->setMesh(Primitives::CreateQuad());
                         }
                         else  if (primitiveNames[currentElement] == "Sphere")
                         {
                             std::shared_ptr<Model> model = Component::Create<Model>();
-                            model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Sphere.model"));
+                            model->setPath(FileManager::GetUniqueFilePath(GetRelativePath().string() + "/Sphere.model"));
                             model->setMesh(Primitives::CreateSphere(sectors, stacks));
                         }
                         else  if (primitiveNames[currentElement] == "Cube")
                         {
                             std::shared_ptr<Model> model = Component::Create<Model>();
-                            model->setPath(FileManager::GetUniqueFilePath(FileManager::GetRelativePath().string() + "/Cube.model"));
+                            model->setPath(FileManager::GetUniqueFilePath(GetRelativePath().string() + "/Cube.model"));
                             model->setMesh(Primitives::CreateCube());
                         }
                         ImGui::CloseCurrentPopup();
@@ -166,7 +169,7 @@ namespace TengineEditor
                 }
                 if (ImGui::BeginTable("Files", columnCount))
                 {
-                    std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetFilesFromCurrentDirectory(FileManager::GetRelativePath());
+                    std::vector<std::filesystem::path> pathToCurrentProjectFiles = FileManager::GetFilesFromCurrentDirectory(GetRelativePath());
                     ImGui::TableNextColumn();
                     for (int i = 0; i < pathToCurrentProjectFiles.size(); i++)
                     {
@@ -174,16 +177,16 @@ namespace TengineEditor
 
                         if (std::filesystem::is_directory(pathToCurrentProjectFiles[i].string()))
                         {
-                            ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                            ImGui::ImageButton((void*)(AssetManager::LoadTexture(Editor::GetPathToEditor().string() + "/data/folder.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
 
                             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                             {
-                                FileManager::SetRelativePath(pathToCurrentProjectFiles[i].string());
+                                SetRelativePath(pathToCurrentProjectFiles[i].string());
                             }
                         }
                         else
                         {
-                            ImGui::ImageButton((void*)(AssetManager::LoadTexture(FileManager::GetPathToEditor().string() + "/data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
+                            ImGui::ImageButton((void*)(AssetManager::LoadTexture(Editor::GetPathToEditor().string() + "/data/file.png")->getId()), ImVec2(cellSize, cellSize), { 0,1 }, { 1,0 });
 
                             if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsItemHovered())
                             {
@@ -266,5 +269,22 @@ namespace TengineEditor
 
         ImGui::End();
     }
+    void WindowFileBrowser::SetRelativePath(std::filesystem::path path)
+    {
+        m_relativePath = path;
+    }
 
+    std::filesystem::path WindowFileBrowser::GetCurrentPath()
+    {
+        if (ProjectManager::GetInstance())
+        {
+            return m_relativePath.string();
+        }
+        return "";
+    }
+
+    std::filesystem::path WindowFileBrowser::GetRelativePath()
+    {
+        return m_relativePath;
+    }
 }

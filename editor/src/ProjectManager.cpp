@@ -25,10 +25,14 @@ namespace TengineEditor
 			nlohmann::json data = nlohmann::json::parse(file);
 			std::filesystem::current_path(path.parent_path());
 
+			EditorScriptSystem::GetInstance()->setPathToDll("builds/ScriptModule/ScriptModule.dll");
+			EditorScriptSystem::GetInstance()->reload();
+
 			m_instance = std::shared_ptr<Project>(new Project());
 			m_instance->setPath(path.parent_path());
 			m_instance->m_name = data["name"];
 			m_instance->m_pathToScenes = data["scenes"];
+			
 			for (const auto& pathToScene : m_instance->getPathToScenes())
 			{
 				SceneManager::AddScene(pathToScene.filename().string(), pathToScene.string());
@@ -37,8 +41,6 @@ namespace TengineEditor
 			{
 				SceneManager::LoadByPath(m_instance->m_pathToScenes[0].string());
 			}
-			EditorScriptSystem::GetInstance()->setPathToDll("builds/ScriptModule/ScriptModule.dll");
-			EditorScriptSystem::GetInstance()->reload();
 			return m_instance;
 		}
 		else
@@ -50,6 +52,8 @@ namespace TengineEditor
 
     std::shared_ptr<Project> ProjectManager::Create(std::filesystem::path path)
     {
+		EditorScriptSystem::GetInstance()->setPathToDll("builds/ScriptModule/ScriptModule.dll");
+		EditorScriptSystem::GetInstance()->reload();
 		m_instance = std::shared_ptr<Project>(new Project());
 		m_instance->m_name = path.filename().string();
 		m_instance->setPath(path);
@@ -62,8 +66,6 @@ namespace TengineEditor
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
 		Save();
-		EditorScriptSystem::GetInstance()->setPathToDll("builds/ScriptModule/ScriptModule.dll");
-		EditorScriptSystem::GetInstance()->reload();
 		return m_instance;
     }
 

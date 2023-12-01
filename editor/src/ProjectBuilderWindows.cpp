@@ -7,7 +7,7 @@
 #include"ProjectManager.h"
 #include"ProjectManager.h"
 #include"Scripts/ScriptCompiler.h"
-#include"FileManager.h"
+#include"Editor.h"
 
 namespace TengineEditor
 {
@@ -326,13 +326,13 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 		std::string cmakeBuildCommand;
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
-			std::filesystem::copy(FileManager::GetPathToEditor().string() + "/TengineCored.lib", m_pathToBuildDirectory.string() + "/TengineCored.lib", 
+			std::filesystem::copy(Editor::GetPathToEditor().string() + "/TengineCored.lib", m_pathToBuildDirectory.string() + "/TengineCored.lib", 
 				std::filesystem::copy_options::overwrite_existing);
 			cmakeBuildCommand = "cmake --build " + m_pathToBuildDirectory.string() + " --config Debug";
 		}
 		else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
 		{
-			std::filesystem::copy(FileManager::GetPathToEditor().string() + "/TengineCore.lib", m_pathToBuildDirectory.string() + "/TengineCore.lib",
+			std::filesystem::copy(Editor::GetPathToEditor().string() + "/TengineCore.lib", m_pathToBuildDirectory.string() + "/TengineCore.lib",
 				std::filesystem::copy_options::overwrite_existing);
 			cmakeBuildCommand = "cmake --build " + m_pathToBuildDirectory.string() + " --config Release";
 		}
@@ -359,7 +359,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 
 
 		//Copy assets
-		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/build/" + FileManager::GetPathToAssets().string(),
+		std::filesystem::copy(Editor::GetPathToAssets(), m_pathToBuildDirectory.string() + "/build/" + Editor::GetPathToAssets().string(),
 			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 
 
@@ -373,7 +373,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 
 
 		//Copy Core Shared Library
-		std::string pathToEditor = FileManager::GetPathToEditor().string();
+		std::string pathToEditor = Editor::GetPathToEditor().string();
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
 			std::filesystem::copy(pathToEditor + "/TengineCored.dll", m_pathToBuildDirectory.string() + "/build/TengineCored.dll",

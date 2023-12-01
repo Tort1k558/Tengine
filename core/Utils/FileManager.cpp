@@ -2,19 +2,10 @@
 
 #include<fstream>
 #include<Core/Logger.h>
+#include<Core/Logger.h>
 
-#include"ProjectManager.h"
-namespace TengineEditor
+namespace Tengine
 {
-	std::filesystem::path FileManager::m_relativePath;
-	std::filesystem::path FileManager::m_pathToEditor;
-
-	void FileManager::Init()
-	{
-		m_pathToEditor = std::filesystem::current_path();
-		m_relativePath = "Assets";
-	}
-
 	void FileManager::NewFolder(std::filesystem::path path)
 	{
 		std::filesystem::path pathToFile = GetUniqueFilePath(path.string());
@@ -46,57 +37,16 @@ namespace TengineEditor
 	{
 		std::filesystem::rename(path, path.parent_path().string() + "/" + name.data());
 	}
-	
-	void FileManager::SetRelativePath(std::filesystem::path path)
-	{
-		m_relativePath = path;
-	}
 
-	std::filesystem::path FileManager::GetCurrentPath()
-	{
-		if (ProjectManager::GetInstance())
-		{
-			return m_relativePath.string();
-		}
-		return "";
-	}
-
-	std::filesystem::path FileManager::GetPathToAssets()
-	{
-		if (ProjectManager::GetInstance())
-		{
-			return "Assets";
-		}
-		return "";
-	}
-
-	std::filesystem::path FileManager::GetRelativePath()
-	{
-		return m_relativePath;
-	}
-
-	std::filesystem::path FileManager::GetPathToEditor()
-	{
-		std::string pathToEditor = m_pathToEditor.string();
-		std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
-		return pathToEditor;
-	}
 	
 	std::vector<std::filesystem::path> FileManager::GetFilesFromCurrentDirectory(std::filesystem::path path)
 	{
 		std::vector<std::filesystem::path> filePaths;
-		if (ProjectManager::GetInstance())
+		for (const auto& entry : std::filesystem::directory_iterator(path.string()))
 		{
-			if (path.empty())
-			{
-				path = "Assets";
-			}
-			for (const auto& entry : std::filesystem::directory_iterator(path.string()))
-			{
-				std::string strPath = entry.path().string();
-				std::replace(strPath.begin(), strPath.end(), '\\', '/');
-				filePaths.push_back(strPath);
-			}
+			std::string strPath = entry.path().string();
+			std::replace(strPath.begin(), strPath.end(), '\\', '/');
+			filePaths.push_back(strPath);
 		}
 		return filePaths;
 	}
@@ -104,7 +54,8 @@ namespace TengineEditor
 	{
 		std::filesystem::path pathToFile = originalPath;
 
-		for (size_t i = 0; std::filesystem::exists(pathToFile); i++) {
+		for (size_t i = 0; std::filesystem::exists(pathToFile); i++) 
+		{
 			pathToFile =  originalPath.parent_path().string() + "/" + originalPath.stem().string() + std::to_string(i) + originalPath.extension().string();
 		}
 

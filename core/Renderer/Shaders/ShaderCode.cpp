@@ -33,7 +33,7 @@ namespace Tengine
         switch (RendererSystem::GetInstance()->getRendererType())
         {
         case RendererType::OpenGL:
-            source.addSourceShader(ShaderType::Vertex, GLSL::lightingShaderVertex);
+            source.addSourceShader(ShaderType::Vertex, GLSL::defaultShaderVertex);
             source.addSourceShader(ShaderType::Fragment, GLSL::lightingShaderFragment);
             break;
         default:

@@ -79,6 +79,7 @@ namespace Tengine
 		}
 		subMaterial->m_parent = this;
 		m_subMaterials[type] = subMaterial;
+
 		AssetManager::SaveMaterial(this);
 	}
 

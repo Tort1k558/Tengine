@@ -10,6 +10,7 @@ namespace Tengine
 		Static = 0,
 		Dynamic
 	};
+
 	class VertexBuffer
 	{
 	public:
@@ -20,7 +21,7 @@ namespace Tengine
 		virtual void unbind() = 0;
 
 		void setLayout(BufferLayout layout);
-		BufferLayout getLayout() { return m_layout; }
+		BufferLayout getLayout();
 
 		static std::shared_ptr<VertexBuffer> Create(float* vertices, unsigned int size, BufferUsage usage);
 	protected:

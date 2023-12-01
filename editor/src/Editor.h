@@ -1,7 +1,8 @@
 #pragma once
 
-#include<Core/Application.h>
+#include<filesystem>
 
+#include<Core/Application.h>
 
 namespace TengineEditor
 {
@@ -14,5 +15,10 @@ namespace TengineEditor
         void create() final;
         void update() final;
         void close() final;
+
+        static std::filesystem::path GetPathToEditor();
+        static std::filesystem::path Editor::GetPathToAssets();
+    private:
+        static std::filesystem::path m_pathToEditor;
     };
 }

@@ -11,7 +11,7 @@ namespace Tengine
 		unsigned char* bytes = static_cast<unsigned char*>(data);
 		size_t bytesPerRow = static_cast<size_t>(size.x) * bytesPerPixel;
 
-		for (int row = 0; row < size.y / 2; ++row) {
+		for (size_t row = 0; row < size.y / 2; ++row) {
 			unsigned char* rowStart = bytes + row * bytesPerRow;
 			unsigned char* rowEnd = bytes + (size.y - row - 1) * bytesPerRow;
 

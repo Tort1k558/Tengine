@@ -3,6 +3,8 @@
 #include<imgui/imgui.h>
 #include<imgui/misc/cpp/imgui_stdlib.h>
 
+#include<Utils/FileManager.h>
+
 namespace TengineEditor
 {
     bool UIRender::DrawFloat(std::string_view name, float* data, float speed, float min, float max)
@@ -97,20 +99,35 @@ namespace TengineEditor
         return false;
     }
 
-    bool UIRender::DrawFile(std::string_view name, std::string& pathToFile)
+    bool UIRender::DrawFile(std::string_view name, std::string& path)
     {
         bool result = false;
         ImGui::Text(name.data());
         ImGui::SameLine();
-        ImGui::InputText(("##" + std::string(name)).c_str(), &pathToFile, ImGuiInputTextFlags_EnterReturnsTrue);
+        std::string pathCopy;
+        if (std::filesystem::exists(path))
+        {
+            pathCopy = path;
+        }
+        if (ImGui::InputText(("##" + std::string(name)).c_str(), &pathCopy, ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            if (std::filesystem::exists(pathCopy))
+            {
+                path = pathCopy;
+                result = true;
+            }
+        }
 
         if (ImGui::BeginDragDropTarget()) {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("path")) {
-                std::string path(static_cast<const char*>(payload->Data), payload->DataSize);
-                if (path != "")
+                std::string pathPayload(static_cast<const char*>(payload->Data), payload->DataSize);
+                if (pathPayload != "")
                 {
-                    pathToFile = path;
-                    result = true;
+                    if (std::filesystem::exists(pathPayload))
+                    {
+                        path = pathPayload;
+                        result = true;
+                    }
                 }
             }
             ImGui::EndDragDropTarget();

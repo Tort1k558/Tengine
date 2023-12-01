@@ -11,7 +11,12 @@ namespace Tengine
 		m_layout = layout;
 	}
 
-	std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* vertices, unsigned int size, BufferUsage usage)
+	BufferLayout VertexBuffer::getLayout()
+	{
+		return m_layout;
+	}
+
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(float* data, unsigned int size, BufferUsage usage)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
 		{
@@ -19,7 +24,7 @@ namespace Tengine
 			Logger::Critical("ERROR::Renderer not initialized!");
 			return nullptr;
 		case RendererType::OpenGL:
-			return std::make_shared<VertexBufferOpenGL>(vertices, size, usage);
+			return std::make_shared<VertexBufferOpenGL>(data, size, usage);
 		}
 		return nullptr;
 	}

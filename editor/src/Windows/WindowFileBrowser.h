@@ -14,6 +14,11 @@ namespace TengineEditor
 
 		static void Render();
 	private:
+		static std::filesystem::path GetCurrentPath();
+		static void SetRelativePath(std::filesystem::path path);
+		static std::filesystem::path GetRelativePath();
+
+		static std::filesystem::path m_relativePath;
 
 	};
 

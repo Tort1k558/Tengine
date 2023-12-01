@@ -34,17 +34,6 @@ namespace Tengine
         return "";
     }
 
-    std::shared_ptr<Texture> LoadMaterialTexture(aiMaterial* material, aiTextureType type, std::filesystem::path directory)
-    {
-        if (material->GetTextureCount(type) > 0)
-        {
-            aiString pathToTexture;
-            material->GetTexture(type, 0, &pathToTexture);
-            return AssetManager::LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
-        }
-        return nullptr;
-    }
-
     std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene)
     {
         std::vector<Vertex> vertices;
@@ -315,71 +304,6 @@ namespace Tengine
         std::shared_ptr<Mesh> mesh = LoadMesh(pathToMesh);
         model->setMesh(mesh);
 
-        Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(pathToMesh.string().c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals);
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            Logger::Critical("ERROR::ASSIMP::{0}", importer.GetErrorString());
-            return nullptr;
-        }
-        std::filesystem::path parentPath = pathToMesh.parent_path();
-        std::vector<std::shared_ptr<Material>> materials;
-        for (size_t i = 0; i < scene->mNumMaterials; i++)
-        {
-            std::shared_ptr<Material> material = std::make_shared<Material>();
-            for (size_t i = 0; true; i++)
-            {
-                if (!std::filesystem::exists(parentPath.string() + "/Material" + std::to_string(i) + ".material"))
-                {
-                    material->setPath(parentPath.string() + "/Material" + std::to_string(i) + ".material");
-                    break;
-                }
-            }
-            aiMaterial* aimaterial = scene->mMaterials[i]; std::shared_ptr<Texture> diffuse = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE, parentPath);
-            if (diffuse)
-            {
-                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(diffuse);
-                material->setSubMaterial(SubMaterialType::Diffuse, subMaterial);
-            }
-            std::shared_ptr<Texture> normals = LoadMaterialTexture(aimaterial, aiTextureType_NORMALS, parentPath);
-            if (normals)
-            {
-                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(normals);
-                material->setSubMaterial(SubMaterialType::Normal, subMaterial);
-            }
-            std::shared_ptr<Texture> specular = LoadMaterialTexture(aimaterial, aiTextureType_SPECULAR, parentPath);
-            if (specular)
-            {
-                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(specular);
-                material->setSubMaterial(SubMaterialType::Specular, subMaterial);
-            }
-            std::shared_ptr<Texture> roughness = LoadMaterialTexture(aimaterial, aiTextureType_DIFFUSE_ROUGHNESS, parentPath);
-            if (roughness)
-            {
-                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(roughness);
-                material->setSubMaterial(SubMaterialType::Roughness, subMaterial);
-            }
-            std::shared_ptr<Texture> occlusion = LoadMaterialTexture(aimaterial, aiTextureType_AMBIENT_OCCLUSION, parentPath);
-            if (occlusion)
-            {
-                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(occlusion);
-                material->setSubMaterial(SubMaterialType::Occlusion, subMaterial);
-            }
-            std::shared_ptr<Texture> metalness = LoadMaterialTexture(aimaterial, aiTextureType_METALNESS, parentPath);
-            if (metalness)
-            {
-                std::shared_ptr subMaterial = std::make_shared<SubMaterial>(metalness);
-                material->setSubMaterial(SubMaterialType::Metalness, subMaterial);
-            }
-            m_resources[material->getPath().string()] = material;
-            materials.push_back(material);
-        }
-        std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
-        for (size_t i = 0; i < submeshes.size(); i++)
-        {
-            model->setSubmeshMaterial(i, materials[submeshes[i]->getMaterialIndex()]);
-        }
-
         return model;
     }
 
@@ -613,6 +537,11 @@ namespace Tengine
         std::shared_ptr<Image> image = std::make_shared<Image>(data, UVec2(width, height), channels);
         image->setPath(path);
         return image;
+    }
+
+    void AssetManager::AddResource(std::filesystem::path path, std::shared_ptr<Resource> resource)
+    {
+        m_resources[path.string()] = resource;
     }
 
     std::filesystem::path Resource::getPath() const

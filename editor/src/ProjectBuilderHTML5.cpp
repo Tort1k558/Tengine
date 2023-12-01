@@ -3,11 +3,12 @@
 #include<filesystem>
 #include<fstream>
 #include<Core/Logger.h>
+#include<Utils/FileManager.h>
 
+#include"Editor.h"
 #include"ProjectManager.h"
 #include"ProjectManager.h"
 #include"Scripts/ScriptCompiler.h"
-#include"FileManager.h"
 
 namespace TengineEditor
 {
@@ -276,7 +277,7 @@ int main(int argc, char** argv)
 		std::ofstream cmakeFile(m_pathToBuildDirectory.string() + "/CMakeLists.txt");
 		if (cmakeFile.is_open())
 		{
-			std::string pathToEditor = FileManager::GetPathToEditor().string();
+			std::string pathToEditor = Editor::GetPathToEditor().string();
 			std::replace(pathToEditor.begin(), pathToEditor.end(), '\\', '/');
 			std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
 			cmakeFile <<
@@ -367,7 +368,7 @@ target_link_options(${PROJECT_NAME} PUBLIC -std=c++17 -pthread --embed-file=Asse
 
 	void ProjectBuilderHTML5::BuildSolution()
 	{
-		std::filesystem::copy(FileManager::GetPathToAssets(), m_pathToBuildDirectory.string() + "/" + FileManager::GetPathToAssets().string(),
+		std::filesystem::copy(Editor::GetPathToAssets(), m_pathToBuildDirectory.string() + "/" + Editor::GetPathToAssets().string(),
 			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
 
 		std::string buildCommand = "emmake make -C " + m_pathToBuildDirectory.string() + " -j 4";

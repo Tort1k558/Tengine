@@ -9,7 +9,7 @@ namespace Tengine
 	class VertexBufferOpenGL : public VertexBuffer
 	{
 	public:
-		VertexBufferOpenGL(float* vertices, unsigned int size, BufferUsage usage);
+		VertexBufferOpenGL(float* data, unsigned int size, BufferUsage usage);
 		~VertexBufferOpenGL();
 
 		VertexBufferOpenGL(const VertexBufferOpenGL&) = delete;

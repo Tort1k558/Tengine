@@ -20,9 +20,9 @@
 #include<Systems/RendererSystem.h>
 #include<Systems/ScriptSystem.h>
 #include<Utils/Material.h>
+#include<Utils/FileManager.h>
 
 #include"UIRender.h"
-#include"FileManager.h"
 #include"ProjectBuilder.h"
 #include"ProjectManager.h"
 #include"Scripts/ScriptCompiler.h"
@@ -162,10 +162,16 @@ namespace TengineEditor
         WindowMonitor::AddFormatHandler(".model", [](std::filesystem::path path) 
             {
                 std::shared_ptr<Model> model = AssetManager::LoadModel(path);
-                std::string meshPath = model->getMesh()->getPath().string();
+
+
+                std::string meshPath;
+                if (model->getMesh())
+                {
+                    meshPath = model->getMesh()->getPath().string();
+                }
                 if (UIRender::DrawFile("PathToMesh", meshPath))
                 {
-                    *model = *AssetManager::CreateModel(meshPath);
+                   model->setMesh(AssetManager::LoadMesh(meshPath));
                 }
 
                 if (UIRender::DrawCollapsingHeader("SubMeshes"))
@@ -257,34 +263,39 @@ namespace TengineEditor
         if (UIRender::DrawButton("Translate"))
         {
             gizmoOperation = ImGuizmo::TRANSLATE;
-            gizmoMode = ImGuizmo::WORLD;
         }
         ImGui::SameLine();
         if (UIRender::DrawButton("Rotate"))
         {
             gizmoOperation = ImGuizmo::ROTATE;
-            gizmoMode = ImGuizmo::LOCAL;
         }
         ImGui::SameLine();
         if (UIRender::DrawButton("Scale"))
         {
             gizmoOperation = ImGuizmo::SCALE;
-            gizmoMode = ImGuizmo::LOCAL;
+        }
+        if (UIRender::DrawButton("Local/World"))
+        {
+            if (gizmoMode == ImGuizmo::WORLD)
+            {
+                gizmoMode = ImGuizmo::LOCAL;
+            }
+            else
+            {
+                gizmoMode = ImGuizmo::WORLD;
+            }
         }
         if (ImGui::IsKeyPressed(ImGuiKey_Q))
         {
             gizmoOperation = ImGuizmo::TRANSLATE;
-            gizmoMode = ImGuizmo::WORLD;
         }
         if (ImGui::IsKeyPressed(ImGuiKey_E))
         {
             gizmoOperation = ImGuizmo::ROTATE;
-            gizmoMode = ImGuizmo::LOCAL;
         }
         if (ImGui::IsKeyPressed(ImGuiKey_R))
         {
             gizmoOperation = ImGuizmo::SCALE;
-            gizmoMode = ImGuizmo::LOCAL;
         }
 
         std::shared_ptr<Camera> sceneCamera = m_sceneCamera->getComponent<Camera>();

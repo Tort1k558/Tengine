@@ -57,6 +57,8 @@ namespace Tengine
 		static std::shared_ptr<Image> LoadImage(std::filesystem::path path,bool flipY = true);
 		template<typename T>
 		static std::shared_ptr<T> GetResource(std::string_view name);
+
+		static void AddResource(std::filesystem::path path, std::shared_ptr<Resource> resource);
 	private:
 
 		static std::unordered_map<std::string, std::shared_ptr<Resource>> m_resources;

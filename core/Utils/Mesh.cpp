@@ -30,7 +30,7 @@ namespace Tengine
 		return m_vertexArray;
 	}
 
-	size_t SubMesh::getMaterialIndex()
+	size_t SubMesh::getMaterialIndex() const
 	{
 		return m_materialIndex;
 	}

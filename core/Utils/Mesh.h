@@ -25,7 +25,7 @@ namespace Tengine
 	public:
 		SubMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
 		std::shared_ptr<VertexArray> getVertexArray() const;
-		size_t getMaterialIndex();
+		size_t getMaterialIndex() const;
 		void setMaterialIndex(size_t index);
 	private:
 		std::vector<Vertex> m_vertices;

@@ -19,11 +19,11 @@ namespace Tengine
 		return 0;
 	}
 
-	VertexBufferOpenGL::VertexBufferOpenGL(float* vertices, unsigned int size, BufferUsage usage)
+	VertexBufferOpenGL::VertexBufferOpenGL(float* data, unsigned int size, BufferUsage usage)
 	{
 		glGenBuffers(1, &m_id);
 		bind();
-		glBufferData(GL_ARRAY_BUFFER, size, vertices, bufferUsageToOpenGL(usage));
+		glBufferData(GL_ARRAY_BUFFER, size, data, bufferUsageToOpenGL(usage));
 		unbind();
 	}
 
