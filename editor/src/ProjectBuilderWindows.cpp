@@ -198,7 +198,7 @@ namespace Tengine
 
 #include<Systems/ScriptSystem.h>
 #include<Scene/SceneManager.h>
-#include<ECS/SystemManager.h>
+#include<Scene/SystemManager.h>
 
 #include"GameScriptSystem.h"
 
@@ -302,12 +302,20 @@ include_directories(/)
 
 add_executable(${PROJECT_NAME} ${TARGET_SRC_MODULE})
 
+target_compile_options(${PROJECT_NAME} PRIVATE /wd4251 /wd4996)
+
 target_link_directories(${PROJECT_NAME} PRIVATE
     )" + pathToEditor + R"(
 )
 )";
-
-			cmakeFile << "target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)\n";
+			if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
+			{
+				cmakeFile << "target_link_libraries(${PROJECT_NAME} PRIVATE TengineCored)\n";
+			}
+			else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
+			{
+				cmakeFile << "target_link_libraries(${PROJECT_NAME} PRIVATE TengineCore)\n";
+			}
 			cmakeFile.close();
 			std::string cmakeCommand = "cmake -S " + m_pathToBuildDirectory.string() + " -B " + m_pathToBuildDirectory.string();
 			std::system(cmakeCommand.c_str());
@@ -318,14 +326,16 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 	{
 
 		std::string cmakeBuildCommand;
-		std::filesystem::copy(Editor::GetPathToEditor().string() + "/TengineCore.lib", m_pathToBuildDirectory.string() + "/TengineCore.lib",
-			std::filesystem::copy_options::overwrite_existing);
 		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
 		{
+			std::filesystem::copy(Editor::GetPathToEditor().string() + "/TengineCored.lib", m_pathToBuildDirectory.string() + "/TengineCored.lib",
+				std::filesystem::copy_options::overwrite_existing);
 			cmakeBuildCommand = "cmake --build " + m_pathToBuildDirectory.string() + " --config Debug";
 		}
 		else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
 		{
+			std::filesystem::copy(Editor::GetPathToEditor().string() + "/TengineCore.lib", m_pathToBuildDirectory.string() + "/TengineCore.lib",
+				std::filesystem::copy_options::overwrite_existing);
 			cmakeBuildCommand = "cmake --build " + m_pathToBuildDirectory.string() + " --config Release";
 		}
 		std::system(cmakeBuildCommand.c_str());
@@ -366,7 +376,15 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 
 		//Copy Core Shared Library
 		std::string pathToEditor = Editor::GetPathToEditor().string();
-		std::filesystem::copy(pathToEditor + "/TengineCore.dll", m_pathToBuildDirectory.string() + "/build/TengineCore.dll",
-			std::filesystem::copy_options::overwrite_existing);
+		if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Debug)
+		{
+			std::filesystem::copy(pathToEditor + "/TengineCored.dll", m_pathToBuildDirectory.string() + "/build/TengineCored.dll",
+				std::filesystem::copy_options::overwrite_existing);
+		}
+		else if (ProjectBuilder::GetBuildConfiguration() == BuildConfiguration::Release)
+		{
+			std::filesystem::copy(pathToEditor + "/TengineCore.dll", m_pathToBuildDirectory.string() + "/build/TengineCore.dll",
+				std::filesystem::copy_options::overwrite_existing);
+		}
 	}
 }

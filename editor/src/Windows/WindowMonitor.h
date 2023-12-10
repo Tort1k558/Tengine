@@ -1,9 +1,10 @@
 #pragma once
 
-#include<ECS/Object.h>
 #include<functional>
 #include<string>
 #include<unordered_map>
+
+#include<Scene/Object.h>
 
 namespace TengineEditor
 {

@@ -65,7 +65,7 @@ namespace Tengine
 					return;
 				}
 			}
-			m_context->clearColor({ 0.1f,0.1f,0.1f, 1.0f });
+			m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
 			m_context->clear();
 			renderCamera(camera);
 			

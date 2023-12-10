@@ -215,7 +215,7 @@ R"(#pragma once
 #include<vector>
 #include<memory>
 
-#include"ECS/Object.h"
+#include"Scene/Object.h"
 
 using namespace Tengine;
 #define EXTERN __declspec(dllexport)
@@ -337,9 +337,11 @@ std::vector<std::string> GetScriptNames()
             std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             std::string compilerOptions;
+            
             std::string nameLib = "TengineCore";
             if (m_coreBuildConfiguration == BuildConfiguration::Debug)
             {
+                nameLib = "TengineCored";
                 compilerOptions = R"(
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MDd")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MDd")
@@ -387,7 +389,7 @@ target_link_directories(${PROJECT_NAME} PRIVATE
     )" + pathToEditor + R"(
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE )"+ nameLib + R"()
+target_link_libraries(${PROJECT_NAME} PRIVATE )" + nameLib + R"()
 
 
 target_compile_options(${PROJECT_NAME} PRIVATE /wd4251 /wd4996)

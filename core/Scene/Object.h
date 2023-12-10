@@ -7,8 +7,8 @@
 #include<unordered_map>
 
 #include"Core/UUID.h"
-#include"ECS/Component.h"
 #include"Core/Core.h"
+#include"Scene/Component.h"
 
 namespace Tengine
 {

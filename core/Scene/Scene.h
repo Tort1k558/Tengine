@@ -1,8 +1,8 @@
 #pragma once
 
-#include"ECS/Component.h"
+#include"Scene/Component.h"
 #include"Core/UUID.h"
-#include"ECS/Object.h"
+#include"Scene/Object.h"
 #include"Components/Camera.h"
 #include"Components/Transform.h"
 

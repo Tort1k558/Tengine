@@ -2,10 +2,10 @@
 
 #include<string>
 
-#include"ECS/System.h"
+#include"Scene/System.h"
 #include"Scene/SceneManager.h"
+#include"Scene/Object.h"
 #include"Core/Core.h"
-#include"ECS/Object.h"
 #include"Components/Script.h"
 
 namespace Tengine

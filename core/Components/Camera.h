@@ -1,6 +1,6 @@
 #pragma once
 
-#include"ECS/Component.h"
+#include"Scene/Component.h"
 #include"Core/Math.h"
 #include"Core/Core.h"
 #include"Renderer/CubeMapTexture.h"

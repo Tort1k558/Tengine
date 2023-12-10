@@ -1,4 +1,4 @@
-#include"ECS/Component.h"
+#include"Scene/Component.h"
 
 
 namespace Tengine

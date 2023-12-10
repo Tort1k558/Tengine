@@ -2,7 +2,7 @@
 
 #include<string>
 
-#include<ECS/Object.h>
+#include<Scene/Object.h>
 
 namespace TengineEditor
 {

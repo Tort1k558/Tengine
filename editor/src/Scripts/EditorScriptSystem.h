@@ -3,10 +3,10 @@
 #include<Windows.h>
 #include<string>
 
-#include<ECS/System.h>
+#include<Scene/System.h>
 #include<Scene/SceneManager.h>
 #include<Core/Core.h>
-#include<ECS/Object.h>
+#include<Scene/Object.h>
 #include<Components/Script.h>
 #include<Systems/ScriptSystem.h>
 

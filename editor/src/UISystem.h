@@ -3,8 +3,8 @@
 #include<memory>
 
 #include<Core/Window.h>
-#include<ECS/Object.h>
-#include<ECS/System.h>
+#include<Scene/Object.h>
+#include<Scene/System.h>
 #include<Renderer/FrameBuffer.h>
 
 namespace TengineEditor

@@ -199,7 +199,7 @@ namespace Tengine
 
 #include<Systems/ScriptSystem.h>
 #include<Scene/SceneManager.h>
-#include<ECS/SystemManager.h>
+#include<Core/SystemManager.h>
 
 #include"GameScriptSystem.h"
 
@@ -295,7 +295,6 @@ set(DIRS_SRC_MODULE
 	"../../Scripts/*.h" "../../Scripts/*.cpp"
 	
 	")" + pathToEditor + R"(/src/core/Core/*.h"			
-	")" + pathToEditor + R"(/src/core/ECS/*.h" 			
 	")" + pathToEditor + R"(/src/core/Components/*.h" 			
 	")" + pathToEditor + R"(/src/core/Systems/*.h" 			
 	")" + pathToEditor + R"(/src/core/Renderer/*.h"		
@@ -305,8 +304,8 @@ set(DIRS_SRC_MODULE
 	")" + pathToEditor + R"(/src/core/Scene/*.h" 		
 	")" + pathToEditor + R"(/src/core/Utils/*.h"          
 	")" + pathToEditor + R"(/src/core/Utils/EditorElements/*.h"
-	")" + pathToEditor + R"(/src/core/Core/*.cpp"                
-	")" + pathToEditor + R"(/src/core/ECS/*.cpp"                 
+
+	")" + pathToEditor + R"(/src/core/Core/*.cpp"                            
 	")" + pathToEditor + R"(/src/core/Components/*.cpp"      	
 	")" + pathToEditor + R"(/src/core/Systems/*.cpp"     		
 	")" + pathToEditor + R"(/src/core/Renderer/*.cpp"            

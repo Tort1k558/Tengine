@@ -8,8 +8,7 @@ set(PROJECT_NAME TengineCore)
 project(${PROJECT_NAME})
 
 set(DIRS_SRC 	
-	"Core/*.cpp"                
-	"ECS/*.cpp"                 
+	"Core/*.cpp"                              
 	"Components/*.cpp"      	
 	"Systems/*.cpp"     		
 	"Renderer/*.cpp"            
@@ -21,8 +20,7 @@ set(DIRS_SRC
 	"Utils/EditorElements/*.cpp"       
 	)
 	set(DIRS_INCLUDES	
-	"Core/*.h"			
-	"ECS/*.h" 			
+	"Core/*.h"					
 	"Components/*.h" 			
 	"Systems/*.h" 			
 	"Renderer/*.h"		
@@ -39,6 +37,7 @@ file(GLOB TARGET_INCLUDES ${DIRS_INCLUDES})
 add_library(${PROJECT_NAME} SHARED ${TARGET_SRC} ${TARGET_INCLUDES})
 
 target_compile_options(${PROJECT_NAME} PRIVATE /wd4251 /wd4996)
+set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
 target_include_directories(${PROJECT_NAME} PUBLIC "../core")
 

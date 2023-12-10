@@ -4,7 +4,7 @@
 
 #include"Core/Math.h"
 #include"Core/AssetManager.h"
-#include"ECS/Component.h"
+#include"Scene/Component.h"
 #include"Renderer/VertexArray.h"
 #include"Renderer/VertexBuffer.h"
 #include"Renderer/IndexBuffer.h"

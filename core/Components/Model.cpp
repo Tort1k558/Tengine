@@ -19,7 +19,6 @@ namespace Tengine
 	void Model::setMesh(std::shared_ptr<Mesh> mesh)
 	{
 		m_mesh = mesh;
-        loadMeshMaterials();
 		AssetManager::SaveModel(this);
 	}
 

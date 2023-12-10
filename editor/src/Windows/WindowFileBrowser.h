@@ -1,6 +1,6 @@
 #pragma once
 
-#include<ECS/Object.h>
+#include<Scene/Object.h>
 
 namespace TengineEditor
 {

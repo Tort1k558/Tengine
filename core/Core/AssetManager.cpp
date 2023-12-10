@@ -163,12 +163,12 @@ namespace Tengine
                     if (data.find("path") != data.end())
                     {
                         std::string pathToTexture = data["path"].get<std::string>();
-                        if (pathToTexture != "null")
+                        if (!pathToTexture.empty())
                         {
                             subMaterial->setTexture(LoadTexture(pathToTexture));
                         }
                     }
-                    Vec3 color = { data["color"][0],data["color"][1],data["color"][2] };
+                    Vec3 color = { data["color"][0], data["color"][1], data["color"][2] };
                     subMaterial->setColor(color);
                     material->setSubMaterial(type, subMaterial);
                 };

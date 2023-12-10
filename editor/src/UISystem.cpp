@@ -15,8 +15,8 @@
 #include<Core/AssetManager.h>
 #include<Core/Input.h>
 #include<Core/Timer.h>
-#include<ECS/Object.h>
-#include<ECS/SystemManager.h>
+#include<Scene/Object.h>
+#include<Scene/SystemManager.h>
 #include<Scene/SceneManager.h>
 #include<Systems/RendererSystem.h>
 #include<Systems/ScriptSystem.h>
@@ -277,6 +277,11 @@ namespace TengineEditor
             gizmoOperation = ImGuizmo::SCALE;
         }
         ImGui::SameLine();
+        if (UIRender::DrawButton("MultiTool"))
+        {
+            gizmoOperation = ImGuizmo::UNIVERSAL;
+        }
+        ImGui::SameLine();
         if (UIRender::DrawButton("Local/World"))
         {
             if (gizmoMode == ImGuizmo::WORLD)
@@ -300,7 +305,10 @@ namespace TengineEditor
         {
             gizmoOperation = ImGuizmo::SCALE;
         }
-
+        if (ImGui::IsKeyPressed(ImGuiKey_T))
+        {
+            gizmoOperation = ImGuizmo::UNIVERSAL;
+        }
         std::shared_ptr<Camera> sceneCamera = m_sceneCamera->getComponent<Camera>();
         std::shared_ptr<Transform> sceneCameraTransform = m_sceneCamera->getComponent<Transform>();
 

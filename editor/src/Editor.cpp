@@ -1,6 +1,5 @@
 #include "Editor.h"
 
-#include<ECS/SystemManager.h>
 #include<Components/Transform.h>
 #include<Components/Camera.h>
 #include<Components/Model.h>
@@ -8,13 +7,14 @@
 #include<Core/Timer.h>
 #include<Core/Logger.h>
 #include<Core/Input.h>
-#include<Scene/SceneManager.h>
-#include<Utils/Primitives.h>
-#include<Utils/Mesh.h>
 #include<Core/AssetManager.h>
+#include<Scene/SystemManager.h>
+#include<Scene/SceneManager.h>
 #include<Scene/SceneManager.h>
 #include<Systems/ScriptSystem.h>
 #include<Systems/RendererSystem.h>
+#include<Utils/Mesh.h>
+#include<Utils/Primitives.h>
 
 #include"Scripts/ScriptCompiler.h"
 #include"Scripts/EditorScriptSystem.h"
