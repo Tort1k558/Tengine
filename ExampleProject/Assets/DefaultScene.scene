@@ -1,35 +1,14 @@
 {
-    "T15473736026908341920": {
-        "Model": {
-            "PathToModelFile": "Assets/Meshes/backpack/backpack.model"
-        },
-        "Transform": {
-            "Position": [
-                0.0,
-                2.0,
-                0.0
-            ],
-            "Rotation": [
-                0.0,
-                0.0,
-                0.0
-            ],
-            "Scale": [
-                1.0,
-                1.0,
-                1.0
-            ]
-        },
-        "name": "Object3"
-    },
-    "T16406696667130754827": {
+    "T1396611566119358332": {
         "Camera": {
             "Aspect": [
                 1.7777777910232544
             ],
+            "CubeMapTexture": "",
             "Fov": [
                 60.0
             ],
+            "Lighting": true,
             "Projection": 0,
             "zFar": [
                 10000.0
@@ -48,13 +27,13 @@
         },
         "Transform": {
             "Position": [
-                0.0,
-                0.0,
-                2.0
+                -1.971893310546875,
+                0.7468509674072266,
+                4.315311908721924
             ],
             "Rotation": [
-                0.0,
-                0.0,
+                -12.245986938476563,
+                -388.10400390625,
                 0.0
             ],
             "Scale": [
@@ -65,28 +44,58 @@
         },
         "name": "Camera"
     },
-    "T17571765472046996676": {
+    "T15682186523962817900": {
         "Model": {
-            "PathToModelFile": "Primitive24.model"
+            "PathToModelFile": "Assets/Meshes/backpack/Model.model"
         },
         "Transform": {
             "Position": [
                 0.0,
-                -1.0,
+                0.0,
                 0.0
             ],
             "Rotation": [
-                -90.0,
+                0.0,
                 0.0,
                 0.0
             ],
             "Scale": [
-                10.0,
-                10.0,
+                1.0,
+                1.0,
                 1.0
             ]
         },
-        "name": "Object1"
+        "name": "Backpack"
+    },
+    "T5449542092591101359": {
+        "DirectionLight": {
+            "Color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Intensity": [
+                1.0
+            ]
+        },
+        "Transform": {
+            "Position": [
+                0.0,
+                2.4330546855926514,
+                0.0
+            ],
+            "Rotation": [
+                -45.73795700073242,
+                -0.0,
+                0.0
+            ],
+            "Scale": [
+                0.999984085559845,
+                0.49886494874954224,
+                0.9999919533729553
+            ]
+        },
+        "name": "DirLight"
     },
     "name": "DefaultScene"
 }

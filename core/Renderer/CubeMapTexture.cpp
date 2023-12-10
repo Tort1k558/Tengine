@@ -6,6 +6,16 @@
 
 namespace Tengine
 {
+	std::array<std::shared_ptr<Texture>, 6> CubeMapTexture::getTextures()
+	{
+		return m_textures;
+	}
+	
+	std::shared_ptr<Texture> CubeMapTexture::getTexture(CubeMapSide side)
+	{
+		return m_textures[static_cast<int>(side)];
+	}
+
 	std::shared_ptr<CubeMapTexture> CubeMapTexture::Create(std::array<std::shared_ptr<Texture>, 6> textures, TextureFilter filter)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())

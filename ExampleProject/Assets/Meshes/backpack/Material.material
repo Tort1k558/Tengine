@@ -1,0 +1,34 @@
+{
+    "Diffuse": {
+        "color": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "path": "Assets/Meshes/backpack/diffuse.jpg"
+    },
+    "Normal": {
+        "color": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "path": "Assets/Meshes/backpack/normal.png"
+    },
+    "Roughness": {
+        "color": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "path": "Assets/Meshes/backpack/roughness.jpg"
+    },
+    "Specular": {
+        "color": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "path": "Assets/Meshes/backpack/specular.jpg"
+    }
+}

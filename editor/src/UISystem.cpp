@@ -1,6 +1,7 @@
 #include "UISystem.h"
 
 #include<functional>
+#include<fstream>
 
 #include<imgui/backends/imgui_impl_glfw.h>
 #include<imgui/backends/imgui_impl_opengl3.h>
@@ -100,10 +101,6 @@ namespace TengineEditor
         ImGui_ImplOpenGL3_Init();
         ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
         m_sceneFramebuffer = FrameBuffer::Create({ 1024,768 });
-        m_sceneCamera = std::make_shared<Object>();
-        m_sceneCamera->setName("SceneCamera");
-        m_sceneCamera->addComponent(Component::Create<Transform>());
-        m_sceneCamera->addComponent(Component::Create<Camera>());
 
         WindowMonitor::AddFormatHandler(".material",[](std::filesystem::path path) {
             std::shared_ptr<Material> material = AssetManager::LoadMaterial(path);
@@ -204,7 +201,11 @@ namespace TengineEditor
             {
                 auto drawTexture = [&cubeMap](std::string name, CubeMapSide side)
                     {
-                        std::string pathToTexture = cubeMap->getSupportingInfo(name);
+                        std::string pathToTexture;
+                        if (cubeMap->getTexture(side))
+                        {
+                            pathToTexture = cubeMap->getTexture(side)->getPath().string();
+                        }
                         if (UIRender::DrawFile(name, pathToTexture))
                         {
                             cubeMap->setSideTexture(side, AssetManager::LoadTexture(pathToTexture));
@@ -212,6 +213,7 @@ namespace TengineEditor
                             AssetManager::SaveCubeMapTexture(cubeMap.get());
                         }
                     };
+                std::array<std::shared_ptr<Texture>,6> textures = cubeMap->getTextures();
                 drawTexture("right", CubeMapSide::Right);
                 drawTexture("left", CubeMapSide::Left);
                 drawTexture("top", CubeMapSide::Top);
@@ -274,6 +276,7 @@ namespace TengineEditor
         {
             gizmoOperation = ImGuizmo::SCALE;
         }
+        ImGui::SameLine();
         if (UIRender::DrawButton("Local/World"))
         {
             if (gizmoMode == ImGuizmo::WORLD)
@@ -436,6 +439,16 @@ namespace TengineEditor
     void UISystem::setWindow(std::shared_ptr<Window> window)
     {
         m_window = window;
+    }
+
+    void UISystem::setSceneCamera(std::shared_ptr<Object> object)
+    {
+        m_sceneCamera = object;
+    }
+
+    std::shared_ptr<Object> UISystem::getSceneCamera()
+    {
+        return m_sceneCamera;
     }
 
     std::shared_ptr<UISystem> UISystem::GetInstance()

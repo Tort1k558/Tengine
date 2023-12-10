@@ -241,10 +241,10 @@ extern "C" EXTERN std::vector<std::string> GetScriptNames();
         {
             initSourceFile << \
                 R"(#include"SystemModule.h"
+#include<Core/Logger.h>
+#include<Scene/SceneManager.h>
+#include<Components/Script.h>
 
-#include"Core/Logger.h"
-#include"Scene/SceneManager.h"
-#include"Components/Script.h"
 )";
             for (const auto& info : scriptInfo)
             {
@@ -337,14 +337,13 @@ std::vector<std::string> GetScriptNames()
             std::string pathToProject = ProjectManager::GetInstance()->getPath().string();
             std::string pathToEngineDirectory = pathToEditor.substr(0, pathToEditor.find("Tengine") + 7);
             std::string compilerOptions;
-            std::string nameLib;
+            std::string nameLib = "TengineCore";
             if (m_coreBuildConfiguration == BuildConfiguration::Debug)
             {
                 compilerOptions = R"(
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MDd")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MDd")
 )";
-                nameLib = "TengineCored";
             }
             else if (m_coreBuildConfiguration == BuildConfiguration::Release)
             {
@@ -354,7 +353,6 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MT")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MT")
 )";
-                nameLib = "TengineCore";
             }
             cmakeFile <<
 R"(cmake_minimum_required(VERSION 3.2)

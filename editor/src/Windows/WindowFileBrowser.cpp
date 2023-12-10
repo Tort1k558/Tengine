@@ -8,6 +8,7 @@
 #include<Utils/Primitives.h>
 #include<Components/Model.h>
 #include<Utils/FileManager.h>
+#include<Renderer/CubeMapTexture.h>
 
 #include"WindowMonitor.h"
 #include"UIRender.h"
@@ -112,6 +113,12 @@ namespace TengineEditor
                     if (ImGui::MenuItem("Create Primitive"))
                     {
                         openPrimitiveMenu = true;
+                    }
+                    if (ImGui::MenuItem("Create Skybox"))
+                    {
+                        std::shared_ptr<CubeMapTexture> cubeMap = CubeMapTexture::Create();
+                        cubeMap->setPath(FileManager::GetUniqueFilePath(GetRelativePath().string() + "/CubeMap.cubemap"));
+                        AssetManager::SaveCubeMapTexture(cubeMap.get());
                     }
                     ImGui::EndPopup();
                 }

@@ -1,13 +1,12 @@
 #pragma once
 
 #include"Components/Script.h"
-#include"SystemModule.h"
 
 namespace Tengine
 {
 	class CameraController : public Script
 	{
-		SHOWINEDITOR;
+		SERIALIZABLE;
 	public:
 		void start() override;
 		void update() override;

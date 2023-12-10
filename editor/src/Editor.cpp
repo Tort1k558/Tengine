@@ -48,7 +48,6 @@ namespace TengineEditor
         m_pathToEditor = std::filesystem::current_path();
 
         ProjectManager::Load("ExampleProject/ProjectData.project");
-
         SceneManager::Save(SceneManager::GetCurrentScene());
     }
 

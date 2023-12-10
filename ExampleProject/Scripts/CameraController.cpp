@@ -1,6 +1,7 @@
 #include "CameraController.h"
 
-#include"Core/Logger.h"
+#include<Core/Logger.h>
+#include<ECS/Object.h>
 #include"Components/Transform.h"
 #include"Components/Camera.h"
 #include"Core/Timer.h"
@@ -27,12 +28,12 @@ namespace Tengine
 		}
 		if (Input::IsKeyPressed(KeyCode::A))
 		{
-			transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp()))
+			transform->setPosition(transform->getPosition() + Math::Normalize(Math::Cross(camera->getDirection(), camera->getUp()))
 				* Vec3(static_cast<float>(-speed * Timer::GetDeltaTime())));
 		}
 		if (Input::IsKeyPressed(KeyCode::D))
 		{
-			transform->setPosition(transform->getPosition() + Normalize(Cross(camera->getDirection(), camera->getUp()))
+			transform->setPosition(transform->getPosition() + Math::Normalize(Math::Cross(camera->getDirection(), camera->getUp()))
 				* Vec3(static_cast<float>(speed * Timer::GetDeltaTime())));
 		}
 		if (Input::IsKeyPressed(KeyCode::LEFT_SHIFT))

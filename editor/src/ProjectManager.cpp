@@ -7,6 +7,7 @@
 
 #include"Scripts/EditorScriptSystem.h"
 
+#include"UISystem.h"
 
 namespace TengineEditor
 {
@@ -32,7 +33,6 @@ namespace TengineEditor
 			m_instance->setPath(path.parent_path());
 			m_instance->m_name = data["name"];
 			m_instance->m_pathToScenes = data["scenes"];
-			
 			for (const auto& pathToScene : m_instance->getPathToScenes())
 			{
 				SceneManager::AddScene(pathToScene.filename().string(), pathToScene.string());
@@ -40,6 +40,22 @@ namespace TengineEditor
 			if (!m_instance->getPathToScenes().empty())
 			{
 				SceneManager::LoadByPath(m_instance->m_pathToScenes[0].string());
+			}
+
+			if (data.find("EditorCamera") != data.end())
+			{
+				std::shared_ptr<Object> sceneCamera = std::make_shared<Object>();
+				sceneCamera->addComponent(Component::Create<Transform>());
+				SceneManager::DeserializeObject(data["EditorCamera"], sceneCamera);
+				UISystem::GetInstance()->setSceneCamera(sceneCamera);
+			}
+			else
+			{
+				std::shared_ptr<Object> sceneCamera = std::make_shared<Object>();
+				sceneCamera->setName("SceneCamera");
+				sceneCamera->addComponent(Component::Create<Transform>());
+				sceneCamera->addComponent(Component::Create<Camera>());
+				UISystem::GetInstance()->setSceneCamera(sceneCamera);
 			}
 			return m_instance;
 		}
@@ -65,6 +81,13 @@ namespace TengineEditor
 		m_instance->addScene(defaultScene->getPath());
 		SceneManager::Save(defaultScene);
 		SceneManager::SetCurrentScene(defaultScene);
+
+		std::shared_ptr<Object> sceneCamera = std::make_shared<Object>();
+		sceneCamera->setName("SceneCamera");
+		sceneCamera->addComponent(Component::Create<Transform>());
+		sceneCamera->addComponent(Component::Create<Camera>());
+		UISystem::GetInstance()->setSceneCamera(sceneCamera);
+
 		Save();
 		return m_instance;
     }
@@ -75,6 +98,12 @@ namespace TengineEditor
 		nlohmann::json data;
 		data["name"] = m_instance->getName();
 		data["scenes"] = m_instance->getPathToScenes();
+		std::shared_ptr<Object> sceneCamera = UISystem::GetInstance()->getSceneCamera();
+		if (sceneCamera)
+		{
+			SceneManager::SerializeObject(data["EditorCamera"], sceneCamera);
+		}
+
 		std::ofstream file("ProjectData.project");
 		if (file.is_open()) {
 			file << data.dump(4);

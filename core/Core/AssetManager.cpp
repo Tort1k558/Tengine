@@ -116,7 +116,10 @@ namespace Tengine
             return texture;
         }
         std::shared_ptr<Image> image = LoadImage(path);
-
+        if (!image)
+        {
+            return nullptr;
+        }
         TextureType type = TextureType::RGB8;
         switch (image->getChannels())
         {
@@ -325,15 +328,12 @@ namespace Tengine
             textures[i] = LoadTexture(paths[i]);
         }
         std::shared_ptr<CubeMapTexture> cubeMapTexture = CubeMapTexture::Create(textures);
-        cubeMapTexture->setSupportingInfo("right", textures[0]->getPath().string());
-        cubeMapTexture->setSupportingInfo("left", textures[1]->getPath().string());
-        cubeMapTexture->setSupportingInfo("top", textures[2]->getPath().string());
-        cubeMapTexture->setSupportingInfo("bottom", textures[3]->getPath().string());
-        cubeMapTexture->setSupportingInfo("front", textures[4]->getPath().string());
-        cubeMapTexture->setSupportingInfo("back", textures[5]->getPath().string());
         cubeMapTexture->setPath(path);
+
         m_resources[path.string()] = cubeMapTexture;
+        
         SaveCubeMapTexture(cubeMapTexture.get());
+
         return cubeMapTexture;
     }
 
@@ -353,27 +353,27 @@ namespace Tengine
             {
                 if (item.key() == "right")
                 {
-                    textures[0] = LoadTexture(item.value());
+                    textures[static_cast<int>(CubeMapSide::Right)] = LoadTexture(item.value());
                 }
                 else if (item.key() == "left")
                 {
-                    textures[1] = LoadTexture(item.value());
+                    textures[static_cast<int>(CubeMapSide::Left)] = LoadTexture(item.value());
                 }
                 else if (item.key() == "top")
                 {
-                    textures[2] = LoadTexture(item.value());
+                    textures[static_cast<int>(CubeMapSide::Top)] = LoadTexture(item.value());
                 }
                 else if (item.key() == "bottom")
                 {
-                    textures[3] = LoadTexture(item.value());
+                    textures[static_cast<int>(CubeMapSide::Bottom)] = LoadTexture(item.value());
                 }
                 else if (item.key() == "front")
                 {
-                    textures[4] = LoadTexture(item.value());
+                    textures[static_cast<int>(CubeMapSide::Front)] = LoadTexture(item.value());
                 }
                 else if (item.key() == "back")
                 {
-                    textures[5] = LoadTexture(item.value());
+                    textures[static_cast<int>(CubeMapSide::Back)] = LoadTexture(item.value());
                 }
             }
             file.close();
@@ -384,15 +384,7 @@ namespace Tengine
         }
         cubeMapTexture = CubeMapTexture::Create(textures);
         cubeMapTexture->setPath(path);
-        for (size_t i = 0; i < textures.size(); i++)
-        {
-            cubeMapTexture->setSupportingInfo("right", textures[0]->getPath().string());
-            cubeMapTexture->setSupportingInfo("left", textures[1]->getPath().string());
-            cubeMapTexture->setSupportingInfo("top", textures[2]->getPath().string());
-            cubeMapTexture->setSupportingInfo("bottom", textures[3]->getPath().string());
-            cubeMapTexture->setSupportingInfo("front", textures[4]->getPath().string());
-            cubeMapTexture->setSupportingInfo("back", textures[5]->getPath().string());
-        }
+        
         m_resources[path.string()] = cubeMapTexture;
 ;       return cubeMapTexture;
     }
@@ -505,12 +497,30 @@ namespace Tengine
         if (!texture->getPath().empty())
         {
             nlohmann::json data;
-            data["right"] = texture->getSupportingInfo("right");
-            data["left"] = texture->getSupportingInfo("left");
-            data["top"] = texture->getSupportingInfo("top");
-            data["bottom"] = texture->getSupportingInfo("bottom");
-            data["front"] = texture->getSupportingInfo("front");
-            data["back"] = texture->getSupportingInfo("back");
+            if (texture->getTexture(CubeMapSide::Right))
+            {
+                data["right"] = texture->getTexture(CubeMapSide::Right)->getPath();
+            }
+            if (texture->getTexture(CubeMapSide::Left))
+            {
+                data["left"] = texture->getTexture(CubeMapSide::Left)->getPath();
+            }
+            if (texture->getTexture(CubeMapSide::Top))
+            {
+                data["top"] = texture->getTexture(CubeMapSide::Top)->getPath();
+            }
+            if (texture->getTexture(CubeMapSide::Bottom))
+            {
+                data["bottom"] = texture->getTexture(CubeMapSide::Bottom)->getPath();
+            }
+            if (texture->getTexture(CubeMapSide::Front))
+            {
+                data["front"] = texture->getTexture(CubeMapSide::Front)->getPath();
+            }
+            if (texture->getTexture(CubeMapSide::Back))
+            {
+                data["back"] = texture->getTexture(CubeMapSide::Back)->getPath();
+            }
 
             std::ofstream file(texture->getPath().parent_path().string() + "/" + texture->getPath().stem().string() + ".cubeMap", std::ios_base::out);
             if (file.is_open()) {
@@ -525,6 +535,11 @@ namespace Tengine
 
     std::shared_ptr<Image> AssetManager::LoadImage(std::filesystem::path path, bool flipY)
     {
+        if (!std::filesystem::exists(path))
+        {
+            return nullptr;
+        }
+
         stbi_set_flip_vertically_on_load(flipY);
         int width, height, channels;
 

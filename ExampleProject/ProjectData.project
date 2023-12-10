@@ -1,6 +1,43 @@
 {
-    "name": "Project",
+    "EditorCamera": {
+        "Camera": {
+            "Aspect": [
+                1.7777777910232544
+            ],
+            "CubeMapTexture": "",
+            "Fov": [
+                60.0
+            ],
+            "Lighting": true,
+            "Projection": 0,
+            "zFar": [
+                10000.0
+            ],
+            "zNear": [
+                0.009999999776482582
+            ]
+        },
+        "Transform": {
+            "Position": [
+                -1.5990657806396484,
+                2.4264726638793945,
+                4.520578861236572
+            ],
+            "Rotation": [
+                -7.535991668701172,
+                -382.4515686035156,
+                0.0
+            ],
+            "Scale": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        },
+        "name": "SceneCamera"
+    },
+    "name": "ExampleProject",
     "scenes": [
-        "DefaultScene.scene"
+        "Assets/DefaultScene.scene"
     ]
 }

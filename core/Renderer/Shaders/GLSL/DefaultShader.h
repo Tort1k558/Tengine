@@ -146,15 +146,15 @@ void main()
 	vec3 result;
 	for(int i = 0; i < countDirLights; i++)
 	{
-  		result += CalcDirLight(dirLights[i], fs_in.normal, viewDir);
+  		result += CalcDirLight(dirLights[i], normalize(fs_in.normal), viewDir);
 	}
     for(int i = 0; i < countPointLights; i++)
 	{
-  		result += CalcPointLight(pointLights[i], fs_in.normal, viewDir);
+  		result += CalcPointLight(pointLights[i], normalize(fs_in.normal), viewDir);
 	}
     for(int i = 0; i < countSpotLights; i++)
 	{
-  		result += CalcSpotLight(spotLights[i], fs_in.normal, viewDir);
+  		result += CalcSpotLight(spotLights[i], normalize(fs_in.normal), viewDir);
 	}
     fragColor = vec4(result,1.0);
 }

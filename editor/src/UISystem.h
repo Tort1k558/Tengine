@@ -18,7 +18,8 @@ namespace TengineEditor
 		void update() final;
 		void destroy() final;
 		void setWindow(std::shared_ptr<Window> window);
-
+		void setSceneCamera(std::shared_ptr<Object> object);
+		std::shared_ptr<Object> getSceneCamera();
 		static std::shared_ptr<UISystem> GetInstance();
 	private:
 		void renderMenuBar();

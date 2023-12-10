@@ -22,33 +22,26 @@ namespace Tengine
 	}
 	void SceneManager::Save(std::shared_ptr<Scene> scene)
 	{
-		//Prepare data
-		nlohmann::json data;
-		data["name"] = scene->getName();
-		for (const auto& object : scene->getAllObjects())
+		if (scene)
 		{
-			data[object->getId().string()]["name"] = object->getName();
-			for (const auto& component : object->getComponents())
+			//Prepare data
+			nlohmann::json data;
+			data["name"] = scene->getName();
+			for (const auto& object : scene->getAllObjects())
 			{
-				ComponentInfo info = component->getInfo();
-				auto elements = info.getElements();
-				auto& componentData = data[object->getId().string()][info.getComponentName()];
-				for (size_t i = 0; i < elements.size(); i++)
-				{
-					SerializeField(componentData[elements[i]->name], elements[i]);
-				}
+				SerializeObject(data[object->getId().string()], object);
 			}
-		}
 
-		//Write data to file
-		std::ofstream file(scene->getPath().string(),std::ios_base::out);
-		if (file.is_open()) 
-		{
-			file << data.dump(4);
-			file.close();
-		}
-		else {
-			Logger::Critical("ERROR::SceneManager::Failed to save the scene file!");
+			//Write data to file
+			std::ofstream file(scene->getPath().string(), std::ios_base::out);
+			if (file.is_open())
+			{
+				file << data.dump(4);
+				file.close();
+			}
+			else {
+				Logger::Critical("ERROR::SceneManager::Failed to save the scene file!");
+			}
 		}
 	}
 
@@ -72,104 +65,7 @@ namespace Tengine
 					std::string objectId = item.key();
 					std::shared_ptr<Object> object = Object::Create(UUID(objectId));
 					nlohmann::json dataObject = item.value();
-					for (auto it = dataObject.begin(); it != dataObject.end(); ++it)
-					{
-						if (it.key() == "name")
-						{
-							std::string name = it.value();
-							object->setName(name);
-						}
-						else if (it.key() == "Transform")
-						{
-							std::shared_ptr<Transform> transform = object->getComponent<Transform>();
-							ComponentInfo info = transform->getInfo();
-							auto elements = info.getElements();
-							auto& componentData = dataObject[info.getComponentName()];
-							for (size_t i = 0; i < elements.size(); i++)
-							{
-								DeserializeField(componentData[elements[i]->name], elements[i]);
-							}
-						}
-						else if (it.key() == "Camera")
-						{
-							std::shared_ptr<Camera> camera;
-							camera = Component::Create<Camera>();
-							ComponentInfo info = camera->getInfo();
-							auto elements = info.getElements();
-							auto& componentData = dataObject[info.getComponentName()];
-							for (size_t i = 0; i < elements.size(); i++)
-							{
-								DeserializeField(componentData[elements[i]->name], elements[i]);
-							}
-							object->addComponent(camera);
-						}
-						else if (it.key() == "Model")
-						{
-							std::shared_ptr<Model> model = Component::Create<Model>();
-							ComponentInfo info = model->getInfo();
-							auto elements = info.getElements();
-							auto& componentData = dataObject[info.getComponentName()];
-							for (size_t i = 0; i < elements.size(); i++)
-							{
-								DeserializeField(componentData[elements[i]->name], elements[i]);
-							}
-							object->addComponent(model);
-						}
-						else if (it.key() == "DirectionLight")
-						{
-							std::shared_ptr<DirectionLight> light = Component::Create<DirectionLight>();
-							ComponentInfo info = light->getInfo();
-							auto elements = info.getElements();
-							auto& componentData = dataObject[info.getComponentName()];
-							for (size_t i = 0; i < elements.size(); i++)
-							{
-								DeserializeField(componentData[elements[i]->name], elements[i]);
-							}
-							object->addComponent(light);
-						}
-						else if (it.key() == "PointLight")
-						{
-							std::shared_ptr<PointLight> light = Component::Create<PointLight>();
-							ComponentInfo info = light->getInfo();
-							auto elements = info.getElements();
-							auto& componentData = dataObject[info.getComponentName()];
-							for (size_t i = 0; i < elements.size(); i++)
-							{
-								DeserializeField(componentData[elements[i]->name], elements[i]);
-							}
-							object->addComponent(light);
-						}
-						else if (it.key() == "SpotLight")
-						{
-							std::shared_ptr<SpotLight> light = Component::Create<SpotLight>();
-							ComponentInfo info = light->getInfo();
-							auto elements = info.getElements();
-							auto& componentData = dataObject[info.getComponentName()];
-							for (size_t i = 0; i < elements.size(); i++)
-							{
-								DeserializeField(componentData[elements[i]->name], elements[i]);
-							}
-							object->addComponent(light);
-						}
-						else
-						{
-							std::vector<std::string> nameScripts = ScriptSystem::GetInstance()->getScriptNames();
-							for (size_t i = 0; i < nameScripts.size(); i++)
-							{
-								if (nameScripts[i] == it.key())
-								{
-									std::shared_ptr<Component> script = ScriptSystem::GetInstance()->addScript(object, it.key());
-									ComponentInfo info = script->getInfo();
-									auto elements = info.getElements();
-									auto& componentData = dataObject[info.getComponentName()];
-									for (size_t i = 0; i < elements.size(); i++)
-									{
-										DeserializeField(componentData[elements[i]->name], elements[i]);
-									}
-								}
-							}
-						}
-					}
+					DeserializeObject(dataObject, object);
 				}
 			}
 			file.close();
@@ -348,6 +244,133 @@ namespace Tengine
 		}
 		default:
 			break;
+		}
+	}
+
+	void SceneManager::DeserializeObject(nlohmann::json& data,std::shared_ptr<Object> object)
+	{
+		for (auto it = data.begin(); it != data.end(); ++it)
+		{
+			if (it.key() == "name")
+			{
+				std::string name = it.value();
+				object->setName(name);
+			}
+			else if (it.key() == "Transform")
+			{
+				std::shared_ptr<Transform> transform;
+				if (object->hasComponent<Transform>())
+				{
+					transform = object->getComponent<Transform>();;
+				}
+				else
+				{
+					transform = Component::Create<Transform>();
+					object->addComponent(transform);
+				}
+				ComponentInfo info = transform->getInfo();
+				auto elements = info.getElements();
+				auto& componentData = data[info.getComponentName()];
+				for (size_t i = 0; i < elements.size(); i++)
+				{
+					DeserializeField(componentData[elements[i]->name], elements[i]);
+				}
+				
+			}
+			else if (it.key() == "Camera")
+			{
+				std::shared_ptr<Camera> camera;
+				camera = Component::Create<Camera>();
+				ComponentInfo info = camera->getInfo();
+				auto elements = info.getElements();
+				auto& componentData = data[info.getComponentName()];
+				for (size_t i = 0; i < elements.size(); i++)
+				{
+					DeserializeField(componentData[elements[i]->name], elements[i]);
+				}
+				object->addComponent(camera);
+			}
+			else if (it.key() == "Model")
+			{
+				std::shared_ptr<Model> model = Component::Create<Model>();
+				ComponentInfo info = model->getInfo();
+				auto elements = info.getElements();
+				auto& componentData = data[info.getComponentName()];
+				for (size_t i = 0; i < elements.size(); i++)
+				{
+					DeserializeField(componentData[elements[i]->name], elements[i]);
+				}
+				object->addComponent(model);
+			}
+			else if (it.key() == "DirectionLight")
+			{
+				std::shared_ptr<DirectionLight> light = Component::Create<DirectionLight>();
+				ComponentInfo info = light->getInfo();
+				auto elements = info.getElements();
+				auto& componentData = data[info.getComponentName()];
+				for (size_t i = 0; i < elements.size(); i++)
+				{
+					DeserializeField(componentData[elements[i]->name], elements[i]);
+				}
+				object->addComponent(light);
+			}
+			else if (it.key() == "PointLight")
+			{
+				std::shared_ptr<PointLight> light = Component::Create<PointLight>();
+				ComponentInfo info = light->getInfo();
+				auto elements = info.getElements();
+				auto& componentData = data[info.getComponentName()];
+				for (size_t i = 0; i < elements.size(); i++)
+				{
+					DeserializeField(componentData[elements[i]->name], elements[i]);
+				}
+				object->addComponent(light);
+			}
+			else if (it.key() == "SpotLight")
+			{
+				std::shared_ptr<SpotLight> light = Component::Create<SpotLight>();
+				ComponentInfo info = light->getInfo();
+				auto elements = info.getElements();
+				auto& componentData = data[info.getComponentName()];
+				for (size_t i = 0; i < elements.size(); i++)
+				{
+					DeserializeField(componentData[elements[i]->name], elements[i]);
+				}
+				object->addComponent(light);
+			}
+			else
+			{
+				std::vector<std::string> nameScripts = ScriptSystem::GetInstance()->getScriptNames();
+				for (size_t i = 0; i < nameScripts.size(); i++)
+				{
+					if (nameScripts[i] == it.key())
+					{
+						std::shared_ptr<Component> script = ScriptSystem::GetInstance()->addScript(object, it.key());
+						ComponentInfo info = script->getInfo();
+						auto elements = info.getElements();
+						auto& componentData = data[info.getComponentName()];
+						for (size_t i = 0; i < elements.size(); i++)
+						{
+							DeserializeField(componentData[elements[i]->name], elements[i]);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void SceneManager::SerializeObject(nlohmann::json& data, std::shared_ptr<Object> object)
+	{
+		data["name"] = object->getName();
+		for (const auto& component : object->getComponents())
+		{
+			ComponentInfo info = component->getInfo();
+			auto elements = info.getElements();
+			auto& componentData = data[info.getComponentName()];
+			for (size_t i = 0; i < elements.size(); i++)
+			{
+				SerializeField(componentData[elements[i]->name], elements[i]);
+			}
 		}
 	}
 

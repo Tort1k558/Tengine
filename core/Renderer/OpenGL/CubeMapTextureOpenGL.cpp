@@ -24,16 +24,17 @@ namespace Tengine
 	CubeMapTextureOpenGL::CubeMapTextureOpenGL(std::array<std::shared_ptr<Texture>, 6> textures, TextureFilter filter) :
 		m_id(0)
 	{
+		m_textures = textures;
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
 
-		for (size_t i = 0; i < textures.size(); i++)
+		for (size_t i = 0; i < m_textures.size(); i++)
 		{
-			if (textures[i]->getData())
+			if (m_textures[i])
 			{
-				UVec2 size = textures[i]->getSize();
-				TextureType type = textures[i]->getType();
-				std::shared_ptr<void> data = textures[i]->getData();
+				UVec2 size = m_textures[i]->getSize();
+				TextureType type = m_textures[i]->getType();
+				std::shared_ptr<void> data = m_textures[i]->getData();
 
 				//We flip the texture because the origin of coordinates in CubeMap is different 
 				FlipImageY(data.get(), size, TextureTypeToSize(type));
@@ -88,6 +89,7 @@ namespace Tengine
 
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<int>(side), 0, TextureTypeToOpenGLInternalFormat(type), size.x, size.y,
 			0, TextureTypeToOpenGLFormat(type), TextureTypeToOpenGLType(type), data.get());
+		m_textures[static_cast<int>(side)] = texture;
 	}
 
 	std::shared_ptr<void> CubeMapTextureOpenGL::getData(CubeMapSide side)

@@ -154,7 +154,10 @@ namespace Tengine
 		skybox->path = m_skybox ? m_skybox->getPath() : "";
 		skybox->callback = [this](const std::string& path) 
 			{
-				this->setSkybox(AssetManager::LoadCubeMapTexture(path));
+				if (std::filesystem::exists(path))
+				{
+					this->setSkybox(AssetManager::LoadCubeMapTexture(path));
+				}
 			};
 		componentInfo.addElement(skybox);
 		return componentInfo;
