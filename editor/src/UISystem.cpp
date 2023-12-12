@@ -168,7 +168,7 @@ namespace TengineEditor
                 }
                 if (UIRender::DrawFile("PathToMesh", meshPath))
                 {
-                   model->setMesh(AssetManager::LoadMesh(meshPath));
+                    model = AssetManager::LoadModel(meshPath);
                 }
 
                 if (UIRender::DrawCollapsingHeader("SubMeshes"))

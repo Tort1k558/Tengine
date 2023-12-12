@@ -45,7 +45,6 @@ namespace Tengine
 		static std::shared_ptr<Mesh> LoadMesh(std::filesystem::path path);
 		
 		static std::shared_ptr<Model> LoadModel(std::filesystem::path path);
-		static std::shared_ptr<Model> CreateModel(std::filesystem::path pathToMesh);
 
 		static std::shared_ptr<CubeMapTexture> LoadCubeMapTexture(std::filesystem::path path);
 		static std::shared_ptr<CubeMapTexture> CreateCubeMapTexture(std::array<std::filesystem::path,6> paths);

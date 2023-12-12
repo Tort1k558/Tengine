@@ -22,7 +22,6 @@ namespace Tengine
 
 		ComponentInfo getInfo() final;
 	private:
-		void loadMeshMaterials();
 		std::unordered_map<size_t, std::shared_ptr<Material>> m_materials;
 		std::shared_ptr<Mesh> m_mesh;
 	};
