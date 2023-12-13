@@ -20,16 +20,23 @@ namespace Tengine
 		FrameBufferOpenGL& operator=(FrameBufferOpenGL&& buffer) noexcept;
 
 		void bind() final;
+		void bindToRead() final;
+		void bindToWrite() final;
 		void unbind() final;
 
+		void attachColorTexture(std::shared_ptr<Texture> texture) final;
+		void attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture) final;
+		void attachDepthTexture(std::shared_ptr<Texture> texture) final;
+		void attachStencilTexture(std::shared_ptr<Texture> texture) final;
 
 		std::shared_ptr<Texture> getColorTexture() final;
 		std::shared_ptr<Texture> getDepthTexture() final;
+		std::shared_ptr<Texture> getStencilTexture() final;
 
 		static void SetDefaultBuffer();
 	private:
 		GLuint m_id;
-		std::shared_ptr<TextureOpenGL> m_colorTexture;
-		std::shared_ptr<TextureOpenGL> m_depthTexture;
+		std::shared_ptr<Texture> m_colorTexture, m_depthTexture,m_stencilTexture;
+		std::shared_ptr<MultisampleTexture> m_multisampledTexture;
 	};
 }

@@ -23,8 +23,10 @@ namespace Tengine
 	{
 	public:
 		virtual ~Resource() = default;
+
 		std::filesystem::path getPath() const;
 		void setPath(std::filesystem::path path);
+
 		void setSupportingInfo(std::string_view key, std::string_view value);
 		std::string getSupportingInfo(std::string_view key);
 	protected:

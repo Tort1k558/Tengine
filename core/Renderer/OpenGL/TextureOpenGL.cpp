@@ -85,60 +85,12 @@ namespace Tengine
 		}
 	}
 
-	TextureOpenGL::TextureOpenGL(std::shared_ptr<Image> image, TextureType type, TextureFilter filter)
-	{
-		m_type = type;
-		m_filter = filter;
-		m_size = image->getSize();
-		generateTexture(image->getData());
-	}
-
 	TextureOpenGL::TextureOpenGL(void* data, UVec2 size, TextureType type, TextureFilter filter)
 	{
 		m_type = type;
 		m_filter = filter;
 		m_size = size;
-		generateTexture(data);
-	}
 
-	TextureOpenGL::~TextureOpenGL()
-	{
-		glDeleteTextures(1, &m_id);
-	}
-
-	TextureOpenGL::TextureOpenGL(TextureOpenGL&& texture) noexcept
-	{
-		m_id = texture.m_id;
-		texture.m_id = 0;
-	}
-
-	TextureOpenGL& TextureOpenGL::operator=(TextureOpenGL&& texture) noexcept
-	{
-		m_id = texture.m_id;
-		texture.m_id = 0;
-		return *this;
-	}
-
-	void TextureOpenGL::bind(unsigned int slot)
-	{
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, m_id);
-	}
-
-	std::shared_ptr<void> TextureOpenGL::getData()
-	{
-		std::shared_ptr<void> pixels(malloc(m_size.x * m_size.y * TextureTypeToSize(m_type)), [](void* ptr) { free(ptr); });
-		bind(0);
-		glGetTexImage(GL_TEXTURE_2D, 0, TextureTypeToOpenGLFormat(m_type), GL_UNSIGNED_BYTE, pixels.get());
-		return pixels;
-	}
-
-	unsigned int TextureOpenGL::getId()
-	{
-		return m_id;
-	}
-	void TextureOpenGL::generateTexture(void* data)
-	{
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_2D, m_id);
 
@@ -212,5 +164,83 @@ namespace Tengine
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+
+	TextureOpenGL::~TextureOpenGL()
+	{
+		glDeleteTextures(1, &m_id);
+	}
+
+	TextureOpenGL::TextureOpenGL(TextureOpenGL&& texture) noexcept
+	{
+		m_id = texture.m_id;
+		texture.m_id = 0;
+	}
+
+	TextureOpenGL& TextureOpenGL::operator=(TextureOpenGL&& texture) noexcept
+	{
+		m_id = texture.m_id;
+		texture.m_id = 0;
+		return *this;
+	}
+
+	void TextureOpenGL::bind(unsigned int slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, m_id);
+	}
+
+	std::shared_ptr<void> TextureOpenGL::getData()
+	{
+		std::shared_ptr<void> pixels(malloc(m_size.x * m_size.y * TextureTypeToSize(m_type)), [](void* ptr) { free(ptr); });
+		bind(0);
+		glGetTexImage(GL_TEXTURE_2D, 0, TextureTypeToOpenGLFormat(m_type), GL_UNSIGNED_BYTE, pixels.get());
+		return pixels;
+	}
+
+	unsigned int TextureOpenGL::getId()
+	{
+		return m_id;
+	}
+
+
+	MultisampleTextureOpenGL::MultisampleTextureOpenGL(void* data, UVec2 size, TextureType type, size_t samples)
+	{
+		m_type = type;
+		m_size = size;
+		m_samples = samples;
+
+		glGenTextures(1, &m_id);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_id);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_samples, TextureTypeToOpenGLInternalFormat(m_type), m_size.x, m_size.y, GL_TRUE);
+	}
+
+	MultisampleTextureOpenGL::MultisampleTextureOpenGL(MultisampleTextureOpenGL&& texture) noexcept
+	{
+		m_id = texture.m_id;
+		texture.m_id = 0;
+	}
+
+	MultisampleTextureOpenGL& MultisampleTextureOpenGL::operator=(MultisampleTextureOpenGL&& texture) noexcept
+	{
+		m_id = texture.m_id;
+		texture.m_id = 0;
+		return *this;
+	}
+
+	MultisampleTextureOpenGL::~MultisampleTextureOpenGL()
+	{
+		glDeleteTextures(1, &m_id);
+	}
+
+	void MultisampleTextureOpenGL::bind(unsigned int slot)
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_id);
+	}
+
+	unsigned int MultisampleTextureOpenGL::getId()
+	{
+		return m_id;
 	}
 }

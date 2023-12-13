@@ -18,15 +18,7 @@ namespace Tengine
 
 	std::shared_ptr<Texture> Texture::Create(std::shared_ptr<Image> image, TextureType type, TextureFilter filter)
 	{
-		switch (RendererSystem::GetInstance()->getRendererType())
-		{
-		case RendererType::None:
-			Logger::Critical("ERROR::Renderer not initialized!");
-			return nullptr;
-		case RendererType::OpenGL:
-			return std::make_shared<TextureOpenGL>(image, type, filter);
-		}
-		return nullptr;
+		Texture::Create(image->getData(), image->getSize(), type, filter);
 	}
 
 	std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType type, TextureFilter filter)
@@ -59,5 +51,22 @@ namespace Tengine
 		default:
 			return 0;
 		}
+	}
+	size_t MultisampleTexture::getCountSamples()
+	{
+		return m_samples;
+	}
+
+	std::shared_ptr<MultisampleTexture> MultisampleTexture::Create(UVec2 size, TextureType type, size_t samples)
+	{
+		switch (RendererSystem::GetInstance()->getRendererType())
+		{
+		case RendererType::None:
+			Logger::Critical("ERROR::Renderer not initialized!");
+			return nullptr;
+		case RendererType::OpenGL:
+			return std::make_shared<MultisampleTextureOpenGL>(size, type,samples);
+		}
+		return nullptr;
 	}
 }

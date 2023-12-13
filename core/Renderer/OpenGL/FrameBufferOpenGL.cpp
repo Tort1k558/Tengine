@@ -10,10 +10,9 @@ namespace Tengine
 
 		glGenFramebuffers(1, &m_id);
 		bind();
-		std::shared_ptr<Image> image = std::make_shared<Image>(nullptr, size);
-		m_colorTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(image, TextureType::RGBA8, TextureFilter::None));
-		m_depthTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(image, TextureType::DEPTH32F, TextureFilter::None));
-
+		m_colorTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(nullptr, size, TextureType::RGBA8, TextureFilter::None));
+		m_depthTexture = std::dynamic_pointer_cast<TextureOpenGL>(Texture::Create(nullptr, size, TextureType::DEPTH32F, TextureFilter::None));
+		
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture->m_id, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->m_id, 0);
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) 
@@ -21,7 +20,7 @@ namespace Tengine
 			Logger::Critical("ERROR::OpenGL::FrameBuffer::Failed to create!");
 			return;
 		}
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		unbind();
 	}
 
 	FrameBufferOpenGL::~FrameBufferOpenGL()
@@ -58,9 +57,52 @@ namespace Tengine
 		glBindFramebuffer(GL_FRAMEBUFFER, m_id);
 	}
 
+	void FrameBufferOpenGL::bindToRead()
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_id);
+	}
+
+	void FrameBufferOpenGL::bindToWrite()
+	{
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_id);
+	}
+
 	void FrameBufferOpenGL::unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void FrameBufferOpenGL::attachColorTexture(std::shared_ptr<Texture> texture)
+	{
+		m_colorTexture = texture;
+		bind();
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture->getId(), 0);
+		unbind();
+	}
+
+	void FrameBufferOpenGL::attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture)
+	{
+		m_multisampledTexture = texture;
+		m_colorTexture = nullptr;
+		bind();
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_multisampledTexture->getId(), 0);
+		unbind();
+	}
+
+	void FrameBufferOpenGL::attachDepthTexture(std::shared_ptr<Texture> texture)
+	{
+		m_depthTexture = texture;
+		bind();
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture->getId(), 0);
+		unbind();
+	}
+
+	void FrameBufferOpenGL::attachStencilTexture(std::shared_ptr<Texture> texture)
+	{
+		m_stencilTexture = texture;
+		bind();
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_stencilTexture->getId(), 0);
+		unbind();
 	}
 
 	std::shared_ptr<Texture> FrameBufferOpenGL::getColorTexture()
@@ -70,6 +112,10 @@ namespace Tengine
 	std::shared_ptr<Texture> FrameBufferOpenGL::getDepthTexture()
 	{
 		return m_depthTexture;
+	}
+	std::shared_ptr<Texture> FrameBufferOpenGL::getStencilTexture()
+	{
+		return std::shared_ptr<Texture>();
 	}
 	void FrameBufferOpenGL::SetDefaultBuffer()
 	{

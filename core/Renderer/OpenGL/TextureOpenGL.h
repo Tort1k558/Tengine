@@ -14,7 +14,6 @@ namespace Tengine
 	class TextureOpenGL : public Texture
 	{
 	public:
-		TextureOpenGL(std::shared_ptr<Image> image, TextureType type,TextureFilter filter = TextureFilter::None);
 		TextureOpenGL(void* data, UVec2 size, TextureType type,TextureFilter filter = TextureFilter::None);
 		~TextureOpenGL();
 		TextureOpenGL(const TextureOpenGL&) = delete;
@@ -26,10 +25,26 @@ namespace Tengine
 		std::shared_ptr<void> getData() final;
 		unsigned int getId() final;
 	private:
-		void generateTexture(void* data);
 		GLuint m_id;
 
 		friend class FrameBufferOpenGL;
+	};
+
+	class MultisampleTextureOpenGL : public MultisampleTexture
+	{
+	public:
+		MultisampleTextureOpenGL(void* data, UVec2 size, TextureType type, size_t samples);
+		~MultisampleTextureOpenGL();
+		MultisampleTextureOpenGL(const MultisampleTextureOpenGL&) = delete;
+		MultisampleTextureOpenGL& operator=(const MultisampleTextureOpenGL&) = delete;
+		MultisampleTextureOpenGL(MultisampleTextureOpenGL&& texture) noexcept;
+		MultisampleTextureOpenGL& operator=(MultisampleTextureOpenGL&& texture) noexcept;
+
+		void bind(unsigned int slot) final;
+		unsigned int getId() final;
+		std::shared_ptr<void> getData() final;
+	private:
+		GLuint m_id;
 	};
 
 }

@@ -22,17 +22,16 @@ namespace Tengine
     std::string ReadFile(std::filesystem::path path)
     {
         std::ifstream file(path);
-        if (file.is_open())
+        if (!file.is_open())
         {
-            std::stringstream buffer;
-            buffer << file.rdbuf();
-
-            file.close();
-
-            return buffer.str();
+            Logger::Critical("ERROR::Failed to open file::{0}", path.string().c_str());
+            return "";
         }
-        Logger::Critical("ERROR::Failed to open file::{0}", path.string().c_str());
-        return "";
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        file.close();
+
+        return buffer.str();
     }
 
     std::shared_ptr<SubMesh> ProcessSubMesh(aiMesh* mesh, const aiScene* scene)
@@ -319,13 +318,13 @@ namespace Tengine
             model->setMesh(mesh);
             auto loadMaterialTexture = [](aiMaterial* material, aiTextureType type, std::filesystem::path directory) -> std::shared_ptr<Texture>
                 {
-                    if (material->GetTextureCount(type) > 0)
+                    if (material->GetTextureCount(type) <= 0)
                     {
-                        aiString pathToTexture;
-                        material->GetTexture(type, 0, &pathToTexture);
-                        return AssetManager::LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
+                        return nullptr;
                     }
-                    return nullptr;
+                    aiString pathToTexture;
+                    material->GetTexture(type, 0, &pathToTexture);
+                    return AssetManager::LoadTexture(directory.string() + "/" + pathToTexture.C_Str());
                 };
             std::filesystem::path parentPath = mesh->getPath().parent_path();
             std::vector<std::shared_ptr<Material>> materials;
@@ -419,42 +418,39 @@ namespace Tengine
         }
         std::array<std::shared_ptr<Texture>, 6> textures;
         std::ifstream file(path.string());
-        if (file.is_open())
+        if (!file.is_open())
         {
-            nlohmann::json data = nlohmann::json::parse(file);
-            for (const auto& item : data.items())
+            Logger::Critical("ERROR::AssetManager::Failed to open the cubemap texture!");
+        }
+        nlohmann::json data = nlohmann::json::parse(file);
+        for (const auto& item : data.items())
+        {
+            if (item.key() == "right")
             {
-                if (item.key() == "right")
-                {
-                    textures[static_cast<int>(CubeMapSide::Right)] = LoadTexture(item.value());
-                }
-                else if (item.key() == "left")
-                {
-                    textures[static_cast<int>(CubeMapSide::Left)] = LoadTexture(item.value());
-                }
-                else if (item.key() == "top")
-                {
-                    textures[static_cast<int>(CubeMapSide::Top)] = LoadTexture(item.value());
-                }
-                else if (item.key() == "bottom")
-                {
-                    textures[static_cast<int>(CubeMapSide::Bottom)] = LoadTexture(item.value());
-                }
-                else if (item.key() == "front")
-                {
-                    textures[static_cast<int>(CubeMapSide::Front)] = LoadTexture(item.value());
-                }
-                else if (item.key() == "back")
-                {
-                    textures[static_cast<int>(CubeMapSide::Back)] = LoadTexture(item.value());
-                }
+                textures[static_cast<int>(CubeMapSide::Right)] = LoadTexture(item.value());
             }
-            file.close();
+            else if (item.key() == "left")
+            {
+                textures[static_cast<int>(CubeMapSide::Left)] = LoadTexture(item.value());
+            }
+            else if (item.key() == "top")
+            {
+                textures[static_cast<int>(CubeMapSide::Top)] = LoadTexture(item.value());
+            }
+            else if (item.key() == "bottom")
+            {
+                textures[static_cast<int>(CubeMapSide::Bottom)] = LoadTexture(item.value());
+            }
+            else if (item.key() == "front")
+            {
+                textures[static_cast<int>(CubeMapSide::Front)] = LoadTexture(item.value());
+            }
+            else if (item.key() == "back")
+            {
+                textures[static_cast<int>(CubeMapSide::Back)] = LoadTexture(item.value());
+            }
         }
-        else
-        {
-            Logger::Critical("ERROR::AssetManager::Failed to open the material file!");
-        }
+        file.close();
         cubeMapTexture = CubeMapTexture::Create(textures);
         cubeMapTexture->setPath(path);
         
@@ -465,10 +461,11 @@ namespace Tengine
     void AssetManager::SaveModel(Model* model)
     {
         nlohmann::json data;
-        if (model->getMesh())
+        std::shared_ptr<Mesh> mesh = model->getMesh();
+        if (mesh)
         {
-            data["PathToMesh"] = model->getMesh()->getPath();
-            std::vector<std::shared_ptr<SubMesh>> submeshes = model->getMesh()->getSubmeshes();
+            data["PathToMesh"] = mesh->getPath();
+            std::vector<std::shared_ptr<SubMesh>> submeshes = mesh->getSubmeshes();
             for (size_t i = 0; i < submeshes.size(); i++)
             {
                 if (model->hasSubmeshMaterial(i))
@@ -484,7 +481,7 @@ namespace Tengine
         std::string pathToModelFile;
         if (model->getPath().empty())
         {
-            if (model->getMesh()->getPath().string().find("Primitive::") != std::string::npos)
+            if (mesh->getPath().string().find("Primitive::") != std::string::npos)
             {
                 size_t i = 0;
                 while (std::filesystem::exists("Primitive" + std::to_string(i) + ".model"))
@@ -495,7 +492,7 @@ namespace Tengine
             }
             else
             {
-                pathToModelFile = model->getMesh()->getPath().parent_path().string() + "/" + model->getMesh()->getPath().stem().string() + ".model";
+                pathToModelFile = mesh->getPath().parent_path().string() + "/" + mesh->getPath().stem().string() + ".model";
             }
         }
         else
@@ -518,50 +515,52 @@ namespace Tengine
 
     void AssetManager::SaveMaterial(Material* material)
     {
-        if (!material->getPath().empty())
+        if (material->getPath().empty())
         {
-            nlohmann::json data;
-            for (const auto& subMaterial : material->getSubMaterials())
+            return;
+        }
+
+        nlohmann::json data;
+        for (const auto& subMaterial : material->getSubMaterials())
+        {
+            std::string subMaterialType;
+            switch (subMaterial.first)
             {
-                std::string subMaterialType;
-                switch (subMaterial.first)
+            case SubMaterialType::Diffuse:
+                subMaterialType = "Diffuse";
+                break;
+            case SubMaterialType::Normal:
+                subMaterialType = "Normal";
+                break;
+            case SubMaterialType::Specular:
+                subMaterialType = "Specular";
+                break;
+            case SubMaterialType::Height:
+                subMaterialType = "Height";
+                break;
+            case SubMaterialType::Roughness:
+                subMaterialType = "Roughness";
+                break;
+            default:
+                break;
+            }
+            if (!subMaterialType.empty())
+            {
+                if (subMaterial.second->hasTexture())
                 {
-                case SubMaterialType::Diffuse:
-                    subMaterialType = "Diffuse";
-                    break;
-                case SubMaterialType::Normal:
-                    subMaterialType = "Normal";
-                    break;
-                case SubMaterialType::Specular:
-                    subMaterialType = "Specular";
-                    break;
-                case SubMaterialType::Height:
-                    subMaterialType = "Height";
-                    break;
-                case SubMaterialType::Roughness:
-                    subMaterialType = "Roughness";
-                    break;
-                default:
-                    break;
+                    data[subMaterialType]["path"] = subMaterial.second->getTexture()->getPath();
                 }
-                if (!subMaterialType.empty())
-                {
-                    if (subMaterial.second->hasTexture())
-                    {
-                        data[subMaterialType]["path"] = subMaterial.second->getTexture()->getPath();
-                    }
-                    Vec3 color = subMaterial.second->getColor();
-                    data[subMaterialType]["color"] = { color.r , color.g, color.b };
-                }
+                Vec3 color = subMaterial.second->getColor();
+                data[subMaterialType]["color"] = { color.r , color.g, color.b };
             }
-            std::ofstream file(material->getPath().parent_path().string() + "/" + material->getPath().stem().string() + ".material", std::ios_base::out);
-            if (file.is_open()) {
-                file << data.dump(4);
-                file.close();
-            }
-            else {
-                Logger::Critical("ERROR::Material::Failed to save the material!");
-            }
+        }
+        std::ofstream file(material->getPath().parent_path().string() + "/" + material->getPath().stem().string() + ".material", std::ios_base::out);
+        if (file.is_open()) {
+            file << data.dump(4);
+            file.close();
+        }
+        else {
+            Logger::Critical("ERROR::Material::Failed to save the material!");
         }
     }
 
@@ -617,7 +616,7 @@ namespace Tengine
         int width, height, channels;
 
         unsigned char* data = stbi_load(path.string().c_str(), &width, &height, &channels, 0);
-        if (data == nullptr)
+        if (!data)
         {
             Logger::Critical("ERROR::Failed to load the image: {0}", path.string().c_str());
             return nullptr;
