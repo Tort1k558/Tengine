@@ -136,12 +136,9 @@ namespace TengineEditor
 
     void WindowMonitor::SetMonitoringObject(std::shared_ptr<Object> object)
     {
-        if (object)
-        {
-            m_monitoringObject = object;
-            m_monitoringType = MonitoringType::Object;
-            m_pathToMonitoringFile = "";
-        }
+        m_monitoringObject = object;
+        m_monitoringType = MonitoringType::Object;
+        m_pathToMonitoringFile = "";
     }
 
     void WindowMonitor::SetPathMonitoringFile(std::filesystem::path pathToFile)
@@ -165,7 +162,7 @@ namespace TengineEditor
         case FieldType::Float:
         {
             std::shared_ptr<FieldFloat> slider = std::dynamic_pointer_cast<FieldFloat>(element);
-            if (UIRender::DrawFloat(slider->name, static_cast<float*>(slider->data), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawFloat(slider->name, static_cast<float*>(slider->data), 1.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -177,7 +174,7 @@ namespace TengineEditor
         case FieldType::Vec2:
         {
             std::shared_ptr<FieldVec2> slider = std::dynamic_pointer_cast<FieldVec2>(element);
-            if (UIRender::DrawVec2(slider->name, static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawVec2(slider->name, static_cast<float*>(&slider->data->x), 1.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -189,7 +186,7 @@ namespace TengineEditor
         case FieldType::Vec3:
         {
             std::shared_ptr<FieldVec3> slider = std::dynamic_pointer_cast<FieldVec3>(element);
-            if (UIRender::DrawVec3(slider->name, static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawVec3(slider->name, static_cast<float*>(&slider->data->x), 1.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {
@@ -201,7 +198,7 @@ namespace TengineEditor
         case FieldType::Vec4:
         {
             std::shared_ptr<FieldVec4> slider = std::dynamic_pointer_cast<FieldVec4>(element);
-            if (UIRender::DrawVec4(slider->name, static_cast<float*>(&slider->data->x), 0.0f, slider->minValue, slider->maxValue))
+            if (UIRender::DrawVec4(slider->name, static_cast<float*>(&slider->data->x), 1.0f, slider->minValue, slider->maxValue))
             {
                 if (slider->callback)
                 {

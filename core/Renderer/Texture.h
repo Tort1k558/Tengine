@@ -56,7 +56,6 @@ namespace Tengine
 	{
 	public:
 		virtual void bind(unsigned int slot) = 0;
-		virtual std::shared_ptr<void> getData() = 0;
 		virtual unsigned int getId() = 0;
 		
 		size_t getCountSamples();

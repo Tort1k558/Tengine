@@ -8,12 +8,18 @@ namespace Tengine
 
 	Camera::Camera()
 	{
+		setResolution(m_resolution);
+		setCameraType(ProjectionType::Perspective);
+	}
+	Camera::Camera(UVec2 resolution)
+	{
+		setResolution(resolution);
 		setCameraType(ProjectionType::Perspective);
 	}
 
-	Camera::Camera(ProjectionType type)
+	Camera::Camera(UVec2 resolution, ProjectionType type)
 	{
-
+		setResolution(resolution);
 		setCameraType(type);
 	}
 
@@ -52,7 +58,25 @@ namespace Tengine
 		Mat4 rotateMatrix = getRotationMatrix(rotation);
 		return rotateMatrix * Vec4(m_up, 1.0f);
 	}
-	
+	void Camera::setAntiAliasingType(AntiAliasingType type)
+	{
+		m_antiAliasingType = type;
+		switch (m_antiAliasingType)
+		{
+		case Tengine::AntiAliasingType::None:
+			m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
+			break;
+		case Tengine::AntiAliasingType::MSAA:
+			m_framebuffer->attachColorMultisampleTexture(MultisampleTexture::Create(m_resolution, TextureType::RGBA8, 4));
+			break;
+		default:
+			break;
+		}
+	}
+	AntiAliasingType Camera::getAntiAliasingType() const
+	{
+		return m_antiAliasingType;
+	}
 	ComponentInfo Camera::getInfo()
 	{
 		ComponentInfo componentInfo;
@@ -160,12 +184,53 @@ namespace Tengine
 				}
 			};
 		componentInfo.addElement(skybox);
+
+		std::shared_ptr<FieldEnum> antiAliasingType = std::make_shared<FieldEnum>();
+		antiAliasingType->name = "AntiAliasing";
+		antiAliasingType->elements = { "None","MSAA" };
+		antiAliasingType->currentElement = reinterpret_cast<int*>(&m_antiAliasingType);
+		antiAliasingType->callback = [this](int element)
+			{
+				this->setAntiAliasingType(static_cast<AntiAliasingType>(element));
+			};
+		componentInfo.addElement(antiAliasingType);
+
+		std::shared_ptr<FieldVec2> resolution = std::make_shared<FieldVec2>();
+		resolution->name = "Resolution";
+		resolution->minValue = 1.0f;
+		resolution->data = &m_resolution;
+		resolution->callback = [this]()
+			{
+				this->setResolution(m_resolution);
+			};
+		componentInfo.addElement(resolution);
 		return componentInfo;
 	}
 
 	bool Camera::isLighting() const
 	{
 		return m_isLighting;
+	}
+
+	std::shared_ptr<FrameBuffer> Camera::getFramebuffer() const
+	{
+		return m_framebuffer;
+	}
+
+	Vec2 Camera::getResolution()
+	{
+		return m_resolution;
+	}
+
+	void Camera::setResolution(Vec2 resolution)
+	{
+		m_resolution = resolution;
+		if (!m_framebuffer)
+		{
+			m_framebuffer = FrameBuffer::Create();
+		}
+		m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
+		m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::DEPTH32F, TextureFilter::None), FrameBufferAttachment::Depth);
 	}
 
 	void Camera::setLighting(bool value)

@@ -20,14 +20,13 @@ namespace Tengine
 		void destroy() final;
 
 		void updateViewport(UVec2 size);
-
+		UVec2 getViewport();
 		void setRendererType(RendererType type);
 		void setTextureFilter(TextureFilter filter);
 		RendererType getRendererType();
 		TextureFilter getTextureFilter();
-		std::shared_ptr<FrameBuffer> getFramebuffer();
 		void renderFramebuffer(std::shared_ptr<FrameBuffer> framebuffer);
-
+		void renderFramebufferToFramebuffer(std::shared_ptr<FrameBuffer> srcFramebuffer, std::shared_ptr<FrameBuffer> dstFramebuffer);
 		void disableRenderToDefaultFramebuffer();
 		void enableRenderToDefaultFramebuffer();
 
@@ -37,10 +36,9 @@ namespace Tengine
 		static std::shared_ptr<RendererSystem> GetInstance();
 	private:
 		std::shared_ptr<RendererContext> m_context;
-		RendererType m_rendererType;
+		RendererType m_rendererType = RendererType::None;
 		UVec2 m_viewportSize;
 		TextureFilter m_textureFilter = TextureFilter::Bilinear;
-		std::shared_ptr<FrameBuffer> m_framebuffer;
 		bool renderToDefaultFramebuffer = true;
 
 		static std::shared_ptr<RendererSystem> m_instance;

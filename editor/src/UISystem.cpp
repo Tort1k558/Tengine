@@ -100,7 +100,6 @@ namespace TengineEditor
         glfwInit();
         ImGui_ImplOpenGL3_Init();
         ImGui_ImplGlfw_InitForOpenGL(m_window->getWindow(), true);
-        m_sceneFramebuffer = FrameBuffer::Create({ 1024,768 });
 
         WindowMonitor::AddFormatHandler(".material",[](std::filesystem::path path) {
             std::shared_ptr<Material> material = AssetManager::LoadMaterial(path);
@@ -359,20 +358,17 @@ namespace TengineEditor
                 deltaMouse = Input::GetDeltaMousePosition();
             }
         }
-        m_sceneFramebuffer->bind();
-        RendererSystem::GetInstance()->getRendererContext()->clear();
-        RendererSystem::GetInstance()->getRendererContext()->clearColor({ 0.1f,0.1f,0.1f,1.0f });
-        RendererSystem::GetInstance()->renderCamera(m_sceneCamera->getComponent<Camera>());
-        m_sceneFramebuffer->unbind();
 
+
+        std::shared_ptr<FrameBuffer> sceneFramebuffer = sceneCamera->getFramebuffer();
         ImVec2 availableAreaSceneWindow = ImGui::GetContentRegionAvail();
-        std::shared_ptr<Texture> sceneTexture = m_sceneFramebuffer->getColorTexture();
+        RendererSystem::GetInstance()->renderCamera(sceneCamera);
+        std::shared_ptr<Texture> sceneTexture = sceneFramebuffer->getAttachment(FrameBufferAttachment::Color);
         ImGui::Image((void*)sceneTexture->getId(), availableAreaSceneWindow, { 0, 1 }, { 1, 0 });
-        if (UVec2(availableAreaSceneWindow.x,availableAreaSceneWindow.y) != m_sceneFramebuffer->getSize())
+        if (UVec2(availableAreaSceneWindow.x,availableAreaSceneWindow.y) != sceneFramebuffer->getAttachment(FrameBufferAttachment::Color)->getSize())
         {
-            m_sceneFramebuffer = FrameBuffer::Create({ availableAreaSceneWindow.x,availableAreaSceneWindow.y });
+            sceneCamera->setResolution({ availableAreaSceneWindow.x,availableAreaSceneWindow.y });
         }
-        
 
         //Gizmo
         ImVec2 sceneWindowPosition = ImGui::GetWindowPos();
@@ -411,9 +407,11 @@ namespace TengineEditor
                 isGameRunning = false;
                 SystemManager::DestroySystems();
                 SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
+                WindowMonitor::SetMonitoringObject(nullptr);
             }
         }
-        else {
+        else 
+        {
             if (ImGui::Button("start")) 
             {
                 isGameRunning = true;
@@ -421,13 +419,25 @@ namespace TengineEditor
                 SystemManager::AddSystem(ScriptSystem::GetInstance());
                 SceneManager::LoadByPath(SceneManager::GetCurrentScene()->getPath());
                 SystemManager::InitSystems();
+                WindowMonitor::SetMonitoringObject(nullptr);
             }
         } 
-        ImVec2 availableAreaGameWindow = ImGui::GetContentRegionAvail();
-        std::shared_ptr<Texture> gameTexture = RendererSystem::GetInstance()->getFramebuffer()->getColorTexture();
-        ImGui::Image((void*)gameTexture->getId(), availableAreaGameWindow, { 0, 1 }, { 1, 0 });
-        RendererSystem::GetInstance()->updateViewport({ availableAreaGameWindow.x, availableAreaGameWindow.y });
-
+        ImVec2 availableAreaGameWindowImVec = ImGui::GetContentRegionAvail();
+        UVec2 availableAreaGameWindow = UVec2(availableAreaGameWindowImVec.x, availableAreaGameWindowImVec.y);
+        std::shared_ptr<Camera> mainCamera = SceneManager::GetCurrentScene()->getMainCamera();
+        if (mainCamera)
+        {
+            if (!m_gameFramebuffer || m_gameFramebuffer->getAttachment(FrameBufferAttachment::Color)->getSize() != availableAreaGameWindow)
+            {
+                m_gameFramebuffer = FrameBuffer::Create();
+                m_gameFramebuffer->attachTexture(Texture::Create(nullptr, availableAreaGameWindow, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
+                m_gameFramebuffer->attachTexture(Texture::Create(nullptr, availableAreaGameWindow, TextureType::DEPTH32F, TextureFilter::None), FrameBufferAttachment::Depth);
+            }
+            RendererSystem::GetInstance()->renderFramebufferToFramebuffer(mainCamera->getFramebuffer(), m_gameFramebuffer);
+        
+            ImGui::Image((void*)m_gameFramebuffer->getAttachment(FrameBufferAttachment::Color)->getId(), availableAreaGameWindowImVec, {0, 1}, {1, 0});
+        }
+        
         ImGui::End();
 
         //Render

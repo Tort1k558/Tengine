@@ -39,7 +39,7 @@ namespace Tengine
 		std::shared_ptr<Texture> m_texture = nullptr;
 		Vec3 m_color = { 0.0f, 0.0f, 0.0f };
 
-		Material* m_parent;
+		Material* m_parent = nullptr;
 		friend class Material;
 	};
 

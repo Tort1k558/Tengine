@@ -12,7 +12,7 @@ namespace Tengine
 	class FrameBufferOpenGL : public FrameBuffer
 	{
 	public:
-		FrameBufferOpenGL(UVec2 size);
+		FrameBufferOpenGL();
 		~FrameBufferOpenGL();
 		FrameBufferOpenGL(const FrameBufferOpenGL&) = delete;
 		FrameBufferOpenGL& operator=(const FrameBufferOpenGL&) = delete;
@@ -23,20 +23,17 @@ namespace Tengine
 		void bindToRead() final;
 		void bindToWrite() final;
 		void unbind() final;
-
-		void attachColorTexture(std::shared_ptr<Texture> texture) final;
+		
+		void attachTexture(std::shared_ptr<Texture> texture, FrameBufferAttachment attachment) final;
 		void attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture) final;
-		void attachDepthTexture(std::shared_ptr<Texture> texture) final;
-		void attachStencilTexture(std::shared_ptr<Texture> texture) final;
 
-		std::shared_ptr<Texture> getColorTexture() final;
-		std::shared_ptr<Texture> getDepthTexture() final;
-		std::shared_ptr<Texture> getStencilTexture() final;
+		std::shared_ptr<Texture> getAttachment(FrameBufferAttachment attachment) final;
 
+		void copy(std::shared_ptr<FrameBuffer> buffer, UVec2 src0, UVec2 src1, UVec2 dst0, UVec2 dst1, FrameBufferAttachment mask, FrameBufferCopyFilter filter) final;
 		static void SetDefaultBuffer();
 	private:
 		GLuint m_id;
-		std::shared_ptr<Texture> m_colorTexture, m_depthTexture,m_stencilTexture;
+		std::unordered_map<FrameBufferAttachment,std::shared_ptr<Texture>> m_attachments;
 		std::shared_ptr<MultisampleTexture> m_multisampledTexture;
 	};
 }

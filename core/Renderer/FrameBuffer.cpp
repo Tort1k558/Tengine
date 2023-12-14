@@ -5,11 +5,7 @@
 #include"OpenGL/FrameBufferOpenGL.h"
 namespace Tengine
 {
-	UVec2 FrameBuffer::getSize()
-	{
-		return m_size;
-	}
-	std::shared_ptr<FrameBuffer> Tengine::FrameBuffer::Create(UVec2 size)
+	std::shared_ptr<FrameBuffer> Tengine::FrameBuffer::Create()
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
 		{
@@ -17,7 +13,7 @@ namespace Tengine
 			Logger::Critical("ERROR::Renderer not initialized!");
 			return nullptr;
 		case RendererType::OpenGL:
-			return std::make_shared<FrameBufferOpenGL>(size);
+			return std::make_shared<FrameBufferOpenGL>();
 		}
 		return nullptr;
 	}

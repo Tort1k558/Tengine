@@ -101,6 +101,10 @@ namespace Tengine
 
 	void SceneManager::DeserializeField(nlohmann::json& data,std::shared_ptr<FieldInfo> element)
 	{
+		if (data.empty())
+		{
+			return;
+		}
 		switch (element->type)
 		{
 		case FieldType::Float:

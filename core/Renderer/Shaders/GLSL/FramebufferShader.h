@@ -18,7 +18,7 @@ void main()
 })";
 		const char* framebufferShaderFragment = R"(#version 460 
 
-layout (binding = 0)uniform sampler2D ourTexture;
+layout (binding = 0) uniform sampler2D ourTexture;
 
 in vec2 uv;
 out vec4 fragColor;

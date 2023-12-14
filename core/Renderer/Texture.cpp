@@ -18,7 +18,7 @@ namespace Tengine
 
 	std::shared_ptr<Texture> Texture::Create(std::shared_ptr<Image> image, TextureType type, TextureFilter filter)
 	{
-		Texture::Create(image->getData(), image->getSize(), type, filter);
+		return Texture::Create(image->getData(), image->getSize(), type, filter);
 	}
 
 	std::shared_ptr<Texture> Texture::Create(void* data, UVec2 size, TextureType type, TextureFilter filter)
@@ -52,6 +52,7 @@ namespace Tengine
 			return 0;
 		}
 	}
+
 	size_t MultisampleTexture::getCountSamples()
 	{
 		return m_samples;

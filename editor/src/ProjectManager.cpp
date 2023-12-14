@@ -4,7 +4,7 @@
 #include<nlohmann/json.hpp>
 #include<Scene/SceneManager.h>
 #include<Systems/ScriptSystem.h>
-
+#include<Systems/RendererSystem.h>
 #include"Scripts/EditorScriptSystem.h"
 
 #include"UISystem.h"

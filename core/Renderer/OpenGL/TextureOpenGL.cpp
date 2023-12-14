@@ -204,7 +204,7 @@ namespace Tengine
 	}
 
 
-	MultisampleTextureOpenGL::MultisampleTextureOpenGL(void* data, UVec2 size, TextureType type, size_t samples)
+	MultisampleTextureOpenGL::MultisampleTextureOpenGL(UVec2 size, TextureType type, size_t samples)
 	{
 		m_type = type;
 		m_size = size;

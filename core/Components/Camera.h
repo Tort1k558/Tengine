@@ -4,6 +4,7 @@
 #include"Core/Math.h"
 #include"Core/Core.h"
 #include"Renderer/CubeMapTexture.h"
+#include"Renderer/FrameBuffer.h"
 
 namespace Tengine
 {
@@ -27,7 +28,7 @@ namespace Tengine
 		float getZNear() const;
 		float getZFar() const;
 	protected:
-		Mat4 m_projection;
+		Mat4 m_projection = Mat4(1.0f);
 		float m_zNear = 0.01f;
 		float m_zFar = 10000.0f;
 
@@ -86,12 +87,17 @@ namespace Tengine
 		ZXY,
 		ZYX
 	};
-
+	enum class AntiAliasingType
+	{
+		None = 0,
+		MSAA
+	};
 	class TENGINE Camera : public Component
 	{
 	public:
 		Camera();
-		Camera(ProjectionType type);
+		Camera(UVec2 resolution);
+		Camera(UVec2 resolution, ProjectionType type);
 
 		void setCameraType(ProjectionType type);
 		void setRotationOrder(RotationOrder order);
@@ -105,12 +111,22 @@ namespace Tengine
 		std::shared_ptr<Projection> getProjection() const;
 		RotationOrder getRotationOrder() const;
 		ProjectionType getProjectionType() const;
+
 		bool isLighting() const;
 
+		std::shared_ptr<FrameBuffer> getFramebuffer() const;
+		Vec2 getResolution();
+		void setResolution(Vec2 resolution);
+
+		void setAntiAliasingType(AntiAliasingType type);
+		AntiAliasingType getAntiAliasingType() const;
 		ComponentInfo getInfo() final;
+
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;
 
+		Vec2 m_resolution = { 640.0f,480.0f };
+		std::shared_ptr<FrameBuffer> m_framebuffer;
 		ProjectionType m_projectionType;
 		std::shared_ptr<Projection> m_projection;
 		RotationOrder m_rotationOrder = RotationOrder::YXZ;
@@ -118,5 +134,7 @@ namespace Tengine
 		Vec3 m_up = { 0.0f,1.0f,0.0f };
 		bool m_isLighting = false;
 		std::shared_ptr<CubeMapTexture> m_skybox = nullptr;
+
+		AntiAliasingType m_antiAliasingType = AntiAliasingType::None;
 	};
 }

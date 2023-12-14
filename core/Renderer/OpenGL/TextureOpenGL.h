@@ -33,7 +33,7 @@ namespace Tengine
 	class MultisampleTextureOpenGL : public MultisampleTexture
 	{
 	public:
-		MultisampleTextureOpenGL(void* data, UVec2 size, TextureType type, size_t samples);
+		MultisampleTextureOpenGL(UVec2 size, TextureType type, size_t samples);
 		~MultisampleTextureOpenGL();
 		MultisampleTextureOpenGL(const MultisampleTextureOpenGL&) = delete;
 		MultisampleTextureOpenGL& operator=(const MultisampleTextureOpenGL&) = delete;
@@ -42,7 +42,6 @@ namespace Tengine
 
 		void bind(unsigned int slot) final;
 		unsigned int getId() final;
-		std::shared_ptr<void> getData() final;
 	private:
 		GLuint m_id;
 	};

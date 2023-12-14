@@ -10,6 +10,11 @@ namespace Tengine
 		Depth,
 		Stencil
 	};
+	enum class FrameBufferCopyFilter
+	{
+		Linear = 0,
+		Nearest,
+	};
 	class TENGINE FrameBuffer
 	{
 	public:
@@ -20,21 +25,16 @@ namespace Tengine
 		virtual void bindToWrite() = 0;
 		virtual void unbind() = 0;
 
-		virtual void attachColorTexture(std::shared_ptr<Texture> texture) = 0;
+		
+		virtual void attachTexture(std::shared_ptr<Texture> texture, FrameBufferAttachment attachment) = 0;
 		virtual void attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture) = 0;
-		virtual void attachDepthTexture(std::shared_ptr<Texture> texture) = 0;
-		virtual void attachStencilTexture(std::shared_ptr<Texture> texture) = 0;
 
-		virtual std::shared_ptr<Texture> getColorTexture() = 0;
-		virtual std::shared_ptr<Texture> getDepthTexture() = 0;
-		virtual std::shared_ptr<Texture> getStencilTexture() = 0;
+		virtual std::shared_ptr<Texture> getAttachment(FrameBufferAttachment attachment) = 0;
 
-		virtual void copy(UVec2 src0, UVec2 src1, FrameBufferAttachment mask) = 0;
-		UVec2 getSize();
+		virtual void copy(std::shared_ptr<FrameBuffer> buffer,UVec2 src0, UVec2 src1, UVec2 dst0, UVec2 dst1, FrameBufferAttachment mask, FrameBufferCopyFilter filter) = 0;
 
-		static std::shared_ptr<FrameBuffer> Create(UVec2 size);
+		static std::shared_ptr<FrameBuffer> Create();
 		static void SetDefaultBuffer();
 	protected:
-		UVec2 m_size;
 	};
 }
