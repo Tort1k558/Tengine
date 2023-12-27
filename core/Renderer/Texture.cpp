@@ -52,6 +52,8 @@ namespace Tengine
 			return 4;
 		case TextureType::DEPTH24STENCIL8:
 			return 4;
+		case TextureType::RGBA16F:
+			return 8;
 		default:
 			return 0;
 		}

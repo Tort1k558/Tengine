@@ -152,10 +152,10 @@ namespace Tengine
 
     GLuint ShaderOpenGL::findUniformLocation(std::string_view name)
     {
-        auto loc = m_uniformLocations.find(name.data());
-        if (loc != m_uniformLocations.end())
+        auto it = m_uniformLocations.find(name.data());
+        if (it != m_uniformLocations.end())
         {
-            return loc->second;
+            return it->second;
         }
         m_uniformLocations[name.data()] = glGetUniformLocation(m_id, name.data());
 

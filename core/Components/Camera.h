@@ -125,6 +125,9 @@ namespace Tengine
 		
 		void setGamma(float gamma);
 		float getGamma() const;
+		
+		void setExposure(float exposure);
+		float getExposure() const;
 
 		ComponentInfo getInfo() final;
 	private:
@@ -140,6 +143,7 @@ namespace Tengine
 		bool m_isLighting = false;
 		std::shared_ptr<CubeMapTexture> m_skybox = nullptr;
 		float m_gamma = 2.2f;
+		float m_exposure = 1.0f;
 
 		AntiAliasingType m_antiAliasingType = AntiAliasingType::None;
 	};

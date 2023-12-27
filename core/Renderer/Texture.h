@@ -22,7 +22,8 @@ namespace Tengine
 		DEPTH32F,
 		DEPTH24STENCIL8,
 		SRGB8,
-		SRGBA8
+		SRGBA8,
+		RGBA16F
 	};
 	unsigned int TextureTypeToSize(TextureType type);
 

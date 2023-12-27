@@ -166,19 +166,19 @@ namespace Tengine
 			switch (camera->getAntiAliasingType())
 			{
 			case AntiAliasingType::MSAA2:
-				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA8, 2), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA16F, 2), FrameBufferAttachment::Color);
 				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::DEPTH32F, 2), FrameBufferAttachment::Depth);
 				break;
 			case AntiAliasingType::MSAA4:
-				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA8, 4), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA16F, 4), FrameBufferAttachment::Color);
 				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::DEPTH32F, 4), FrameBufferAttachment::Depth);
 				break;
 			case AntiAliasingType::MSAA8:
-				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA8, 8), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA16F, 8), FrameBufferAttachment::Color);
 				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::DEPTH32F, 8), FrameBufferAttachment::Depth);
 				break;
 			default:
-				mainFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::RGBA8), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::RGBA16F), FrameBufferAttachment::Color);
 				mainFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::DEPTH32F), FrameBufferAttachment::Depth);
 				break;
 			}
@@ -334,7 +334,7 @@ namespace Tengine
 			{
 				std::shared_ptr<FrameBuffer> interFramebuffer = FrameBuffer::Create();
 				interFramebuffer->bind();
-				interFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::RGB8), FrameBufferAttachment::Color);
+				interFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::RGBA16F), FrameBufferAttachment::Color);
 				interFramebuffer->copy(mainFramebuffer, { 0,0 }, mainFramebufferSize,
 					{ 0,0 }, mainFramebufferSize,
 					FrameBufferAttachment::Color, FrameBufferCopyFilter::Nearest);
@@ -349,6 +349,7 @@ namespace Tengine
 			std::shared_ptr<Shader> postProcessingShader = AssetManager::GetResource<Shader>("PostProcessingShader");
 			postProcessingShader->bind();
 			postProcessingShader->setUniformFloat("u_gamma", camera->getGamma());
+			postProcessingShader->setUniformFloat("u_exposure", camera->getExposure());
 			mainColorAttachment->bind(0);
 			m_context->drawIndexed(Primitives::CreateQuad()->getSubmeshes()[0]->getVertexArray());
 			

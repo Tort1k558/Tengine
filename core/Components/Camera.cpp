@@ -76,6 +76,16 @@ namespace Tengine
 	{
 		return m_gamma;
 	}
+
+	void Camera::setExposure(float exposure)
+	{
+		m_exposure = exposure;
+	}
+	
+	float Camera::getExposure() const
+	{
+		return m_exposure;
+	}
 	ComponentInfo Camera::getInfo()
 	{
 		ComponentInfo componentInfo;
@@ -213,6 +223,16 @@ namespace Tengine
 				this->setGamma(m_gamma);
 			};
 		componentInfo.addElement(gamma);
+
+		std::shared_ptr<FieldFloat> exposure = std::make_shared<FieldFloat>();
+		exposure->name = "Exposure";
+		exposure->minValue = 0.01f;
+		exposure->data = &m_exposure;
+		exposure->callback = [this]()
+			{
+				this->setExposure(m_exposure);
+			};
+		componentInfo.addElement(exposure);
 
 		return componentInfo;
 	}

@@ -32,6 +32,7 @@ void main()
 layout (binding = 0) uniform sampler2D ourTexture;
 
 uniform float u_gamma;
+uniform float u_exposure;
 
 in vec2 uv;
 out vec4 fragColor;
@@ -39,6 +40,8 @@ out vec4 fragColor;
 void main()
 {
     vec3 result = texture(ourTexture,uv).rgb;
+
+	result = vec3(1.0) - exp(-result * u_exposure);
 
 	result = pow(result, vec3(1.0 / u_gamma));
 	
