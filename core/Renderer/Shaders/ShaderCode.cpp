@@ -70,7 +70,7 @@ namespace Tengine
         {
         case RendererType::OpenGL:
             source.addSourceShader(ShaderType::Vertex, GLSL::framebufferShaderVertex);
-            source.addSourceShader(ShaderType::Fragment, GLSL::PostProcessingShaderFragment);
+            source.addSourceShader(ShaderType::Fragment, GLSL::postProcessingShaderFragment);
             break;
         case RendererType::OpenGLES:
             //source.addSourceShader(ShaderType::Vertex, ESSL::framebufferShaderVertex);

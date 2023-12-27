@@ -114,19 +114,12 @@ namespace Tengine
 
 	void RendererSystem::renderFramebuffer(std::shared_ptr<FrameBuffer> framebuffer)
 	{
-		std::shared_ptr<Texture> colorAttachment = framebuffer->getAttachment(FrameBufferAttachment::Color);
-		std::shared_ptr<FrameBuffer> interFramebuffer = FrameBuffer::Create();
-		interFramebuffer->attachTexture(Texture::Create(nullptr,colorAttachment->getSize(), TextureType::RGB8), FrameBufferAttachment::Color);
-		interFramebuffer->copy(framebuffer, { 0,0 },colorAttachment->getSize(),
-							{0,0}, colorAttachment->getSize(),
-							FrameBufferAttachment::Color,FrameBufferCopyFilter::Nearest);
-
 		FrameBuffer::SetDefaultBuffer();
 		m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
 		m_context->clear();
 		std::shared_ptr<Shader> framebufferShader = AssetManager::GetResource<Shader>("FramebufferShader");
 		framebufferShader->bind();
-		interFramebuffer->getAttachment(FrameBufferAttachment::Color)->bind(0);
+		framebuffer->getAttachment(FrameBufferAttachment::Color)->bind(0);
 		std::shared_ptr<Mesh> quad = Primitives::CreateQuad();
 		m_context->drawIndexed(quad->getSubmeshes()[0]->getVertexArray());
 		framebufferShader->unbind();
@@ -134,23 +127,16 @@ namespace Tengine
 
 	void RendererSystem::renderFramebufferToFramebuffer(std::shared_ptr<FrameBuffer> srcFramebuffer, std::shared_ptr<FrameBuffer> dstFramebuffer)
 	{
-		std::shared_ptr<Shader> framebufferShader = AssetManager::GetResource<Shader>("FramebufferShader");
-		
-		std::shared_ptr<Texture> colorAttachment = srcFramebuffer->getAttachment(FrameBufferAttachment::Color);
-		std::shared_ptr<FrameBuffer> interFramebuffer = FrameBuffer::Create();
-		interFramebuffer->attachTexture(Texture::Create(nullptr, colorAttachment->getSize(), TextureType::RGB8), FrameBufferAttachment::Color);
-		interFramebuffer->copy(srcFramebuffer, { 0,0 }, colorAttachment->getSize(),
-			{ 0,0 }, colorAttachment->getSize(),
-			FrameBufferAttachment::Color, FrameBufferCopyFilter::Nearest);
 
 		dstFramebuffer->bind();
 		updateViewport(dstFramebuffer->getAttachment(FrameBufferAttachment::Color)->getSize());
 		m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
 		m_context->clear();
+		std::shared_ptr<Shader> framebufferShader = AssetManager::GetResource<Shader>("FramebufferShader");
 		framebufferShader->bind();
-		interFramebuffer->getAttachment(FrameBufferAttachment::Color)->bind(0);
-		std::shared_ptr<Mesh> quad = Primitives::CreateQuad();
-		m_context->drawIndexed(quad->getSubmeshes()[0]->getVertexArray());
+		srcFramebuffer->getAttachment(FrameBufferAttachment::Color)->bind(0);
+		m_context->drawIndexed(Primitives::CreateQuad()->getSubmeshes()[0]->getVertexArray());
+
 		dstFramebuffer->unbind();
 		framebufferShader->unbind();
 	}
@@ -171,13 +157,33 @@ namespace Tengine
 		if (scene)
 		{
 
-			std::shared_ptr<FrameBuffer> cameraFramebuffer = camera->getFramebuffer();
-			cameraFramebuffer->bind();
-			
+			std::shared_ptr<FrameBuffer> cameraFramebuffer = camera->getFramebuffer();			
 			UVec2 prevViewportSize = m_viewportSize;
-			std::shared_ptr<Texture> colorAttachment = cameraFramebuffer->getAttachment(FrameBufferAttachment::Color);
+			std::shared_ptr<Texture> colorCameraAttachment = cameraFramebuffer->getAttachment(FrameBufferAttachment::Color);
 			
-			updateViewport(colorAttachment->getSize());
+			std::shared_ptr<FrameBuffer> mainFramebuffer = FrameBuffer::Create();
+			UVec2 mainFramebufferSize = colorCameraAttachment->getSize();
+			switch (camera->getAntiAliasingType())
+			{
+			case AntiAliasingType::MSAA2:
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA8, 2), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::DEPTH32F, 2), FrameBufferAttachment::Depth);
+				break;
+			case AntiAliasingType::MSAA4:
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA8, 4), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::DEPTH32F, 4), FrameBufferAttachment::Depth);
+				break;
+			case AntiAliasingType::MSAA8:
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::RGBA8, 8), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(MultisampleTexture::Create(mainFramebufferSize, TextureType::DEPTH32F, 8), FrameBufferAttachment::Depth);
+				break;
+			default:
+				mainFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::RGBA8), FrameBufferAttachment::Color);
+				mainFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::DEPTH32F), FrameBufferAttachment::Depth);
+				break;
+			}
+			mainFramebuffer->bind();
+			updateViewport(mainFramebufferSize);
 			m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
 			m_context->clear();
 			std::vector<std::shared_ptr<Model>> models = scene->getComponents<Model>();
@@ -296,6 +302,8 @@ namespace Tengine
 					}
 				}
 			}
+			shader->unbind();
+
 			if (camera->getSkybox())
 			{
 				m_context->setDepthFunc(DepthFunc::LessOrEqual);
@@ -312,16 +320,41 @@ namespace Tengine
 				m_context->drawIndexed(cube->getSubmeshes()[0]->getVertexArray());
 
 				m_context->setDepthFunc(DepthFunc::Less);
+				skyboxShader->unbind();
+			}
+			mainFramebuffer->unbind();
+			
+			//Post-processing
+			std::shared_ptr<Texture> mainColorAttachment;
+			if (camera->getAntiAliasingType() == AntiAliasingType::None)
+			{
+				mainColorAttachment = mainFramebuffer->getAttachment(FrameBufferAttachment::Color);
+			}
+			else
+			{
+				std::shared_ptr<FrameBuffer> interFramebuffer = FrameBuffer::Create();
+				interFramebuffer->bind();
+				interFramebuffer->attachTexture(Texture::Create(nullptr, mainFramebufferSize, TextureType::RGB8), FrameBufferAttachment::Color);
+				interFramebuffer->copy(mainFramebuffer, { 0,0 }, mainFramebufferSize,
+					{ 0,0 }, mainFramebufferSize,
+					FrameBufferAttachment::Color, FrameBufferCopyFilter::Nearest);
+				interFramebuffer->unbind();
+				mainColorAttachment = interFramebuffer->getAttachment(FrameBufferAttachment::Color);
 			}
 
-			//Post-processing
+			cameraFramebuffer->bind();
+			m_context->clearColor({ 0.0f,0.0f,0.0f, 1.0f });
+			m_context->clear();
+
 			std::shared_ptr<Shader> postProcessingShader = AssetManager::GetResource<Shader>("PostProcessingShader");
 			postProcessingShader->bind();
 			postProcessingShader->setUniformFloat("u_gamma", camera->getGamma());
-			colorAttachment->bind(0);
+			mainColorAttachment->bind(0);
 			m_context->drawIndexed(Primitives::CreateQuad()->getSubmeshes()[0]->getVertexArray());
 			
+			postProcessingShader->unbind();
 			cameraFramebuffer->unbind();
+
 			updateViewport(prevViewportSize);
 		}
 	}

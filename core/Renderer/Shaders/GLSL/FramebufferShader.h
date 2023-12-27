@@ -27,7 +27,7 @@ void main()
 {
     fragColor = texture(ourTexture,uv);
 })";
-		const char* PostProcessingShaderFragment = R"(#version 460 
+		const char* postProcessingShaderFragment = R"(#version 460 
 
 layout (binding = 0) uniform sampler2D ourTexture;
 
@@ -38,9 +38,9 @@ out vec4 fragColor;
 
 void main()
 {
-    vec3 result = texture(ourTexture,uv);
+    vec3 result = texture(ourTexture,uv).rgb;
 
-	result = pow(result,vec3(1.0 / u_gamma));
+	result = pow(result, vec3(1.0 / u_gamma));
 	
 	fragColor = vec4(result,1.0);
 })";

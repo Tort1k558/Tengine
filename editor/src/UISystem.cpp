@@ -372,8 +372,7 @@ namespace TengineEditor
             sceneFramebuffer->attachTexture(Texture::Create(nullptr, availableAreaSceneWindow, TextureType::DEPTH32F, TextureFilter::None), FrameBufferAttachment::Depth);
             sceneFramebuffer->attachTexture(Texture::Create(nullptr, availableAreaSceneWindow, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
         }
-        std::shared_ptr<FrameBuffer> cameraSceneFramebuffer = sceneCamera->getFramebuffer();
-        RendererSystem::GetInstance()->renderFramebufferToFramebuffer(cameraSceneFramebuffer, sceneFramebuffer);
+        RendererSystem::GetInstance()->renderFramebufferToFramebuffer(sceneCamera->getFramebuffer(), sceneFramebuffer);
         std::shared_ptr<Texture> sceneTexture = sceneFramebuffer->getAttachment(FrameBufferAttachment::Color);
         ImGui::Image((void*)sceneTexture->getId(), availableAreaSceneWindowImVec, { 0, 1 }, { 1, 0 });
 
