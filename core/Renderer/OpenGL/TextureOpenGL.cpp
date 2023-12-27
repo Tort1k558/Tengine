@@ -19,6 +19,8 @@ namespace Tengine
 			return GL_RGBA;
 		case TextureType::DEPTH32F:
 			return GL_DEPTH_COMPONENT;
+		case TextureType::DEPTH24STENCIL8:
+			return GL_DEPTH_STENCIL;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return 0;
@@ -39,6 +41,8 @@ namespace Tengine
 			return GL_RGBA8;
 		case TextureType::DEPTH32F:
 			return GL_DEPTH_COMPONENT32F;
+		case TextureType::DEPTH24STENCIL8:
+			return GL_DEPTH24_STENCIL8;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return 0;
@@ -59,6 +63,8 @@ namespace Tengine
 			return TextureType::RGBA8;
 		case GL_DEPTH_COMPONENT32F:
 			return TextureType::DEPTH32F;
+		case GL_UNSIGNED_INT_24_8:
+			return TextureType::DEPTH24STENCIL8;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return TextureType::RGB8;
@@ -79,6 +85,8 @@ namespace Tengine
 			return GL_UNSIGNED_BYTE;
 		case TextureType::DEPTH32F:
 			return GL_FLOAT;
+		case TextureType::DEPTH24STENCIL8:
+			return GL_UNSIGNED_INT_24_8;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return 0;
@@ -213,6 +221,7 @@ namespace Tengine
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_id);
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_samples, TextureTypeToOpenGLInternalFormat(m_type), m_size.x, m_size.y, GL_TRUE);
+		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 	}
 
 	MultisampleTextureOpenGL::MultisampleTextureOpenGL(MultisampleTextureOpenGL&& texture) noexcept

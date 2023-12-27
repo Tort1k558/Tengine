@@ -25,7 +25,6 @@ namespace Tengine
 		void unbind() final;
 		
 		void attachTexture(std::shared_ptr<Texture> texture, FrameBufferAttachment attachment) final;
-		void attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture) final;
 
 		std::shared_ptr<Texture> getAttachment(FrameBufferAttachment attachment) final;
 
@@ -34,6 +33,5 @@ namespace Tengine
 	private:
 		GLuint m_id;
 		std::unordered_map<FrameBufferAttachment,std::shared_ptr<Texture>> m_attachments;
-		std::shared_ptr<MultisampleTexture> m_multisampledTexture;
 	};
 }

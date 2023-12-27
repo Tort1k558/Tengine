@@ -90,7 +90,9 @@ namespace Tengine
 	enum class AntiAliasingType
 	{
 		None = 0,
-		MSAA
+		MSAA2,
+		MSAA4,
+		MSAA8,
 	};
 	class TENGINE Camera : public Component
 	{
@@ -124,7 +126,7 @@ namespace Tengine
 
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;
-
+		void recreateFramebuffer();
 		Vec2 m_resolution = { 640.0f,480.0f };
 		std::shared_ptr<FrameBuffer> m_framebuffer;
 		ProjectionType m_projectionType;

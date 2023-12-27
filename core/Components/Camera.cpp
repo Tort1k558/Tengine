@@ -58,25 +58,17 @@ namespace Tengine
 		Mat4 rotateMatrix = getRotationMatrix(rotation);
 		return rotateMatrix * Vec4(m_up, 1.0f);
 	}
+
 	void Camera::setAntiAliasingType(AntiAliasingType type)
 	{
 		m_antiAliasingType = type;
-		switch (m_antiAliasingType)
-		{
-		case Tengine::AntiAliasingType::None:
-			m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
-			break;
-		case Tengine::AntiAliasingType::MSAA:
-			m_framebuffer->attachColorMultisampleTexture(MultisampleTexture::Create(m_resolution, TextureType::RGBA8, 4));
-			break;
-		default:
-			break;
-		}
+		recreateFramebuffer();
 	}
 	AntiAliasingType Camera::getAntiAliasingType() const
 	{
 		return m_antiAliasingType;
 	}
+
 	ComponentInfo Camera::getInfo()
 	{
 		ComponentInfo componentInfo;
@@ -187,7 +179,7 @@ namespace Tengine
 
 		std::shared_ptr<FieldEnum> antiAliasingType = std::make_shared<FieldEnum>();
 		antiAliasingType->name = "AntiAliasing";
-		antiAliasingType->elements = { "None","MSAA" };
+		antiAliasingType->elements = { "None","MSAA2","MSAA4","MSAA8" };
 		antiAliasingType->currentElement = reinterpret_cast<int*>(&m_antiAliasingType);
 		antiAliasingType->callback = [this](int element)
 			{
@@ -225,12 +217,7 @@ namespace Tengine
 	void Camera::setResolution(Vec2 resolution)
 	{
 		m_resolution = resolution;
-		if (!m_framebuffer)
-		{
-			m_framebuffer = FrameBuffer::Create();
-		}
-		m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
-		m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::DEPTH32F, TextureFilter::None), FrameBufferAttachment::Depth);
+		recreateFramebuffer();
 	}
 
 	void Camera::setLighting(bool value)
@@ -271,6 +258,32 @@ namespace Tengine
 			return Math::GetEulerMatrixZYX(rotation);
 		}
 		return Mat4(1.0f);
+	}
+
+	void Camera::recreateFramebuffer()
+	{
+		m_framebuffer = FrameBuffer::Create();
+		switch (m_antiAliasingType)
+		{
+		case Tengine::AntiAliasingType::None:
+			m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
+			m_framebuffer->attachTexture(Texture::Create(nullptr, m_resolution, TextureType::DEPTH32F, TextureFilter::None), FrameBufferAttachment::Depth);
+			break;
+		case Tengine::AntiAliasingType::MSAA2:
+			m_framebuffer->attachTexture(MultisampleTexture::Create(m_resolution, TextureType::RGBA8, 2), FrameBufferAttachment::Color);
+			m_framebuffer->attachTexture(MultisampleTexture::Create(m_resolution, TextureType::DEPTH32F, 2), FrameBufferAttachment::Depth);
+			break;
+		case Tengine::AntiAliasingType::MSAA4:
+			m_framebuffer->attachTexture(MultisampleTexture::Create(m_resolution, TextureType::RGBA8, 4), FrameBufferAttachment::Color);
+			m_framebuffer->attachTexture(MultisampleTexture::Create(m_resolution, TextureType::DEPTH32F, 4), FrameBufferAttachment::Depth);
+			break;
+		case Tengine::AntiAliasingType::MSAA8:
+			m_framebuffer->attachTexture(MultisampleTexture::Create(m_resolution, TextureType::RGBA8, 8), FrameBufferAttachment::Color);
+			m_framebuffer->attachTexture(MultisampleTexture::Create(m_resolution, TextureType::DEPTH32F, 8), FrameBufferAttachment::Depth);
+			break;
+		default:
+			break;
+		}
 	}
 
 	void Camera::setCameraType(ProjectionType type)

@@ -36,7 +36,7 @@ namespace TengineEditor
         UISystem::GetInstance()->setWindow(getWindow());
         UISystem::GetInstance()->init();
         EditorScriptSystem::GetInstance();
-        RendererSystem::GetInstance()->getRendererContext()->enableDebugInfo();
+        RendererSystem::GetInstance()->getRendererContext()->enableFeature(RenderFeature::DebugInfo);
 
 #ifdef NDEBUG
         ScriptCompiler::SetCoreBuildConfiguration(BuildConfiguration::Release);
@@ -60,6 +60,7 @@ namespace TengineEditor
             destroy();
         }
     }
+
     void Editor::close()
     {
         UISystem::GetInstance()->destroy();

@@ -8,7 +8,8 @@ namespace Tengine
 	{
 		Color = 0,
 		Depth,
-		Stencil
+		Stencil,
+		DepthStencil
 	};
 	enum class FrameBufferCopyFilter
 	{
@@ -27,8 +28,6 @@ namespace Tengine
 
 		
 		virtual void attachTexture(std::shared_ptr<Texture> texture, FrameBufferAttachment attachment) = 0;
-		virtual void attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture) = 0;
-
 		virtual std::shared_ptr<Texture> getAttachment(FrameBufferAttachment attachment) = 0;
 
 		virtual void copy(std::shared_ptr<FrameBuffer> buffer,UVec2 src0, UVec2 src1, UVec2 dst0, UVec2 dst1, FrameBufferAttachment mask, FrameBufferCopyFilter filter) = 0;

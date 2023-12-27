@@ -24,8 +24,15 @@ namespace Tengine
 		LessOrEqual,
 		Greater,
 		NotEqual,
-		GreaterOrEqual,
+		GreaterOrEqual
+	};
 
+	enum class RenderFeature
+	{
+		DepthTest = 0,
+		StencilTest,
+		Multisample,
+		DebugInfo
 	};
 
 	class TENGINE RendererContext
@@ -38,9 +45,8 @@ namespace Tengine
 		virtual void drawIndexed(std::shared_ptr<VertexArray> va) = 0;
 		virtual void clear() = 0;
 		virtual void clearColor(Vec4 color) = 0;
-		virtual void enableDepthTest() = 0;
-		virtual void disableDepthTest() = 0;
-		virtual void enableDebugInfo() = 0;
+		virtual void enableFeature(RenderFeature feature) = 0;
+		virtual void disableFeature(RenderFeature feature) = 0;
 		virtual void setDepthFunc(DepthFunc func) = 0;
 		RendererType getType();
 	protected:

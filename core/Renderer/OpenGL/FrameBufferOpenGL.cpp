@@ -23,7 +23,6 @@ namespace Tengine
 	{
 		m_id = buffer.m_id;
 		m_attachments = std::move(buffer.m_attachments);
-		m_multisampledTexture = std::move(buffer.m_multisampledTexture);
 
 		buffer.m_id = 0;
 	}
@@ -32,7 +31,6 @@ namespace Tengine
 	{
 		m_id = buffer.m_id;
 		m_attachments = std::move(buffer.m_attachments);
-		m_multisampledTexture = std::move(buffer.m_multisampledTexture);
 
 		buffer.m_id = 0;
 
@@ -62,30 +60,34 @@ namespace Tengine
 	void FrameBufferOpenGL::attachTexture(std::shared_ptr<Texture> texture, FrameBufferAttachment attachment)
 	{
 		m_attachments[attachment] = texture;
+		
+		GLenum texTarget = GL_TEXTURE_2D;
+		if (std::dynamic_pointer_cast<MultisampleTexture>(texture))
+		{
+			texTarget = GL_TEXTURE_2D_MULTISAMPLE;
+		}
 		bind();
 		switch (attachment)
 		{
 		case Tengine::FrameBufferAttachment::Color:
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture->getId(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texTarget, texture->getId(), 0);
 			break;
 		case Tengine::FrameBufferAttachment::Depth:
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texture->getId(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texTarget, texture->getId(), 0);
 			break;
 		case Tengine::FrameBufferAttachment::Stencil:
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture->getId(), 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, texTarget, texture->getId(), 0);
+			break;
+		case Tengine::FrameBufferAttachment::DepthStencil:
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, texTarget, texture->getId(), 0);
 			break;
 		default:
 			break;
 		}
-		unbind();
-	}
-
-	void FrameBufferOpenGL::attachColorMultisampleTexture(std::shared_ptr<MultisampleTexture> texture)
-	{
-		m_multisampledTexture = texture;
-		m_attachments[FrameBufferAttachment::Color] = nullptr;
-		bind();
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_multisampledTexture->getId(), 0);
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			Logger::Critical("ERROR::FRAMEBUFFER::NOT COMPLETE!");
+		}
 		unbind();
 	}
 
@@ -102,7 +104,7 @@ namespace Tengine
 	{
 		buffer->bindToRead();
 		bindToWrite();
-		GLbitfield maskOpenGL = 0;
+		GLbitfield maskOpenGL = GL_COLOR_BUFFER_BIT;
 		switch (mask)
 		{
 		case Tengine::FrameBufferAttachment::Color:
@@ -117,7 +119,7 @@ namespace Tengine
 		default:
 			break;
 		}
-		GLenum filterOpenGL = 0;
+		GLenum filterOpenGL = GL_LINEAR;
 		switch (filter)
 		{
 		case Tengine::FrameBufferCopyFilter::Linear:

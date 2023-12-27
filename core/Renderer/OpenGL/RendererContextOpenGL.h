@@ -15,9 +15,8 @@ namespace Tengine
 		void drawIndexed(std::shared_ptr<VertexArray> vertexArray) final;
 		void clear() final;
 		void clearColor(Vec4 color) final;
-		void enableDepthTest() final;
-		void disableDepthTest() final;
-		void enableDebugInfo() final;
+		void enableFeature(RenderFeature feature) final;
+		void disableFeature(RenderFeature feature) final;
 		void setDepthFunc(DepthFunc func) final;
 	};
 }

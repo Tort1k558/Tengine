@@ -48,6 +48,8 @@ namespace Tengine
 			return 4;
 		case TextureType::DEPTH32F:
 			return 4;
+		case TextureType::DEPTH24STENCIL8:
+			return 4;
 		default:
 			return 0;
 		}
@@ -58,6 +60,11 @@ namespace Tengine
 		return m_samples;
 	}
 
+	std::shared_ptr<void> MultisampleTexture::getData()
+	{
+		return nullptr;
+	}
+
 	std::shared_ptr<MultisampleTexture> MultisampleTexture::Create(UVec2 size, TextureType type, size_t samples)
 	{
 		switch (RendererSystem::GetInstance()->getRendererType())
@@ -66,7 +73,7 @@ namespace Tengine
 			Logger::Critical("ERROR::Renderer not initialized!");
 			return nullptr;
 		case RendererType::OpenGL:
-			return std::make_shared<MultisampleTextureOpenGL>(size, type,samples);
+			return std::make_shared<MultisampleTextureOpenGL>(size, type, samples);
 		}
 		return nullptr;
 	}

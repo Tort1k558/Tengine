@@ -19,7 +19,8 @@ namespace Tengine
 		RG8,
 		RGB8,
 		RGBA8,
-		DEPTH32F
+		DEPTH32F,
+		DEPTH24STENCIL8
 	};
 	unsigned int TextureTypeToSize(TextureType type);
 
@@ -52,17 +53,13 @@ namespace Tengine
 		TextureFilter m_filter = TextureFilter::None;
 	};
 
-	class TENGINE MultisampleTexture
+	class TENGINE MultisampleTexture : public Texture
 	{
 	public:
-		virtual void bind(unsigned int slot) = 0;
-		virtual unsigned int getId() = 0;
-		
+		std::shared_ptr<void> getData() final;
 		size_t getCountSamples();
 		static std::shared_ptr<MultisampleTexture> Create(UVec2 size, TextureType type, size_t samples);
 	protected:
-		UVec2 m_size = { 0,0 };
-		TextureType m_type = TextureType::RGB8;
 		size_t m_samples = 1;
 	};
 }

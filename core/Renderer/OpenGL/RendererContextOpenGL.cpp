@@ -79,43 +79,70 @@ namespace Tengine
     {
         glClearColor(color.r, color.g, color.b, color.a);
     }
-
-    void RendererContextOpenGL::enableDepthTest()
+    void RendererContextOpenGL::enableFeature(RenderFeature feature)
     {
-        glEnable(GL_DEPTH_TEST);
-    }
-
-    void RendererContextOpenGL::disableDepthTest()
-    {
-        glDisable(GL_DEPTH_TEST);
-    }
-
-    void RendererContextOpenGL::enableDebugInfo()
-    {
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
-        glDebugMessageCallback([](GLenum glSource, GLenum glType, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
-            {
-                std::string source = GlSourceToStr(glSource);
-                std::string type = GlTypeToStr(glType);
-                switch (severity)
+        switch (feature)
+        {
+        case RenderFeature::DepthTest:
+            glEnable(GL_DEPTH_TEST);
+            break;
+        case RenderFeature::StencilTest:
+            glEnable(GL_STENCIL_TEST);
+            break;
+        case RenderFeature::Multisample:
+            glEnable(GL_MULTISAMPLE);
+            break;
+        case RenderFeature::DebugInfo:
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+            glDebugMessageCallback([](GLenum glSource, GLenum glType, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
                 {
-                case GL_DEBUG_SEVERITY_HIGH:
-                    Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
-                    break;
-                case GL_DEBUG_SEVERITY_MEDIUM:
-                case GL_DEBUG_SEVERITY_LOW:
-                    Logger::Warning("WARNING::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
-                    break;
-                case GL_DEBUG_SEVERITY_NOTIFICATION:
-                    Logger::Info("NOTIFICATION::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
-                    break;
-                default:
-                    Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
-                }
-            }, nullptr);
+                    std::string source = GlSourceToStr(glSource);
+                    std::string type = GlTypeToStr(glType);
+                    switch (severity)
+                    {
+                    case GL_DEBUG_SEVERITY_HIGH:
+                        Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
+                        break;
+                    case GL_DEBUG_SEVERITY_MEDIUM:
+                    case GL_DEBUG_SEVERITY_LOW:
+                        Logger::Warning("WARNING::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
+                        break;
+                    case GL_DEBUG_SEVERITY_NOTIFICATION:
+                        Logger::Info("NOTIFICATION::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
+                        break;
+                    default:
+                        Logger::Critical("ERROR::OpenGL::{0}::{1}::{2}:: {3}", source, type, id, message);
+                    }
+                }, nullptr);
+            break;
+        default:
+            break;
+        }
     }
+
+    void RendererContextOpenGL::disableFeature(RenderFeature feature)
+    {
+        switch (feature)
+        {
+        case RenderFeature::DepthTest:
+            glDisable(GL_DEPTH_TEST);
+            break;
+        case RenderFeature::StencilTest:
+            glDisable(GL_STENCIL_TEST);
+            break;
+        case RenderFeature::Multisample:
+            glDisable(GL_MULTISAMPLE);
+            break;
+        case RenderFeature::DebugInfo:
+            glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            break;
+        default:
+            break;
+        }
+    }
+
     void RendererContextOpenGL::setDepthFunc(DepthFunc func)
     {
         switch (func)

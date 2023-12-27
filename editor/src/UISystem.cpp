@@ -360,15 +360,21 @@ namespace TengineEditor
         }
 
 
-        std::shared_ptr<FrameBuffer> sceneFramebuffer = sceneCamera->getFramebuffer();
-        ImVec2 availableAreaSceneWindow = ImGui::GetContentRegionAvail();
+        ImVec2 availableAreaSceneWindowImVec = ImGui::GetContentRegionAvail();
+        UVec2 availableAreaSceneWindow = { availableAreaSceneWindowImVec.x,availableAreaSceneWindowImVec.y };
         RendererSystem::GetInstance()->renderCamera(sceneCamera);
-        std::shared_ptr<Texture> sceneTexture = sceneFramebuffer->getAttachment(FrameBufferAttachment::Color);
-        ImGui::Image((void*)sceneTexture->getId(), availableAreaSceneWindow, { 0, 1 }, { 1, 0 });
-        if (UVec2(availableAreaSceneWindow.x,availableAreaSceneWindow.y) != sceneFramebuffer->getAttachment(FrameBufferAttachment::Color)->getSize())
+        static std::shared_ptr<FrameBuffer> sceneFramebuffer;
+
+        if (!sceneFramebuffer || sceneFramebuffer->getAttachment(FrameBufferAttachment::Color)->getSize() != availableAreaSceneWindow)
         {
-            sceneCamera->setResolution({ availableAreaSceneWindow.x,availableAreaSceneWindow.y });
+            sceneFramebuffer = FrameBuffer::Create();
+            sceneFramebuffer->attachTexture(Texture::Create(nullptr, availableAreaSceneWindow, TextureType::DEPTH32F, TextureFilter::None), FrameBufferAttachment::Depth);
+            sceneFramebuffer->attachTexture(Texture::Create(nullptr, availableAreaSceneWindow, TextureType::RGBA8, TextureFilter::None), FrameBufferAttachment::Color);
         }
+        std::shared_ptr<FrameBuffer> cameraSceneFramebuffer = sceneCamera->getFramebuffer();
+        RendererSystem::GetInstance()->renderFramebufferToFramebuffer(cameraSceneFramebuffer, sceneFramebuffer);
+        std::shared_ptr<Texture> sceneTexture = sceneFramebuffer->getAttachment(FrameBufferAttachment::Color);
+        ImGui::Image((void*)sceneTexture->getId(), availableAreaSceneWindowImVec, { 0, 1 }, { 1, 0 });
 
         //Gizmo
         ImVec2 sceneWindowPosition = ImGui::GetWindowPos();
