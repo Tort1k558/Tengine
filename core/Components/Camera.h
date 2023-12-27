@@ -122,8 +122,11 @@ namespace Tengine
 
 		void setAntiAliasingType(AntiAliasingType type);
 		AntiAliasingType getAntiAliasingType() const;
-		ComponentInfo getInfo() final;
+		
+		void setGamma(float gamma);
+		float getGamma() const;
 
+		ComponentInfo getInfo() final;
 	private:
 		Mat4 getRotationMatrix(Vec3 rotation) const;
 		void recreateFramebuffer();
@@ -136,6 +139,7 @@ namespace Tengine
 		Vec3 m_up = { 0.0f,1.0f,0.0f };
 		bool m_isLighting = false;
 		std::shared_ptr<CubeMapTexture> m_skybox = nullptr;
+		float m_gamma = 2.2f;
 
 		AntiAliasingType m_antiAliasingType = AntiAliasingType::None;
 	};

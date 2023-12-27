@@ -124,6 +124,7 @@ namespace TengineEditor
                             {
                                 UIRender::DrawImage(reinterpret_cast<void*>(subMaterial->getTexture()->getId()), { 75,75 });
                             }
+                            
                             Vec3 color = subMaterial->getColor();
                             if (ImGui::ColorEdit3(subMaterialName.c_str(), &(color)[0]))
                             {

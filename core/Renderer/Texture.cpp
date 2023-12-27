@@ -42,9 +42,11 @@ namespace Tengine
 			return 1;
 		case TextureType::RG8:
 			return 2;
+		case TextureType::SRGB8:
 		case TextureType::RGB8:
 			return 3;
 		case TextureType::RGBA8:
+		case TextureType::SRGBA8:
 			return 4;
 		case TextureType::DEPTH32F:
 			return 4;

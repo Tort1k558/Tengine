@@ -44,6 +44,8 @@ namespace Tengine
 		AssetManager::AddShader("LightingShader", lightingShaderSource.getSourceShader(ShaderType::Vertex), lightingShaderSource.getSourceShader(ShaderType::Fragment));
 		ShaderSource skyboxShaderSource = ShaderCode::GetSkyboxShader();
 		AssetManager::AddShader("SkyboxShader", skyboxShaderSource.getSourceShader(ShaderType::Vertex), skyboxShaderSource.getSourceShader(ShaderType::Fragment));
+		ShaderSource postProcessingShader = ShaderCode::GetPostProcessingShader();
+		AssetManager::AddShader("PostProcessingShader", postProcessingShader.getSourceShader(ShaderType::Vertex), postProcessingShader.getSourceShader(ShaderType::Fragment));
 
 	}
 
@@ -312,6 +314,13 @@ namespace Tengine
 				m_context->setDepthFunc(DepthFunc::Less);
 			}
 
+			//Post-processing
+			std::shared_ptr<Shader> postProcessingShader = AssetManager::GetResource<Shader>("PostProcessingShader");
+			postProcessingShader->bind();
+			postProcessingShader->setUniformFloat("u_gamma", camera->getGamma());
+			colorAttachment->bind(0);
+			m_context->drawIndexed(Primitives::CreateQuad()->getSubmeshes()[0]->getVertexArray());
+			
 			cameraFramebuffer->unbind();
 			updateViewport(prevViewportSize);
 		}

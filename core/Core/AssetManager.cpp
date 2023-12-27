@@ -108,7 +108,7 @@ namespace Tengine
         return shader;
     }
 
-    std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path)
+    std::shared_ptr<Texture> AssetManager::LoadTexture(std::filesystem::path path, bool srgb)
     {
         std::shared_ptr<Texture> texture = GetResource<Texture>(path.string());
         if (texture)
@@ -121,20 +121,41 @@ namespace Tengine
             return nullptr;
         }
         TextureType type = TextureType::RGB8;
-        switch (image->getChannels())
+        if (srgb)
         {
-        case 1:
-            type = TextureType::R8;
-            break;
-        case 2:
-            type = TextureType::RG8;
-            break;
-        case 3:
-            type = TextureType::RGB8;
-            break;
-        case 4:
-            type = TextureType::RGBA8;
-            break;
+            switch (image->getChannels())
+            {
+            case 1:
+                type = TextureType::R8;
+                break;
+            case 2:
+                type = TextureType::RG8;
+                break;
+            case 3:
+                type = TextureType::SRGB8;
+                break;
+            case 4:
+                type = TextureType::SRGBA8;
+                break;
+            }
+        }
+        else
+        {
+            switch (image->getChannels())
+            {
+            case 1:
+                type = TextureType::R8;
+                break;
+            case 2:
+                type = TextureType::RG8;
+                break;
+            case 3:
+                type = TextureType::RGB8;
+                break;
+            case 4:
+                type = TextureType::RGBA8;
+                break;
+            }
         }
         texture = Texture::Create(image, type);
         texture->setPath(path);
@@ -142,6 +163,7 @@ namespace Tengine
         m_resources[path.string()] = texture;
         return texture;
     }
+
 
 
     std::shared_ptr<Material> AssetManager::LoadMaterial(std::filesystem::path path)
@@ -165,7 +187,14 @@ namespace Tengine
                         std::string pathToTexture = data["path"].get<std::string>();
                         if (!pathToTexture.empty())
                         {
-                            subMaterial->setTexture(LoadTexture(pathToTexture));
+                            if (type == SubMaterialType::Diffuse)
+                            {
+                                subMaterial->setTexture(LoadTexture(pathToTexture, true));
+                            }
+                            else
+                            {
+                                subMaterial->setTexture(LoadTexture(pathToTexture, false));
+                            }
                         }
                     }
                     Vec3 color = { data["color"][0], data["color"][1], data["color"][2] };
@@ -397,7 +426,7 @@ namespace Tengine
         std::array<std::shared_ptr<Texture>, 6> textures;
         for (size_t i = 0; i < paths.size(); i++)
         {
-            textures[i] = LoadTexture(paths[i]);
+            textures[i] = LoadTexture(paths[i], true);
         }
         std::shared_ptr<CubeMapTexture> cubeMapTexture = CubeMapTexture::Create(textures);
         cubeMapTexture->setPath(path);
@@ -427,27 +456,27 @@ namespace Tengine
         {
             if (item.key() == "right")
             {
-                textures[static_cast<int>(CubeMapSide::Right)] = LoadTexture(item.value());
+                textures[static_cast<int>(CubeMapSide::Right)] = LoadTexture(item.value(), true);
             }
             else if (item.key() == "left")
             {
-                textures[static_cast<int>(CubeMapSide::Left)] = LoadTexture(item.value());
+                textures[static_cast<int>(CubeMapSide::Left)] = LoadTexture(item.value(), true);
             }
             else if (item.key() == "top")
             {
-                textures[static_cast<int>(CubeMapSide::Top)] = LoadTexture(item.value());
+                textures[static_cast<int>(CubeMapSide::Top)] = LoadTexture(item.value(), true);
             }
             else if (item.key() == "bottom")
             {
-                textures[static_cast<int>(CubeMapSide::Bottom)] = LoadTexture(item.value());
+                textures[static_cast<int>(CubeMapSide::Bottom)] = LoadTexture(item.value(), true);
             }
             else if (item.key() == "front")
             {
-                textures[static_cast<int>(CubeMapSide::Front)] = LoadTexture(item.value());
+                textures[static_cast<int>(CubeMapSide::Front)] = LoadTexture(item.value(), true);
             }
             else if (item.key() == "back")
             {
-                textures[static_cast<int>(CubeMapSide::Back)] = LoadTexture(item.value());
+                textures[static_cast<int>(CubeMapSide::Back)] = LoadTexture(item.value(), true);
             }
         }
         file.close();

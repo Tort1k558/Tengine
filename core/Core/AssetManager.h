@@ -42,7 +42,7 @@ namespace Tengine
 		static std::shared_ptr<Shader> LoadShader(std::string_view name, std::filesystem::path pathToVertexShader, std::filesystem::path pathToFragmentShader);
 		static std::shared_ptr<Shader> AddShader(std::string_view name, std::string_view vertexSource, std::string_view fragmentSource);
 
-		static std::shared_ptr<Texture> LoadTexture(std::filesystem::path path);
+		static std::shared_ptr<Texture> LoadTexture(std::filesystem::path path, bool srgb = false);
 		static std::shared_ptr<Material> LoadMaterial(std::filesystem::path path);
 		static std::shared_ptr<Mesh> LoadMesh(std::filesystem::path path);
 		

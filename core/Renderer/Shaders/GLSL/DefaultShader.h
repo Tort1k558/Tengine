@@ -156,6 +156,7 @@ void main()
 	{
   		result += CalcSpotLight(spotLights[i], normalize(fs_in.normal), viewDir);
 	}
+    
     fragColor = vec4(result,1.0);
 }
 

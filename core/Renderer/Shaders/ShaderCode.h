@@ -23,6 +23,7 @@ namespace Tengine
 		static ShaderSource GetDefaultShader();
 		static ShaderSource GetLightingShader();
 		static ShaderSource GetFramebufferShader();
+		static ShaderSource GetPostProcessingShader();
 		static ShaderSource GetSkyboxShader();
 	};
 }

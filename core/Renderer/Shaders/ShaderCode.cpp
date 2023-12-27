@@ -63,6 +63,26 @@ namespace Tengine
         return source;
     }
 
+    ShaderSource ShaderCode::GetPostProcessingShader()
+    {
+        ShaderSource source;
+        switch (RendererSystem::GetInstance()->getRendererType())
+        {
+        case RendererType::OpenGL:
+            source.addSourceShader(ShaderType::Vertex, GLSL::framebufferShaderVertex);
+            source.addSourceShader(ShaderType::Fragment, GLSL::PostProcessingShaderFragment);
+            break;
+        case RendererType::OpenGLES:
+            //source.addSourceShader(ShaderType::Vertex, ESSL::framebufferShaderVertex);
+            //source.addSourceShader(ShaderType::Fragment, ESSL::PostProcessingShaderFragment);
+            break;
+        default:
+            Logger::Critical("ERROR::ShaderCode::CurrentShader doesn't support in this RenderContext!");
+            break;
+        }
+        return source;
+    }
+
     ShaderSource ShaderCode::GetSkyboxShader()
     {
         ShaderSource source;

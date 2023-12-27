@@ -20,7 +20,9 @@ namespace Tengine
 		RGB8,
 		RGBA8,
 		DEPTH32F,
-		DEPTH24STENCIL8
+		DEPTH24STENCIL8,
+		SRGB8,
+		SRGBA8
 	};
 	unsigned int TextureTypeToSize(TextureType type);
 

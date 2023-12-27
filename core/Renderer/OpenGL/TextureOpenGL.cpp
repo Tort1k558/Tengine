@@ -14,7 +14,9 @@ namespace Tengine
 		case TextureType::RG8:
 			return GL_RG;
 		case TextureType::RGB8:
+		case TextureType::SRGB8:
 			return GL_RGB;
+		case TextureType::SRGBA8:
 		case TextureType::RGBA8:
 			return GL_RGBA;
 		case TextureType::DEPTH32F:
@@ -43,6 +45,10 @@ namespace Tengine
 			return GL_DEPTH_COMPONENT32F;
 		case TextureType::DEPTH24STENCIL8:
 			return GL_DEPTH24_STENCIL8;
+		case TextureType::SRGB8:
+			return GL_SRGB;
+		case TextureType::SRGBA8:
+			return GL_SRGB_ALPHA;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return 0;
@@ -65,6 +71,10 @@ namespace Tengine
 			return TextureType::DEPTH32F;
 		case GL_UNSIGNED_INT_24_8:
 			return TextureType::DEPTH24STENCIL8;
+		case GL_SRGB8:
+			return TextureType::SRGB8;
+		case GL_SRGB8_ALPHA8:
+			return TextureType::SRGBA8;
 		default:
 			Logger::Info("ERROR::OpenGL::Unknown texture type!");
 			return TextureType::RGB8;
@@ -76,12 +86,11 @@ namespace Tengine
 		switch (type)
 		{
 		case TextureType::R8:
-			return GL_UNSIGNED_BYTE;
 		case TextureType::RG8:
-			return GL_UNSIGNED_BYTE;
 		case TextureType::RGB8:
-			return GL_UNSIGNED_BYTE;
+		case TextureType::SRGB8:
 		case TextureType::RGBA8:
+		case TextureType::SRGBA8:
 			return GL_UNSIGNED_BYTE;
 		case TextureType::DEPTH32F:
 			return GL_FLOAT;

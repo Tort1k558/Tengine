@@ -69,6 +69,14 @@ namespace Tengine
 		return m_antiAliasingType;
 	}
 
+	void Camera::setGamma(float gamma)
+	{
+		m_gamma = gamma;
+	}
+	float Camera::getGamma() const
+	{
+		return m_gamma;
+	}
 	ComponentInfo Camera::getInfo()
 	{
 		ComponentInfo componentInfo;
@@ -196,6 +204,17 @@ namespace Tengine
 				this->setResolution(m_resolution);
 			};
 		componentInfo.addElement(resolution);
+		
+		std::shared_ptr<FieldFloat> gamma = std::make_shared<FieldFloat>();
+		gamma->name = "Gamma";
+		gamma->minValue = 0.01f;
+		gamma->data = &m_gamma;
+		gamma->callback = [this]()
+			{
+				this->setGamma(m_gamma);
+			};
+		componentInfo.addElement(gamma);
+
 		return componentInfo;
 	}
 
